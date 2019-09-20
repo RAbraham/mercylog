@@ -1,0 +1,490 @@
+	<yagoTheme_yagoSchema>	<hasGloss>	"This file is part of the ontology YAGO3. It is licensed under a Creative-Commons Attribution License by the YAGO team at the Max Planck Institute for Informatics/Germany. See http://yago-knowledge.org for all details. This file was generated on 2017-05-30 T 11:59:03.0339. The domains, ranges and confidence values of YAGO relations TAXONOMY"	
+<id_E6n!IJn!Jr_O1n_0EsGYjWbi9>	<graduatedFrom>	rdfs:range	<wordnet_university_108286569>	
+<id_?RGufJFBdR_O1n_uRZHKm6aLD>	<hasGivenName>	rdfs:range	xsd:string	
+<id_EGcgvQQgMO_O1n_KukFM4VlQ7>	<_yagoMetadata>	rdfs:range	xsd:String	
+<id_AypJzCSjLb_O1n_KdEX!y?wiG>	<hasCurrency>	rdfs:range	owl:Thing	
+<id_?!VtKe8N6Z_O1n_uRZHKm6aLD>	<hasGeonamesClassId>	rdfs:range	xsd:string	
+<id_e!1Dxw5lnJ_O1n_hrUs8UA4yf>	<dealsWith>	rdfs:range	<wordnet_country_108544813>	
+<id_iqvUKl!ECA_O1n_uRZHKm6aLD>	<hasMotto>	rdfs:range	xsd:string	
+<id_w!UqetLWZe_O1n_FNZ17GW0Jo>	<hasNeighbor>	rdfs:range	<yagoGeoEntity>	
+<id_yqifFULyde_O1n_CkqeGfgJ0O>	<hasGDP>	rdfs:range	<yagoMonetaryValue>	
+<id_OGeTdRMinU_O1n_uRZHKm6aLD>	<hasAnchorText>	rdfs:range	xsd:string	
+<id_PqLKJQ?cf5_O1n_uRZHKm6aLD>	<hasLanguageCode>	rdfs:range	xsd:string	
+<id_ggTWjwhVWk_O1n_uRZHKm6aLD>	<hasCitationTitle>	rdfs:range	xsd:string	
+<id_4MnfVPQls1_O1n_uRZHKm6aLD>	<hasSynsetId>	rdfs:range	xsd:string	
+<id_Vl!Ut3itCq_O1n_uRZHKm6aLD>	<hasWikipediaCategory>	rdfs:range	xsd:string	
+<id_0i102o!K39_O1n_FNZ17GW0Jo>	<isLocatedIn>	rdfs:range	<yagoGeoEntity>	
+<id_Mx8D4zZp4o_O1n_KdEX!y?wiG>	<created>	rdfs:range	owl:Thing	
+<id_sVq5ALqqX_O1n_FNZ17GW0Jo>	<occursIn>	rdfs:range	<yagoGeoEntity>	
+<id_7fpsli4Ypx_O1n_FNZ17GW0Jo>	<wasBornIn>	rdfs:range	<yagoGeoEntity>	
+<id_lcNKEPl66X_O1n_uRZHKm6aLD>	rdfs:comment	rdfs:range	xsd:string	
+<id_0PHxtw9ml?_O1n_2rIbdV?l0b>	<hasHeight>	rdfs:range	<m>	
+<id_qBem!d7o6f_O1n_uRZHKm6aLD>	<wikipediaSubCategoryOf>	rdfs:range	xsd:string	
+<id_OzwcP1w53H_O1n_4iWXrOlWGW>	<wasBornOnDate>	rdfs:range	xsd:date	
+<id_Opt4M?1mMM_O1n_4iWXrOlWGW>	<diedOnDate>	rdfs:range	xsd:date	
+<id_PYQoHZLM?Z_O1n_K7iKjCmMQm>	<hasArea>	rdfs:range	<km2>	
+<id_5BDMT1eY4z_O1n_KdEX!y?wiG>	<isKnownFor>	rdfs:range	owl:Thing	
+<id_TjN2w1PwfN_O1n_uRZHKm6aLD>	<hasContextSucceedingAnchor>	rdfs:range	xsd:string	
+<id_1ZI2Tp3Ggg_O1n_uRZHKm6aLD>	<hasImdb>	rdfs:range	xsd:string	
+<id_QeK9lf2DJ!_O1n_9o9YmDSiad>	<hasAcademicAdvisor>	rdfs:range	<wordnet_person_100007846>	
+<id_SimO3GzUHr_O1n_CkqeGfgJ0O>	<hasExpenses>	rdfs:range	<yagoMonetaryValue>	
+<id_kGbSYjGZCB_O1n_4iWXrOlWGW>	<endedOnDate>	rdfs:range	xsd:date	
+<id_IyutbzutP0_O1n_dPPQJbzwwX>	<hasISBN>	rdfs:range	<yagoISBN>	
+<id_hGlCLxcRnz_O1n_CkqeGfgJ0O>	<hasImport>	rdfs:range	<yagoMonetaryValue>	
+<id_WM2F8WqCj4_O1n_66Yy!EOgKV>	<livesIn>	rdfs:range	<wordnet_location_100027167>	
+<id_xlyZb2sVVL_O1n_uRZHKm6aLD>	<extractionTechnique>	rdfs:range	xsd:string	
+<id_UI1MYRk7TR_O1n_0DSECBmSxt>	<isAffiliatedTo>	rdfs:range	<yagoLegalActor>	
+<id_4fhaLp5YGD_O1n_wvk5fm5CWM>	<directed>	rdfs:range	<wordnet_movie_106613686>	
+<id_gJx!CJeGve_O1n_KdEX!y?wiG>	<hasInternalWikipediaLinkTo>	rdfs:range	owl:Thing	
+<id_daAQfhdGjF_O1n_kfGv?nijQQ>	rdfs:domain	rdfs:range	rdfs:Class	
+<id_J85HJMrZsH_O1n_nItjZDHgkC>	<hasGender>	rdfs:range	<wordnet_sex_105006898>	
+<id_0XL?HozpNb_O1n_bnYH1fkdiM>	<hasTLD>	rdfs:range	<yagoTLD>	
+<id_W2WBXlHDuy_O1n_wF4X1hokX9>	<hasWebsite>	rdfs:range	<yagoURL>	
+<id_TEF?zd?BsZ_O1n_4iWXrOlWGW>	<endsExistingOnDate>	rdfs:range	xsd:date	
+<id_yp1KrekKZ!_O1n_uRZHKm6aLD>	<redirectedFrom>	rdfs:range	xsd:string	
+<id_Z2!3sO2eXU_O1n_uRZHKm6aLD>	<hasWikipediaAbstract>	rdfs:range	xsd:string	
+<id_1EW?gKXFo4_O1n_KdEX!y?wiG>	<hasExternalWikipediaLinkTo>	rdfs:range	owl:Thing	
+<id_WoWrpohqIr_O1n_4iWXrOlWGW>	<occursSince>	rdfs:range	xsd:date	
+<id_1FciTGy?5D_O1n_FNZ17GW0Jo>	<placedIn>	rdfs:range	<yagoGeoEntity>	
+<id_1qjfJaMA7t_O1n_MmFNd8VvaH>	<hasInflation>	rdfs:range	<percent>	
+<id_YZT9uXWln4_O1n_2rLHdV?mvl>	<hasDuration>	rdfs:range	<s>	
+<id_a8HiWoT1py_O1n_b3meX?!7tZ>	<hasConfidence>	rdfs:range	<yagoFraction>	
+<id_OOpyGMN?Fv_O1n_4iWXrOlWGW>	<occursUntil>	rdfs:range	xsd:date	
+<id_arpVbrkVqB_O1n_JHikFb45Tb>	<worksAt>	rdfs:range	<wordnet_organization_108008335>	
+<id_owSKi3Ex1G_O1n_kfGv?nijQQ>	rdfs:subClassOf	rdfs:range	rdfs:Class	
+<id_Xu72M?OnX1_O1n_JHikFb45Tb>	<playsFor>	rdfs:range	<wordnet_organization_108008335>	
+<id_dCLkZWK2a6_O1n_KdEX!y?wiG>	<permanentRelationToSubject>	rdfs:range	owl:Thing	
+<id_e0Cd?TNhpO_O1n_kfGv?nijQQ>	<imports>	rdfs:range	rdfs:Class	
+<id_wgXThXm8F9_O1n_wvk5fm5CWM>	<wroteMusicFor>	rdfs:range	<wordnet_movie_106613686>	
+<id_tRIrEJL!nT_O1n_uRZHKm6aLD>	<hasGeonamesEntityId>	rdfs:range	xsd:string	
+<id_5sFe?YK5ps_O1n_KdEX!y?wiG>	<relationLocatedByObject>	rdfs:range	owl:Thing	
+<id_68GRE?61!B_O1n_U0!ii0NhMK>	<hasCapital>	rdfs:range	<wordnet_city_108524735>	
+<id_ReVPhneX!c_O1n_uRZHKm6aLD>	<_hasTypeCheckPattern>	rdfs:range	xsd:string	
+<id_wwJjW?APp1_O1n_hrUs8UA4yf>	<isCitizenOf>	rdfs:range	<wordnet_country_108544813>	
+<id_8wM4cFj1A6_O1n_24wl2b7Lsq>	<_timeToLocation>	rdfs:range	rdf:Property	
+<id_OrzW2jXrQQ_O1n_fJsptGwotF>	<hasLongitude>	rdfs:range	<degrees>	
+<id_uvgMySNEPp_O1n_uRZHKm6aLD>	<hasGloss>	rdfs:range	xsd:string	
+<id_maQEGQx6xS_O1n_2rIbdV?l0b>	<hasLength>	rdfs:range	<m>	
+<id_8VXFpprjB6_O1n_4iWXrOlWGW>	<wasDestroyedOnDate>	rdfs:range	xsd:date	
+<id_Tm9RdHdkiF_O1n_wF4X1hokX9>	<extractionSource>	rdfs:range	<yagoURL>	
+<id_H!utbzn7e3_O1n_dthQJbu?l2>	<hasISIN>	rdfs:range	<yagoISIN>	
+<id_NBwSS2BkQ1_O1n_CkqeGfgJ0O>	<hasRevenue>	rdfs:range	<yagoMonetaryValue>	
+<id_y1wULXz09e_O1n_KdEX!y?wiG>	<objectEndRelation>	rdfs:range	owl:Thing	
+<id_LTq8sZOJ8P_O1n_MmFNd8VvaH>	<hasUnemployment>	rdfs:range	<percent>	
+<id_kTn7Q83eLE_O1n_uRZHKm6aLD>	<hasContext>	rdfs:range	xsd:string	
+<id_HxGIJOjb5A_O1n_fJsptGwotF>	<hasLatitude>	rdfs:range	<degrees>	
+<id_HnW94kbIJv_O1n_KdEX!y?wiG>	<objectStartRelation>	rdfs:range	owl:Thing	
+<id_hfkSLmY826_O1n_bc?WigSfiM>	<byTransport>	rdfs:range	<wordnet_airline_102690081>	
+<id_ncNt6rsDFq_O1n_KdEX!y?wiG>	<permanentRelationToObject>	rdfs:range	owl:Thing	
+<id_8Oj026y6M?_O1n_uRZHKm6aLD>	<hasAirportCode>	rdfs:range	xsd:string	
+<id_AI6UEaG6oh_O1n_2SNVASZbru>	<hasNumberOfPeople>	rdfs:range	xsd:nonNegativeInteger	
+<id_eoVpKIErxi_O1n_wvk5fm5CWM>	<edited>	rdfs:range	<wordnet_movie_106613686>	
+<id_higQznGBui_O1n_MmFNd8VvaH>	<hasPoverty>	rdfs:range	<percent>	
+<id_rLBnXDjZCl_O1n_kfGv?nijQQ>	<exports>	rdfs:range	rdfs:Class	
+<id_UVh5Qu6nDY_O1n_uRZHKm6aLD>	skos:prefLabel	rdfs:range	xsd:string	
+<id_tbHy6E6TRz_O1n_KdEX!y?wiG>	<isInterestedIn>	rdfs:range	owl:Thing	
+<id_QypqR1gcU3_O1n_KdEX!y?wiG>	<subjectStartRelation>	rdfs:range	owl:Thing	
+<id_?MuANePHSd_O1n_2?DQrGlfS?>	<hasOfficialLanguage>	rdfs:range	<wordnet_language_106282651>	
+<id_zBA?HmD9hi_O1n_WH4KPrWJn?>	<_hasLinkLikelihood>	rdfs:range	xsd:double	
+<id_e9qWevkEsX_O1n_FNZ17GW0Jo>	<happenedIn>	rdfs:range	<yagoGeoEntity>	
+<id_H?SLgj!2H5_O1n_8Giy5xWJit>	<isLeaderOf>	rdfs:range	<yagoLegalActorGeo>	
+<id_cvhiZM3vq0_O1n_MmFNd8VvaH>	<hasEconomicGrowth>	rdfs:range	<percent>	
+<id_dkbE?83Aw1_O1n_2SNVASZbru>	<hasWikipediaId>	rdfs:range	xsd:nonNegativeInteger	
+<id_YfuGHeXBto_O1n_iun9jh7vJ5>	<hasWonPrize>	rdfs:range	<wordnet_award_106696483>	
+<id_glgr0IcDm4_O1n_UdQgZfQPBH>	<isPoliticianOf>	rdfs:range	<wordnet_administrative_district_108491826>	
+<id_5iBa2NFEh1_O1n_2SNVASZbru>	<hasPages>	rdfs:range	xsd:nonNegativeInteger	
+<id_E6lADGe8ro_O1n_uRZHKm6aLD>	<isPreferredMeaningOf>	rdfs:range	xsd:string	
+<id_ja6oWlnYFD_O1n_9o9YmDSiad>	<influences>	rdfs:range	<wordnet_person_100007846>	
+<id_Ekj1YahGh!_O1n_24wl2b7Lsq>	rdfs:subPropertyOf	rdfs:range	rdf:Property	
+<id_GrOOqe1Q7G_O1n_KdEX!y?wiG>	<subjectEndRelation>	rdfs:range	owl:Thing	
+<id_5BimgCyoz?_O1n_nd4cOf7rZV>	<hasGini>	rdfs:range	<yago0to100>	
+<id_5yHJa0valg_O1n_KdEX!y?wiG>	<owns>	rdfs:range	owl:Thing	
+<id_q893L4ulf1_O1n_9o9YmDSiad>	<hasChild>	rdfs:range	<wordnet_person_100007846>	
+<id_itrojroAcp_O1n_9o9YmDSiad>	<holdsPoliticalPosition>	rdfs:range	<wordnet_person_100007846>	
+<id_QFw2e9rkWs_O1n_4iWXrOlWGW>	<startsExistingOnDate>	rdfs:range	xsd:date	
+<id_3rzK8DnVBM_O1n_uRZHKm6aLD>	<hasThreeLetterLanguageCode>	rdfs:range	xsd:string	
+<id_3SsL8yU26t_O1n_9o9YmDSiad>	<hasSuccessor>	rdfs:range	<wordnet_person_100007846>	
+<id_lcYPJviAae_O1n_4iWXrOlWGW>	<startedOnDate>	rdfs:range	xsd:date	
+<id_siBa8PWPxV_O1n_uRZHKm6aLD>	<hasContextPrecedingAnchor>	rdfs:range	xsd:string	
+<id_V2A1?7kWe!_O1n_uRZHKm6aLD>	<hasWikipediaAnchorText>	rdfs:range	xsd:string	
+<id_MA?Ee9GTCb_O1n_Ir!a4sSxme>	<hasWikipediaArticleLength>	rdfs:range	xsd:decimal	
+<id_hM9FlOGtXs_O1n_CkqeGfgJ0O>	<hasExport>	rdfs:range	<yagoMonetaryValue>	
+<id_GA3ioQm17m_O1n_FNZ17GW0Jo>	<diedIn>	rdfs:range	<yagoGeoEntity>	
+<id_O1npu5fR5R_O1n_kfGv?nijQQ>	rdfs:range	rdfs:range	rdfs:Class	
+<id_ukZE69quc7_O1n_uRZHKm6aLD>	<hasFamilyName>	rdfs:range	xsd:string	
+<id_GzeKyhVJR5_O1n_4iWXrOlWGW>	<wasCreatedOnDate>	rdfs:range	xsd:date	
+<id_sm0RJTHBeD_O1n_CkqeGfgJ0O>	<hasBudget>	rdfs:range	<yagoMonetaryValue>	
+<id_ozi1130g3d_O1n_kfGv?nijQQ>	<hasMusicalRole>	rdfs:range	rdfs:Class	
+<id_FCZKG0tb8O_O1n_2rGHdV?knp>	<hasWeight>	rdfs:range	<g>	
+<id_k03WKsbpF4_O1n_tNq4xp?lFI>	<hasPopulationDensity>	rdfs:range	</km2>	
+<id_g7MWW3JSXE_O1n_wF4X1hokX9>	<hasWikipediaUrl>	rdfs:range	<yagoURL>	
+<id_?XGUM6gKV3_O1n_9o9YmDSiad>	<isMarriedTo>	rdfs:range	<wordnet_person_100007846>	
+<id_934Qgffok1_O1n_4iWXrOlWGW>	<happenedOnDate>	rdfs:range	xsd:date	
+<id_5yqLVNj!?G_O1n_wvk5fm5CWM>	<actedIn>	rdfs:range	<wordnet_movie_106613686>	
+<id_1m6JHkiG4I_O1n_FNZ17GW0Jo>	<isConnectedTo>	rdfs:range	<yagoGeoEntity>	
+<id_SBdQz0h35W_O1n_uRZHKm6aLD>	rdfs:label	rdfs:range	xsd:string	
+<id_aVIIIYw6IE_O1n_KdEX!y?wiG>	<participatedIn>	rdfs:range	owl:Thing	
+<id_U6AjLVHsOC_O1n_9o9YmDSiad>	<hasPredecessor>	rdfs:range	<wordnet_person_100007846>	
+<id_KCMouEZyrl_O1n_kfGv?nijQQ>	rdf:type	rdfs:range	rdfs:Class	
+<id_nXySGrzjhQ_O1n_KdEX!y?wiG>	<linksTo>	rdfs:range	owl:Thing	
+<id_tbHy6E6TRz_a8H_I!Ps9IedQZ>	<isInterestedIn>	<hasConfidence>	"0.9315"^^xsd:decimal	0.9315
+<id_?XGUM6gKV3_a8H_zztY9XC3MA>	<isMarriedTo>	<hasConfidence>	"0.9729"^^xsd:decimal	0.9729
+<id_GzeKyhVJR5_a8H_zbGY9Xx0av>	<wasCreatedOnDate>	<hasConfidence>	"0.9793"^^xsd:decimal	0.9793
+<id_KCMouEZyrl_a8H_OVhjR!274H>	rdf:type	<hasConfidence>	"0.9665"^^xsd:decimal	0.9665
+<id_0PHxtw9ml?_a8H_W!ds9ILoHI>	<hasHeight>	<hasConfidence>	"0.9202"^^xsd:decimal	0.9202
+<id_iqvUKl!ECA_a8H_P9i3R!5jpT>	<hasMotto>	<hasConfidence>	"0.9610"^^xsd:decimal	0.9610
+<id_LTq8sZOJ8P_a8H_Av8Y9P6YFn>	<hasUnemployment>	<hasConfidence>	"0.9599"^^xsd:decimal	0.9599
+<id_q893L4ulf1_a8H_eGFs9VDdEF>	<hasChild>	<hasConfidence>	"0.9470"^^xsd:decimal	0.9470
+<id_wwJjW?APp1_a8H_wV6jRNxbhq>	<isCitizenOf>	<hasConfidence>	"0.9815"^^xsd:decimal	0.9815
+<id_FCZKG0tb8O_a8H_AxuI9P7e43>	<hasWeight>	<hasConfidence>	"0.9582"^^xsd:decimal	0.9582
+<id_ukZE69quc7_a8H_WQ3c9IJf2Y>	<hasFamilyName>	<hasConfidence>	"0.9259"^^xsd:decimal	0.9259
+<id_arpVbrkVqB_a8H_zvzc9XB7rY>	<worksAt>	<hasConfidence>	"0.9736"^^xsd:decimal	0.9736
+<id_kGbSYjGZCB_a8H_ORo3R!1boR>	<endedOnDate>	<hasConfidence>	"0.9678"^^xsd:decimal	0.9678
+<id_hM9FlOGtXs_a8H_P3r3R!4gvR>	<hasExport>	<hasConfidence>	"0.9634"^^xsd:decimal	0.9634
+<id_7fpsli4Ypx_a8H_PBp3R!bu33>	<wasBornIn>	<hasConfidence>	"0.9694"^^xsd:decimal	0.9694
+<id_SimO3GzUHr_a8H_AxuI9P7e43>	<hasExpenses>	<hasConfidence>	"0.9582"^^xsd:decimal	0.9582
+<id_hGlCLxcRnz_a8H_P3rPR!4gQe>	<hasImport>	<hasConfidence>	"0.9639"^^xsd:decimal	0.9639
+<id_sm0RJTHBeD_a8H_AjuI9P4aeD>	<hasBudget>	<hasConfidence>	"0.9542"^^xsd:decimal	0.9542
+<id_?MuANePHSd_a8H_Av7s9P6Y0B>	<hasOfficialLanguage>	<hasConfidence>	"0.9593"^^xsd:decimal	0.9593
+<id_owSKi3Ex1G_a8H_A9eI9P1!9y>	rdfs:subClassOf	<hasConfidence>	"0.9532"^^xsd:decimal	0.9532
+<id_934Qgffok1_a8H_zvyI9XB7em>	<happenedOnDate>	<hasConfidence>	"0.9734"^^xsd:decimal	0.9734
+<id_yqifFULyde_a8H_Xslc9IRHQE>	<hasGDP>	<hasConfidence>	"0.9291"^^xsd:decimal	0.9291
+<id_1qjfJaMA7t_a8H_OVi3R!27p4>	<hasInflation>	<hasConfidence>	"0.9660"^^xsd:decimal	0.9660
+<id_e0Cd?TNhpO_a8H_A9hc9P1?dw>	<imports>	<hasConfidence>	"0.9538"^^xsd:decimal	0.9538
+<id_0i102o!K39_a8H_Av7s9P6Y0B>	<isLocatedIn>	<hasConfidence>	"0.9593"^^xsd:decimal	0.9593
+<id_HxGIJOjb5A_a8H_zJHs9XEeNH>	<hasLatitude>	<hasConfidence>	"0.9771"^^xsd:decimal	0.9771
+<id_WoWrpohqIr_a8H_zNzI9XFa2l>	<occursSince>	<hasConfidence>	"0.9760"^^xsd:decimal	0.9760
+<id_1ZI2Tp3Ggg_a8H_eAqI9VC0EW>	<hasImdb>	<hasConfidence>	"0.9495"^^xsd:decimal	0.9495
+<id_higQznGBui_a8H_Pdb3R!6e!W>	<hasPoverty>	<hasConfidence>	"0.9604"^^xsd:decimal	0.9604
+<id_E6lADGe8ro_a8H_zTPI9XGnA3>	<isPreferredMeaningOf>	<hasConfidence>	"0.9740"^^xsd:decimal	0.9740
+<id_e!1Dxw5lnJ_a8H_A9dY9P1ZR9>	<dealsWith>	<hasConfidence>	"0.9535"^^xsd:decimal	0.9535
+<id_5BDMT1eY4z_a8H_A9hc9P1?dw>	<isKnownFor>	<hasConfidence>	"0.9538"^^xsd:decimal	0.9538
+<id_e2mr4ZaL1y_a8H_zzsY9XC3lo>	<inLanguage>	<hasConfidence>	"0.9725"^^xsd:decimal	0.9725
+<id_?RGufJFBdR_a8H_Ajuc9P4a11>	<hasGivenName>	<hasConfidence>	"0.9544"^^xsd:decimal	0.9544
+<id_0XL?HozpNb_a8H_zzsY9XC3lo>	<hasTLD>	<hasConfidence>	"0.9725"^^xsd:decimal	0.9725
+<id_4fhaLp5YGD_a8H_zRts9XG5XN>	<directed>	<hasConfidence>	"0.9759"^^xsd:decimal	0.9759
+<id_YZT9uXWln4_a8H_AhwY9P430r>	<hasDuration>	<hasConfidence>	"0.9559"^^xsd:decimal	0.9559
+<id_Mx8D4zZp4o_a8H_Ajtc9P49BR>	<created>	<hasConfidence>	"0.9548"^^xsd:decimal	0.9548
+<id_NBwSS2BkQ1_a8H_Xsjs9IRH53>	<hasRevenue>	<hasConfidence>	"0.9296"^^xsd:decimal	0.9296
+<id_68GRE?61!B_a8H_AxuI9P7e43>	<hasCapital>	<hasConfidence>	"0.9582"^^xsd:decimal	0.9582
+<id_QeK9lf2DJ!_a8H_zFNI9XDiUf>	<hasAcademicAdvisor>	<hasConfidence>	"0.9708"^^xsd:decimal	0.9708
+<id_Xu72M?OnX1_a8H_zNyY9XF9JY>	<playsFor>	<hasConfidence>	"0.9765"^^xsd:decimal	0.9765
+<id_IyutbzutP0_a8H_eUhc9VG7aO>	<hasISBN>	<hasConfidence>	"0.9433"^^xsd:decimal	0.9433
+<id_aNHLqe9mnV_a8H_Av8Y9P6YFn>	<hasPopulation>	<hasConfidence>	"0.9599"^^xsd:decimal	0.9599
+<id_UVh5Qu6nDY_a8H_zbHs9Xx0o5>	skos:prefLabel	<hasConfidence>	"0.9791"^^xsd:decimal	0.9791
+<id_k03WKsbpF4_a8H_zvzY9XB7Ml>	<hasPopulationDensity>	<hasConfidence>	"0.9733"^^xsd:decimal	0.9733
+<id_e9qWevkEsX_a8H_Av7s9P6Y0B>	<happenedIn>	<hasConfidence>	"0.9593"^^xsd:decimal	0.9593
+<id_W2WBXlHDuy_a8H_zTPI9XGnA3>	<hasWebsite>	<hasConfidence>	"0.9740"^^xsd:decimal	0.9740
+<id_EC8glAoU!8_a8H_P7izR!5bs6>	<hasHDI>	<hasConfidence>	"0.9622"^^xsd:decimal	0.9622
+<id_lcYPJviAae_a8H_zJIs9XEfcT>	<startedOnDate>	<hasConfidence>	"0.9775"^^xsd:decimal	0.9775
+<id_YfuGHeXBto_a8H_zvzY9XB7Ml>	<hasWonPrize>	<hasConfidence>	"0.9733"^^xsd:decimal	0.9733
+<id_pXEtk5nYPI_a8H_O?1PR!37d?>	<hasICD10>	<hasConfidence>	"0.9643"^^xsd:decimal	0.9643
+<id_WM2F8WqCj4_a8H_zbGY9Xx0av>	<livesIn>	<hasConfidence>	"0.9793"^^xsd:decimal	0.9793
+<id_GA3ioQm17m_a8H_wV4PRNxaEE>	<diedIn>	<hasConfidence>	"0.9813"^^xsd:decimal	0.9813
+<id_SBdQz0h35W_a8H_eQns9VFbhm>	rdfs:label	<hasConfidence>	"0.9428"^^xsd:decimal	0.9428
+<id_aVIIIYw6IE_a8H_OZbzR!33bJ>	<participatedIn>	<hasConfidence>	"0.9656"^^xsd:decimal	0.9656
+<id_OOpyGMN?Fv_a8H_PFjjR!cqa5>	<occursUntil>	<hasConfidence>	"0.9685"^^xsd:decimal	0.9685
+<id_t!D?6VBs1y_a8H_Sha0S7lqpC>	<hasCallingCode>	<hasConfidence>	"0.7163"^^xsd:decimal	0.7163
+<id_PYQoHZLM?Z_a8H_P7izR!5bs6>	<hasArea>	<hasConfidence>	"0.9622"^^xsd:decimal	0.9622
+<id_OzwcP1w53H_a8H_PBrPR!bvdQ>	<wasBornOnDate>	<hasConfidence>	"0.9699"^^xsd:decimal	0.9699
+<id_Opt4M?1mMM_a8H_zbHs9Xx0o5>	<diedOnDate>	<hasConfidence>	"0.9791"^^xsd:decimal	0.9791
+<id_AI6UEaG6oh_a8H_Axxc9P7f81>	<hasNumberOfPeople>	<hasConfidence>	"0.9588"^^xsd:decimal	0.9588
+<id_rLBnXDjZCl_a8H_IUWY9Idai9>	<exports>	<hasConfidence>	"0.9333"^^xsd:decimal	0.9333
+<id_E6n!IJn!Jr_a8H_zTPI9XGnA3>	<graduatedFrom>	<hasConfidence>	"0.9740"^^xsd:decimal	0.9740
+<id_5BimgCyoz?_a8H_OZazR!32Mx>	<hasGini>	<hasConfidence>	"0.9652"^^xsd:decimal	0.9652
+<id_ja6oWlnYFD_a8H_P7jjR!5bMv>	<influences>	<hasConfidence>	"0.9625"^^xsd:decimal	0.9625
+<id_5yqLVNj!?G_a8H_zJHs9XEeNH>	<actedIn>	<hasConfidence>	"0.9771"^^xsd:decimal	0.9771
+<id_cvhiZM3vq0_a8H_e!zs9VHlFH>	<hasEconomicGrowth>	<hasConfidence>	"0.9418"^^xsd:decimal	0.9418
+<id_glgr0IcDm4_a8H_zvzY9XB7Ml>	<isPoliticianOf>	<hasConfidence>	"0.9733"^^xsd:decimal	0.9733
+<id_5iBa2NFEh1_a8H_Ardc9P5?Vz>	<hasPages>	<hasConfidence>	"0.9568"^^xsd:decimal	0.9568
+<id_AypJzCSjLb_a8H_PBp3R!bu33>	<hasCurrency>	<hasConfidence>	"0.9694"^^xsd:decimal	0.9694
+<id_3SsL8yU26t_a8H_zJII9XEfjG>	<hasSuccessor>	<hasConfidence>	"0.9774"^^xsd:decimal	0.9774
+<id_OrzW2jXrQQ_a8H_O?1PR!37d?>	<hasLongitude>	<hasConfidence>	"0.9643"^^xsd:decimal	0.9643
+<id_H?SLgj!2H5_a8H_zzsY9XC3lo>	<isLeaderOf>	<hasConfidence>	"0.9725"^^xsd:decimal	0.9725
+<id_gGSIUxoQzz_a8H_O?1PR!37d?>	<produced>	<hasConfidence>	"0.9643"^^xsd:decimal	0.9643
+<id_1zcRkx5oVs_a8H_Ad6Y9P2Vqc>	<hasUTCOffset>	<hasConfidence>	"0.9527"^^xsd:decimal	0.9527
+<id_itrojroAcp_a8H_eChc9VC4N?>	<holdsPoliticalPosition>	<hasConfidence>	"0.9461"^^xsd:decimal	0.9461
+<id_oOnMM?u8mw_a8H_OVizR!27CG>	<isCalled>	<hasConfidence>	"0.9662"^^xsd:decimal	0.9662
+<id_8VXFpprjB6_a8H_AhwY9P430r>	<wasDestroyedOnDate>	<hasConfidence>	"0.9559"^^xsd:decimal	0.9559
+<id_ozi1130g3d_a8H_Xskc9IRHps>	<hasMusicalRole>	<hasConfidence>	"0.9295"^^xsd:decimal	0.9295
+<id_8VXFpprjB6_Ekj_TEF?zd?BsZ>	<wasDestroyedOnDate>	rdfs:subPropertyOf	<endsExistingOnDate>	
+<id_934Qgffok1_Ekj_lcYPJviAae>	<happenedOnDate>	rdfs:subPropertyOf	<startedOnDate>	
+<id_ggTWjwhVWk_Ekj_kTn7Q83eLE>	<hasCitationTitle>	rdfs:subPropertyOf	<hasContext>	
+<id_934Qgffok1_Ekj_kGbSYjGZCB>	<happenedOnDate>	rdfs:subPropertyOf	<endedOnDate>	
+<id_kGbSYjGZCB_Ekj_TEF?zd?BsZ>	<endedOnDate>	rdfs:subPropertyOf	<endsExistingOnDate>	
+<id_8Oj026y6M?_Ekj_SBdQz0h35W>	<hasAirportCode>	rdfs:subPropertyOf	rdfs:label	
+<id_Opt4M?1mMM_Ekj_TEF?zd?BsZ>	<diedOnDate>	rdfs:subPropertyOf	<endsExistingOnDate>	
+<id_934Qgffok1_Ekj_TEF?zd?BsZ>	<happenedOnDate>	rdfs:subPropertyOf	<endsExistingOnDate>	
+<id_V2A1?7kWe!_Ekj_kTn7Q83eLE>	<hasWikipediaAnchorText>	rdfs:subPropertyOf	<hasContext>	
+<id_OzwcP1w53H_Ekj_QFw2e9rkWs>	<wasBornOnDate>	rdfs:subPropertyOf	<startsExistingOnDate>	
+<id_e9qWevkEsX_Ekj_1FciTGy?5D>	<happenedIn>	rdfs:subPropertyOf	<placedIn>	
+<id_?RGufJFBdR_Ekj_SBdQz0h35W>	<hasGivenName>	rdfs:subPropertyOf	rdfs:label	
+<id_ukZE69quc7_Ekj_SBdQz0h35W>	<hasFamilyName>	rdfs:subPropertyOf	rdfs:label	
+<id_934Qgffok1_Ekj_QFw2e9rkWs>	<happenedOnDate>	rdfs:subPropertyOf	<startsExistingOnDate>	
+<id_GzeKyhVJR5_Ekj_QFw2e9rkWs>	<wasCreatedOnDate>	rdfs:subPropertyOf	<startsExistingOnDate>	
+<id_lcYPJviAae_Ekj_QFw2e9rkWs>	<startedOnDate>	rdfs:subPropertyOf	<startsExistingOnDate>	
+<id_Vl!Ut3itCq_Ekj_kTn7Q83eLE>	<hasWikipediaCategory>	rdfs:subPropertyOf	<hasContext>	
+<id_0i102o!K39_Ekj_1FciTGy?5D>	<isLocatedIn>	rdfs:subPropertyOf	<placedIn>	
+<id_H!utbzn7e3_KCM_a6aEFg1dqJ>	<hasISIN>	rdf:type	owl:FunctionalProperty	
+<id_5BimgCyoz?_KCM_a6aEFg1dqJ>	<hasGini>	rdf:type	owl:FunctionalProperty	
+<id_Tm9RdHdkiF_KCM_m0M7pTe96a>	<extractionSource>	rdf:type	rdfs:Property	
+<id_8Oj026y6M?_KCM_a6aEFg1dqJ>	<hasAirportCode>	rdf:type	owl:FunctionalProperty	
+<id_y1wULXz09e_KCM_24wl2b7Lsq>	<objectEndRelation>	rdf:type	rdf:Property	
+<id_HnW94kbIJv_KCM_24wl2b7Lsq>	<objectStartRelation>	rdf:type	rdf:Property	
+<id_WoWrpohqIr_KCM_a6aEFg1dqJ>	<occursSince>	rdf:type	owl:FunctionalProperty	
+<id_MA?Ee9GTCb_KCM_haJC0WLmiE>	<hasWikipediaArticleLength>	rdf:type	<yagoExtendedRelation>	
+<id_TEF?zd?BsZ_KCM_a6aEFg1dqJ>	<endsExistingOnDate>	rdf:type	owl:FunctionalProperty	
+<id_YZT9uXWln4_KCM_a6aEFg1dqJ>	<hasDuration>	rdf:type	owl:FunctionalProperty	
+<id_w!UqetLWZe_KCM_24wl2b7Lsq>	<hasNeighbor>	rdf:type	rdf:Property	
+<id_GA3ioQm17m_KCM_GrOOqe1Q7G>	<diedIn>	rdf:type	<subjectEndRelation>	
+<id_e0Cd?TNhpO_KCM_24wl2b7Lsq>	<imports>	rdf:type	rdf:Property	
+<id_934Qgffok1_KCM_a6aEFg1dqJ>	<happenedOnDate>	rdf:type	owl:FunctionalProperty	
+<id_siBa8PWPxV_KCM_haJC0WLmiE>	<hasContextPrecedingAnchor>	rdf:type	<yagoExtendedRelation>	
+<id_tbHy6E6TRz_KCM_24wl2b7Lsq>	<isInterestedIn>	rdf:type	rdf:Property	
+<id_Ekj1YahGh!_KCM_24wl2b7Lsq>	rdfs:subPropertyOf	rdf:type	rdf:Property	
+<id_IyutbzutP0_KCM_dCLkZWK2a6>	<hasISBN>	rdf:type	<permanentRelationToSubject>	
+<id_E6lADGe8ro_KCM_dCLkZWK2a6>	<isPreferredMeaningOf>	rdf:type	<permanentRelationToSubject>	
+<id_H?SLgj!2H5_KCM_24wl2b7Lsq>	<isLeaderOf>	rdf:type	rdf:Property	
+<id_maQEGQx6xS_KCM_a6aEFg1dqJ>	<hasLength>	rdf:type	owl:FunctionalProperty	
+<id_KCMouEZyrl_KCM_24wl2b7Lsq>	rdf:type	rdf:type	rdf:Property	
+<id_?XGUM6gKV3_KCM_24wl2b7Lsq>	<isMarriedTo>	rdf:type	rdf:Property	
+<id_V2A1?7kWe!_KCM_haJC0WLmiE>	<hasWikipediaAnchorText>	rdf:type	<yagoExtendedRelation>	
+<id_ggTWjwhVWk_KCM_haJC0WLmiE>	<hasCitationTitle>	rdf:type	<yagoExtendedRelation>	
+<id_IyutbzutP0_KCM_a6aEFg1dqJ>	<hasISBN>	rdf:type	owl:FunctionalProperty	
+<id_PqLKJQ?cf5_KCM_24wl2b7Lsq>	<hasLanguageCode>	rdf:type	rdf:Property	
+<id_Opt4M?1mMM_KCM_GrOOqe1Q7G>	<diedOnDate>	rdf:type	<subjectEndRelation>	
+<id_NBwSS2BkQ1_KCM_a6aEFg1dqJ>	<hasRevenue>	rdf:type	owl:FunctionalProperty	
+<id_3SsL8yU26t_KCM_a6aEFg1dqJ>	<hasSuccessor>	rdf:type	owl:FunctionalProperty	
+<id_TjN2w1PwfN_KCM_haJC0WLmiE>	<hasContextSucceedingAnchor>	rdf:type	<yagoExtendedRelation>	
+<id_hM9FlOGtXs_KCM_a6aEFg1dqJ>	<hasExport>	rdf:type	owl:FunctionalProperty	
+<id_qBem!d7o6f_KCM_haJC0WLmiE>	<wikipediaSubCategoryOf>	rdf:type	<yagoExtendedRelation>	
+<id_dCLkZWK2a6_KCM_24wl2b7Lsq>	<permanentRelationToSubject>	rdf:type	rdf:Property	
+<id_sVq5ALqqX_KCM_24wl2b7Lsq>	<occursIn>	rdf:type	rdf:Property	
+<id_4MnfVPQls1_KCM_a6aEFg1dqJ>	<hasSynsetId>	rdf:type	owl:FunctionalProperty	
+<id_GA3ioQm17m_KCM_a6aEFg1dqJ>	<diedIn>	rdf:type	owl:FunctionalProperty	
+<id_5sFe?YK5ps_KCM_24wl2b7Lsq>	<relationLocatedByObject>	rdf:type	rdf:Property	
+<id_OzwcP1w53H_KCM_QypqR1gcU3>	<wasBornOnDate>	rdf:type	<subjectStartRelation>	
+<id_q893L4ulf1_KCM_24wl2b7Lsq>	<hasChild>	rdf:type	rdf:Property	
+<id_kTn7Q83eLE_KCM_24wl2b7Lsq>	<hasContext>	rdf:type	rdf:Property	
+<id_hfkSLmY826_KCM_24wl2b7Lsq>	<byTransport>	rdf:type	rdf:Property	
+<id_U6AjLVHsOC_KCM_a6aEFg1dqJ>	<hasPredecessor>	rdf:type	owl:FunctionalProperty	
+<id_1ZI2Tp3Ggg_KCM_a6aEFg1dqJ>	<hasImdb>	rdf:type	owl:FunctionalProperty	
+<id_QypqR1gcU3_KCM_24wl2b7Lsq>	<subjectStartRelation>	rdf:type	rdf:Property	
+<id_xlyZb2sVVL_KCM_m0M7pTe96a>	<extractionTechnique>	rdf:type	rdfs:Property	
+<id_a8HiWoT1py_KCM_24wl2b7Lsq>	<hasConfidence>	rdf:type	rdf:Property	
+<id_WM2F8WqCj4_KCM_24wl2b7Lsq>	<livesIn>	rdf:type	rdf:Property	
+<id_uvgMySNEPp_KCM_a6aEFg1dqJ>	<hasGloss>	rdf:type	owl:FunctionalProperty	
+<id_8VXFpprjB6_KCM_a6aEFg1dqJ>	<wasDestroyedOnDate>	rdf:type	owl:FunctionalProperty	
+<id_ReVPhneX!c_KCM_Oo??ppyCOw>	<_hasTypeCheckPattern>	rdf:type	<yagoInternalRelation>	
+<id_daAQfhdGjF_KCM_a6aEFg1dqJ>	rdfs:domain	rdf:type	owl:FunctionalProperty	
+<id_hGlCLxcRnz_KCM_a6aEFg1dqJ>	<hasImport>	rdf:type	owl:FunctionalProperty	
+<id_wgXThXm8F9_KCM_24wl2b7Lsq>	<wroteMusicFor>	rdf:type	rdf:Property	
+<id_QFw2e9rkWs_KCM_a6aEFg1dqJ>	<startsExistingOnDate>	rdf:type	owl:FunctionalProperty	
+<id_SBdQz0h35W_KCM_24wl2b7Lsq>	rdfs:label	rdf:type	rdf:Property	
+<id_3rzK8DnVBM_KCM_24wl2b7Lsq>	<hasThreeLetterLanguageCode>	rdf:type	rdf:Property	
+<id_1FciTGy?5D_KCM_24wl2b7Lsq>	<placedIn>	rdf:type	rdf:Property	
+<id_4fhaLp5YGD_KCM_HnW94kbIJv>	<directed>	rdf:type	<objectStartRelation>	
+<id_7fpsli4Ypx_KCM_QypqR1gcU3>	<wasBornIn>	rdf:type	<subjectStartRelation>	
+<id_Opt4M?1mMM_KCM_a6aEFg1dqJ>	<diedOnDate>	rdf:type	owl:FunctionalProperty	
+<id_tRIrEJL!nT_KCM_a6aEFg1dqJ>	<hasGeonamesEntityId>	rdf:type	owl:FunctionalProperty	
+<id_0XL?HozpNb_KCM_a6aEFg1dqJ>	<hasTLD>	rdf:type	owl:FunctionalProperty	
+<id_yp1KrekKZ!_KCM_dCLkZWK2a6>	<redirectedFrom>	rdf:type	<permanentRelationToSubject>	
+<id_gJx!CJeGve_KCM_haJC0WLmiE>	<hasInternalWikipediaLinkTo>	rdf:type	<yagoExtendedRelation>	
+<id_1EW?gKXFo4_KCM_haJC0WLmiE>	<hasExternalWikipediaLinkTo>	rdf:type	<yagoExtendedRelation>	
+<id_iqvUKl!ECA_KCM_24wl2b7Lsq>	<hasMotto>	rdf:type	rdf:Property	
+<id_wwJjW?APp1_KCM_24wl2b7Lsq>	<isCitizenOf>	rdf:type	rdf:Property	
+<id_OrzW2jXrQQ_KCM_dCLkZWK2a6>	<hasLongitude>	rdf:type	<permanentRelationToSubject>	
+<id_OOpyGMN?Fv_KCM_a6aEFg1dqJ>	<occursUntil>	rdf:type	owl:FunctionalProperty	
+<id_ozi1130g3d_KCM_24wl2b7Lsq>	<hasMusicalRole>	rdf:type	rdf:Property	
+<id_Xu72M?OnX1_KCM_24wl2b7Lsq>	<playsFor>	rdf:type	rdf:Property	
+<id_ukZE69quc7_KCM_dCLkZWK2a6>	<hasFamilyName>	rdf:type	<permanentRelationToSubject>	
+<id_GzeKyhVJR5_KCM_a6aEFg1dqJ>	<wasCreatedOnDate>	rdf:type	owl:FunctionalProperty	
+<id_lcYPJviAae_KCM_a6aEFg1dqJ>	<startedOnDate>	rdf:type	owl:FunctionalProperty	
+<id_kGbSYjGZCB_KCM_a6aEFg1dqJ>	<endedOnDate>	rdf:type	owl:FunctionalProperty	
+<id_aVIIIYw6IE_KCM_24wl2b7Lsq>	<participatedIn>	rdf:type	rdf:Property	
+<id_zBA?HmD9hi_KCM_haJC0WLmiE>	<_hasLinkLikelihood>	rdf:type	<yagoExtendedRelation>	
+<id_J85HJMrZsH_KCM_a6aEFg1dqJ>	<hasGender>	rdf:type	owl:FunctionalProperty	
+<id_EGcgvQQgMO_KCM_uRiIq6Dzxg>	<_yagoMetadata>	rdf:type	<yagoMetadataRelation>	
+<id_HxGIJOjb5A_KCM_a6aEFg1dqJ>	<hasLatitude>	rdf:type	owl:FunctionalProperty	
+<id_Vl!Ut3itCq_KCM_haJC0WLmiE>	<hasWikipediaCategory>	rdf:type	<yagoExtendedRelation>	
+<id_?!VtKe8N6Z_KCM_a6aEFg1dqJ>	<hasGeonamesClassId>	rdf:type	owl:FunctionalProperty	
+<id_yp1KrekKZ!_KCM_24wl2b7Lsq>	<redirectedFrom>	rdf:type	rdf:Property	
+<id_5yqLVNj!?G_KCM_24wl2b7Lsq>	<actedIn>	rdf:type	rdf:Property	
+<id_?RGufJFBdR_KCM_dCLkZWK2a6>	<hasGivenName>	rdf:type	<permanentRelationToSubject>	
+<id_owSKi3Ex1G_KCM_W7LgZqk8ov>	rdfs:subClassOf	rdf:type	owl:TransitiveProperty	
+<id_Ekj1YahGh!_KCM_W7LgZqk8ov>	rdfs:subPropertyOf	rdf:type	owl:TransitiveProperty	
+<id_?RGufJFBdR_KCM_a6aEFg1dqJ>	<hasGivenName>	rdf:type	owl:FunctionalProperty	
+<id_HxGIJOjb5A_KCM_dCLkZWK2a6>	<hasLatitude>	rdf:type	<permanentRelationToSubject>	
+<id_g7MWW3JSXE_KCM_a6aEFg1dqJ>	<hasWikipediaUrl>	rdf:type	owl:FunctionalProperty	
+<id_eoVpKIErxi_KCM_24wl2b7Lsq>	<edited>	rdf:type	rdf:Property	
+<id_0i102o!K39_KCM_W7LgZqk8ov>	<isLocatedIn>	rdf:type	owl:TransitiveProperty	
+<id_OrzW2jXrQQ_KCM_a6aEFg1dqJ>	<hasLongitude>	rdf:type	owl:FunctionalProperty	
+<id_8wM4cFj1A6_KCM_24wl2b7Lsq>	<_timeToLocation>	rdf:type	rdf:Property	
+<id_ja6oWlnYFD_KCM_24wl2b7Lsq>	<influences>	rdf:type	rdf:Property	
+<id_GrOOqe1Q7G_KCM_24wl2b7Lsq>	<subjectEndRelation>	rdf:type	rdf:Property	
+<id_owSKi3Ex1G_KCM_24wl2b7Lsq>	rdfs:subClassOf	rdf:type	rdf:Property	
+<id_0PHxtw9ml?_KCM_a6aEFg1dqJ>	<hasHeight>	rdf:type	owl:FunctionalProperty	
+<id_dkbE?83Aw1_KCM_haJC0WLmiE>	<hasWikipediaId>	rdf:type	<yagoExtendedRelation>	
+<id_5iBa2NFEh1_KCM_a6aEFg1dqJ>	<hasPages>	rdf:type	owl:FunctionalProperty	
+<id_?XGUM6gKV3_KCM_stLX3roAbw>	<isMarriedTo>	rdf:type	owl:SymmetricProperty	
+<id_5yHJa0valg_KCM_24wl2b7Lsq>	<owns>	rdf:type	rdf:Property	
+<id_UI1MYRk7TR_KCM_24wl2b7Lsq>	<isAffiliatedTo>	rdf:type	rdf:Property	
+<id_itrojroAcp_KCM_24wl2b7Lsq>	<holdsPoliticalPosition>	rdf:type	rdf:Property	
+<id_O1npu5fR5R_KCM_a6aEFg1dqJ>	rdfs:range	rdf:type	owl:FunctionalProperty	
+<id_OGeTdRMinU_KCM_haJC0WLmiE>	<hasAnchorText>	rdf:type	<yagoExtendedRelation>	
+<id_rLBnXDjZCl_KCM_24wl2b7Lsq>	<exports>	rdf:type	rdf:Property	
+<id_cvhiZM3vq0_KCM_a6aEFg1dqJ>	<hasEconomicGrowth>	rdf:type	owl:FunctionalProperty	
+<id_e!1Dxw5lnJ_KCM_24wl2b7Lsq>	<dealsWith>	rdf:type	rdf:Property	
+<id_nXySGrzjhQ_KCM_24wl2b7Lsq>	<linksTo>	rdf:type	rdf:Property	
+<id_FCZKG0tb8O_KCM_a6aEFg1dqJ>	<hasWeight>	rdf:type	owl:FunctionalProperty	
+<id_UVh5Qu6nDY_KCM_dCLkZWK2a6>	skos:prefLabel	rdf:type	<permanentRelationToSubject>	
+<id_UVh5Qu6nDY_KCM_a6aEFg1dqJ>	skos:prefLabel	rdf:type	owl:FunctionalProperty	
+<id_SimO3GzUHr_KCM_a6aEFg1dqJ>	<hasExpenses>	rdf:type	owl:FunctionalProperty	
+<id_7fpsli4Ypx_KCM_a6aEFg1dqJ>	<wasBornIn>	rdf:type	owl:FunctionalProperty	
+<id_Mx8D4zZp4o_KCM_HnW94kbIJv>	<created>	rdf:type	<objectStartRelation>	
+<id_Z2!3sO2eXU_KCM_haJC0WLmiE>	<hasWikipediaAbstract>	rdf:type	<yagoExtendedRelation>	
+<id_lcNKEPl66X_KCM_24wl2b7Lsq>	rdfs:comment	rdf:type	rdf:Property	
+<id_PYQoHZLM?Z_KCM_a6aEFg1dqJ>	<hasArea>	rdf:type	owl:FunctionalProperty	
+<id_24wl2b7Lsq_KCM_PCDsIcM0nR>	rdf:Property	rdf:type	rdfs:Resource	
+<id_ncNt6rsDFq_KCM_24wl2b7Lsq>	<permanentRelationToObject>	rdf:type	rdf:Property	
+<id_W2WBXlHDuy_KCM_24wl2b7Lsq>	<hasWebsite>	rdf:type	rdf:Property	
+<id_SBdQz0h35W_KCM_dCLkZWK2a6>	rdfs:label	rdf:type	<permanentRelationToSubject>	
+<id_E6lADGe8ro_KCM_a6aEFg1dqJ>	<isPreferredMeaningOf>	rdf:type	owl:FunctionalProperty	
+<id_5BDMT1eY4z_KCM_24wl2b7Lsq>	<isKnownFor>	rdf:type	rdf:Property	
+<id_OzwcP1w53H_KCM_a6aEFg1dqJ>	<wasBornOnDate>	rdf:type	owl:FunctionalProperty	
+<id_KCMouEZyrl_KCM_dCLkZWK2a6>	rdf:type	rdf:type	<permanentRelationToSubject>	
+<id_1m6JHkiG4I_KCM_24wl2b7Lsq>	<isConnectedTo>	rdf:type	rdf:Property	
+<id_ukZE69quc7_KCM_a6aEFg1dqJ>	<hasFamilyName>	rdf:type	owl:FunctionalProperty	
+<id_YfuGHeXBto_KCM_24wl2b7Lsq>	<hasWonPrize>	rdf:type	rdf:Property	
+<id_sm0RJTHBeD_KCM_a6aEFg1dqJ>	<hasBudget>	rdf:type	owl:FunctionalProperty	
+<id_?MuANePHSd_KCM_24wl2b7Lsq>	<hasOfficialLanguage>	rdf:type	rdf:Property	
+<id_AypJzCSjLb_KCM_a6aEFg1dqJ>	<hasCurrency>	rdf:type	owl:FunctionalProperty	
+<id_kTn7Q83eLE_daA_KdEX!y?wiG>	<hasContext>	rdfs:domain	owl:Thing	
+<id_Ekj1YahGh!_daA_24wl2b7Lsq>	rdfs:subPropertyOf	rdfs:domain	rdf:Property	
+<id_8VXFpprjB6_daA_KdEX!y?wiG>	<wasDestroyedOnDate>	rdfs:domain	owl:Thing	
+<id_5sFe?YK5ps_daA_KdEX!y?wiG>	<relationLocatedByObject>	rdfs:domain	owl:Thing	
+<id_uvgMySNEPp_daA_KdEX!y?wiG>	<hasGloss>	rdfs:domain	owl:Thing	
+<id_1EW?gKXFo4_daA_KdEX!y?wiG>	<hasExternalWikipediaLinkTo>	rdfs:domain	owl:Thing	
+<id_3SsL8yU26t_daA_Kp8P64YJ0f>	<hasSuccessor>	rdfs:domain	rdf:Statement	
+<id_PqLKJQ?cf5_daA_2?DQrGlfS?>	<hasLanguageCode>	rdfs:domain	<wordnet_language_106282651>	
+<id_lcYPJviAae_daA_mi61FY7bTp>	<startedOnDate>	rdfs:domain	<wordnet_event_100029378>	
+<id_siBa8PWPxV_daA_Kp8P64YJ0f>	<hasContextPrecedingAnchor>	rdfs:domain	rdf:Statement	
+<id_gJx!CJeGve_daA_KdEX!y?wiG>	<hasInternalWikipediaLinkTo>	rdfs:domain	owl:Thing	
+<id_GrOOqe1Q7G_daA_KdEX!y?wiG>	<subjectEndRelation>	rdfs:domain	owl:Thing	
+<id_hfkSLmY826_daA_Kp8P64YJ0f>	<byTransport>	rdfs:domain	rdf:Statement	
+<id_g7MWW3JSXE_daA_KdEX!y?wiG>	<hasWikipediaUrl>	rdfs:domain	owl:Thing	
+<id_MA?Ee9GTCb_daA_KdEX!y?wiG>	<hasWikipediaArticleLength>	rdfs:domain	owl:Thing	
+<id_dCLkZWK2a6_daA_KdEX!y?wiG>	<permanentRelationToSubject>	rdfs:domain	owl:Thing	
+<id_nXySGrzjhQ_daA_KdEX!y?wiG>	<linksTo>	rdfs:domain	owl:Thing	
+<id_owSKi3Ex1G_daA_kfGv?nijQQ>	rdfs:subClassOf	rdfs:domain	rdfs:Class	
+<id_4fhaLp5YGD_daA_9o9YmDSiad>	<directed>	rdfs:domain	<wordnet_person_100007846>	
+<id_EGcgvQQgMO_daA_KukFM4VlQ7>	<_yagoMetadata>	rdfs:domain	xsd:String	
+<id_daAQfhdGjF_daA_24wl2b7Lsq>	rdfs:domain	rdfs:domain	rdf:Property	
+<id_HxGIJOjb5A_daA_FNZ17GW0Jo>	<hasLatitude>	rdfs:domain	<yagoGeoEntity>	
+<id_IyutbzutP0_daA_KdEX!y?wiG>	<hasISBN>	rdfs:domain	owl:Thing	
+<id_aVIIIYw6IE_daA_8Giy5xWJit>	<participatedIn>	rdfs:domain	<yagoLegalActorGeo>	
+<id_1m6JHkiG4I_daA_FNZ17GW0Jo>	<isConnectedTo>	rdfs:domain	<yagoGeoEntity>	
+<id_UVh5Qu6nDY_daA_KdEX!y?wiG>	skos:prefLabel	rdfs:domain	owl:Thing	
+<id_e!1Dxw5lnJ_daA_hrUs8UA4yf>	<dealsWith>	rdfs:domain	<wordnet_country_108544813>	
+<id_Mx8D4zZp4o_daA_0DSECBmSxt>	<created>	rdfs:domain	<yagoLegalActor>	
+<id_e0Cd?TNhpO_daA_66Yy!EOgKV>	<imports>	rdfs:domain	<wordnet_location_100027167>	
+<id_YZT9uXWln4_daA_KdEX!y?wiG>	<hasDuration>	rdfs:domain	owl:Thing	
+<id_E6n!IJn!Jr_daA_9o9YmDSiad>	<graduatedFrom>	rdfs:domain	<wordnet_person_100007846>	
+<id_8Oj026y6M?_daA_75l4lAq6jN>	<hasAirportCode>	rdfs:domain	<wordnet_airport_102692232>	
+<id_AypJzCSjLb_daA_66Yy!EOgKV>	<hasCurrency>	rdfs:domain	<wordnet_location_100027167>	
+<id_zBA?HmD9hi_daA_KukFM4VlQ7>	<_hasLinkLikelihood>	rdfs:domain	xsd:String	
+<id_HnW94kbIJv_daA_KdEX!y?wiG>	<objectStartRelation>	rdfs:domain	owl:Thing	
+<id_SimO3GzUHr_daA_8Giy5xWJit>	<hasExpenses>	rdfs:domain	<yagoLegalActorGeo>	
+<id_y1wULXz09e_daA_KdEX!y?wiG>	<objectEndRelation>	rdfs:domain	owl:Thing	
+<id_Xu72M?OnX1_daA_9o9YmDSiad>	<playsFor>	rdfs:domain	<wordnet_person_100007846>	
+<id_E6lADGe8ro_daA_KdEX!y?wiG>	<isPreferredMeaningOf>	rdfs:domain	owl:Thing	
+<id_TEF?zd?BsZ_daA_KdEX!y?wiG>	<endsExistingOnDate>	rdfs:domain	owl:Thing	
+<id_QeK9lf2DJ!_daA_9o9YmDSiad>	<hasAcademicAdvisor>	rdfs:domain	<wordnet_person_100007846>	
+<id_e9qWevkEsX_daA_mi61FY7bTp>	<happenedIn>	rdfs:domain	<wordnet_event_100029378>	
+<id_ozi1130g3d_daA_9o9YmDSiad>	<hasMusicalRole>	rdfs:domain	<wordnet_person_100007846>	
+<id_arpVbrkVqB_daA_9o9YmDSiad>	<worksAt>	rdfs:domain	<wordnet_person_100007846>	
+<id_1qjfJaMA7t_daA_66Yy!EOgKV>	<hasInflation>	rdfs:domain	<wordnet_location_100027167>	
+<id_1FciTGy?5D_daA_KdEX!y?wiG>	<placedIn>	rdfs:domain	owl:Thing	
+<id_OrzW2jXrQQ_daA_FNZ17GW0Jo>	<hasLongitude>	rdfs:domain	<yagoGeoEntity>	
+<id_w!UqetLWZe_daA_FNZ17GW0Jo>	<hasNeighbor>	rdfs:domain	<yagoGeoEntity>	
+<id_1ZI2Tp3Ggg_daA_wvk5fm5CWM>	<hasImdb>	rdfs:domain	<wordnet_movie_106613686>	
+<id_iqvUKl!ECA_daA_8Giy5xWJit>	<hasMotto>	rdfs:domain	<yagoLegalActorGeo>	
+<id_yqifFULyde_daA_66Yy!EOgKV>	<hasGDP>	rdfs:domain	<wordnet_location_100027167>	
+<id_0PHxtw9ml?_daA_PemQsPqeJy>	<hasHeight>	rdfs:domain	<wordnet_physical_entity_100001930>	
+<id_KCMouEZyrl_daA_PCDsIcM0nR>	rdf:type	rdfs:domain	rdfs:Resource	
+<id_WM2F8WqCj4_daA_9o9YmDSiad>	<livesIn>	rdfs:domain	<wordnet_person_100007846>	
+<id_ukZE69quc7_daA_9o9YmDSiad>	<hasFamilyName>	rdfs:domain	<wordnet_person_100007846>	
+<id_3rzK8DnVBM_daA_2?DQrGlfS?>	<hasThreeLetterLanguageCode>	rdfs:domain	<wordnet_language_106282651>	
+<id_7fpsli4Ypx_daA_9o9YmDSiad>	<wasBornIn>	rdfs:domain	<wordnet_person_100007846>	
+<id_AI6UEaG6oh_daA_8Giy5xWJit>	<hasNumberOfPeople>	rdfs:domain	<yagoLegalActorGeo>	
+<id_TjN2w1PwfN_daA_Kp8P64YJ0f>	<hasContextSucceedingAnchor>	rdfs:domain	rdf:Statement	
+<id_wgXThXm8F9_daA_9o9YmDSiad>	<wroteMusicFor>	rdfs:domain	<wordnet_person_100007846>	
+<id_U6AjLVHsOC_daA_Kp8P64YJ0f>	<hasPredecessor>	rdfs:domain	rdf:Statement	
+<id_UI1MYRk7TR_daA_0DSECBmSxt>	<isAffiliatedTo>	rdfs:domain	<yagoLegalActor>	
+<id_SBdQz0h35W_daA_KdEX!y?wiG>	rdfs:label	rdfs:domain	owl:Thing	
+<id_YfuGHeXBto_daA_8Giy5xWJit>	<hasWonPrize>	rdfs:domain	<yagoLegalActorGeo>	
+<id_rLBnXDjZCl_daA_66Yy!EOgKV>	<exports>	rdfs:domain	<wordnet_location_100027167>	
+<id_H!utbzn7e3_daA_JHikFb45Tb>	<hasISIN>	rdfs:domain	<wordnet_organization_108008335>	
+<id_4MnfVPQls1_daA_kfGv?nijQQ>	<hasSynsetId>	rdfs:domain	rdfs:Class	
+<id_LTq8sZOJ8P_daA_66Yy!EOgKV>	<hasUnemployment>	rdfs:domain	<wordnet_location_100027167>	
+<id_wwJjW?APp1_daA_9o9YmDSiad>	<isCitizenOf>	rdfs:domain	<wordnet_person_100007846>	
+<id_QypqR1gcU3_daA_KdEX!y?wiG>	<subjectStartRelation>	rdfs:domain	owl:Thing	
+<id_higQznGBui_daA_66Yy!EOgKV>	<hasPoverty>	rdfs:domain	<wordnet_location_100027167>	
+<id_ja6oWlnYFD_daA_9o9YmDSiad>	<influences>	rdfs:domain	<wordnet_person_100007846>	
+<id_OzwcP1w53H_daA_9o9YmDSiad>	<wasBornOnDate>	rdfs:domain	<wordnet_person_100007846>	
+<id_cvhiZM3vq0_daA_66Yy!EOgKV>	<hasEconomicGrowth>	rdfs:domain	<wordnet_location_100027167>	
+<id_5iBa2NFEh1_daA_KdEX!y?wiG>	<hasPages>	rdfs:domain	owl:Thing	
+<id_lcNKEPl66X_daA_PCDsIcM0nR>	rdfs:comment	rdfs:domain	rdfs:Resource	
+<id_FCZKG0tb8O_daA_PemQsPqeJy>	<hasWeight>	rdfs:domain	<wordnet_physical_entity_100001930>	
+<id_?MuANePHSd_daA_66Yy!EOgKV>	<hasOfficialLanguage>	rdfs:domain	<wordnet_location_100027167>	
+<id_GA3ioQm17m_daA_9o9YmDSiad>	<diedIn>	rdfs:domain	<wordnet_person_100007846>	
+<id_ReVPhneX!c_daA_kfGv?nijQQ>	<_hasTypeCheckPattern>	rdfs:domain	rdfs:Class	
+<id_q893L4ulf1_daA_9o9YmDSiad>	<hasChild>	rdfs:domain	<wordnet_person_100007846>	
+<id_hGlCLxcRnz_daA_66Yy!EOgKV>	<hasImport>	rdfs:domain	<wordnet_location_100027167>	
+<id_qBem!d7o6f_daA_KdEX!y?wiG>	<wikipediaSubCategoryOf>	rdfs:domain	owl:Thing	
+<id_?!VtKe8N6Z_daA_KdEX!y?wiG>	<hasGeonamesClassId>	rdfs:domain	owl:Thing	
+<id_maQEGQx6xS_daA_FNZ17GW0Jo>	<hasLength>	rdfs:domain	<yagoGeoEntity>	
+<id_OGeTdRMinU_daA_Kp8P64YJ0f>	<hasAnchorText>	rdfs:domain	rdf:Statement	
+<id_tbHy6E6TRz_daA_9o9YmDSiad>	<isInterestedIn>	rdfs:domain	<wordnet_person_100007846>	
+<id_GzeKyhVJR5_daA_KdEX!y?wiG>	<wasCreatedOnDate>	rdfs:domain	owl:Thing	
+<id_QFw2e9rkWs_daA_KdEX!y?wiG>	<startsExistingOnDate>	rdfs:domain	owl:Thing	
+<id_0i102o!K39_daA_ys8!hs6ulH>	<isLocatedIn>	rdfs:domain	<yagoPermanentlyLocatedEntity>	
+<id_J85HJMrZsH_daA_9o9YmDSiad>	<hasGender>	rdfs:domain	<wordnet_person_100007846>	
+<id_PYQoHZLM?Z_daA_66Yy!EOgKV>	<hasArea>	rdfs:domain	<wordnet_location_100027167>	
+<id_sm0RJTHBeD_daA_8Giy5xWJit>	<hasBudget>	rdfs:domain	<yagoLegalActorGeo>	
+<id_yp1KrekKZ!_daA_KdEX!y?wiG>	<redirectedFrom>	rdfs:domain	owl:Thing	
+<id_934Qgffok1_daA_mi61FY7bTp>	<happenedOnDate>	rdfs:domain	<wordnet_event_100029378>	
+<id_a8HiWoT1py_daA_24wl2b7Lsq>	<hasConfidence>	rdfs:domain	rdf:Property	
+<id_5BDMT1eY4z_daA_0DSECBmSxt>	<isKnownFor>	rdfs:domain	<yagoLegalActor>	
+<id_?RGufJFBdR_daA_9o9YmDSiad>	<hasGivenName>	rdfs:domain	<wordnet_person_100007846>	
+<id_5yHJa0valg_daA_8Giy5xWJit>	<owns>	rdfs:domain	<yagoLegalActorGeo>	
+<id_5yqLVNj!?G_daA_70uaZ60cuZ>	<actedIn>	rdfs:domain	<wordnet_actor_109765278>	
+<id_8wM4cFj1A6_daA_24wl2b7Lsq>	<_timeToLocation>	rdfs:domain	rdf:Property	
+<id_68GRE?61!B_daA_66Yy!EOgKV>	<hasCapital>	rdfs:domain	<wordnet_location_100027167>	
+<id_V2A1?7kWe!_daA_KdEX!y?wiG>	<hasWikipediaAnchorText>	rdfs:domain	owl:Thing	
+<id_O1npu5fR5R_daA_24wl2b7Lsq>	rdfs:range	rdfs:domain	rdf:Property	
+<id_5BimgCyoz?_daA_66Yy!EOgKV>	<hasGini>	rdfs:domain	<wordnet_location_100027167>	
+<id_G?Tm35Q62H_daA_KdEX!y?wiG>	owl:sameAs	rdfs:domain	owl:Thing	
+<id_H?SLgj!2H5_daA_9o9YmDSiad>	<isLeaderOf>	rdfs:domain	<wordnet_person_100007846>	
+<id_xlyZb2sVVL_daA_Kp8P64YJ0f>	<extractionTechnique>	rdfs:domain	rdf:Statement	
+<id_glgr0IcDm4_daA_9o9YmDSiad>	<isPoliticianOf>	rdfs:domain	<wordnet_person_100007846>	
+<id_WoWrpohqIr_daA_Kp8P64YJ0f>	<occursSince>	rdfs:domain	rdf:Statement	
+<id_0XL?HozpNb_daA_66Yy!EOgKV>	<hasTLD>	rdfs:domain	<wordnet_location_100027167>	
+<id_k03WKsbpF4_daA_66Yy!EOgKV>	<hasPopulationDensity>	rdfs:domain	<wordnet_location_100027167>	
+<id_Opt4M?1mMM_daA_9o9YmDSiad>	<diedOnDate>	rdfs:domain	<wordnet_person_100007846>	
+<id_eoVpKIErxi_daA_u0HnToTkPV>	<edited>	rdfs:domain	<wordnet_editor_110044879>	
+<id_OOpyGMN?Fv_daA_Kp8P64YJ0f>	<occursUntil>	rdfs:domain	rdf:Statement	
+<id_ggTWjwhVWk_daA_KdEX!y?wiG>	<hasCitationTitle>	rdfs:domain	owl:Thing	
+<id_?XGUM6gKV3_daA_9o9YmDSiad>	<isMarriedTo>	rdfs:domain	<wordnet_person_100007846>	
+<id_tRIrEJL!nT_daA_KdEX!y?wiG>	<hasGeonamesEntityId>	rdfs:domain	owl:Thing	
+<id_kGbSYjGZCB_daA_mi61FY7bTp>	<endedOnDate>	rdfs:domain	<wordnet_event_100029378>	
+<id_Tm9RdHdkiF_daA_Kp8P64YJ0f>	<extractionSource>	rdfs:domain	rdf:Statement	
+<id_sVq5ALqqX_daA_Kp8P64YJ0f>	<occursIn>	rdfs:domain	rdf:Statement	
+<id_Vl!Ut3itCq_daA_KdEX!y?wiG>	<hasWikipediaCategory>	rdfs:domain	owl:Thing	
+<id_W2WBXlHDuy_daA_8Giy5xWJit>	<hasWebsite>	rdfs:domain	<yagoLegalActorGeo>	
+<id_dkbE?83Aw1_daA_KdEX!y?wiG>	<hasWikipediaId>	rdfs:domain	owl:Thing	
+<id_hM9FlOGtXs_daA_66Yy!EOgKV>	<hasExport>	rdfs:domain	<wordnet_location_100027167>	
+<id_ncNt6rsDFq_daA_KdEX!y?wiG>	<permanentRelationToObject>	rdfs:domain	owl:Thing	
+<id_Z2!3sO2eXU_daA_KdEX!y?wiG>	<hasWikipediaAbstract>	rdfs:domain	owl:Thing	
+<id_NBwSS2BkQ1_daA_8Giy5xWJit>	<hasRevenue>	rdfs:domain	<yagoLegalActorGeo>	
+<id_itrojroAcp_daA_9o9YmDSiad>	<holdsPoliticalPosition>	rdfs:domain	<wordnet_person_100007846>	
