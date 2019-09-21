@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "mercy"
+name = "mercylog"
 version = "0.1.0"
 description = "Datalog Inspired Logic Programming in Python"
 authors = ["Rajiv Abraham <rajiv.abraham@gmail.com>"]
