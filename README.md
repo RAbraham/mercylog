@@ -5,7 +5,7 @@ NOTE: EXPERIMENTAL. Do not use in production !!
 * `pip install mercylog`
 
 # Tutorial
-Refer to Mercy Log Tutorial
+Check out the [tutorial/introduction](https://github.com/RAbraham/mercylog_tutorial) to Mercylog
 
 # Short Introduction
 ```python
