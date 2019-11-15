@@ -1,6 +1,6 @@
 NOTE: EXPERIMENTAL. Do not use in production !!
 
-# Vision 2020
+# Vision
 
 Merycylog will be a Datalog based library which allows developers to build
 - Applications: 
