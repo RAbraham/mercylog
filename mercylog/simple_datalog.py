@@ -2,7 +2,7 @@ from typing import *
 from dataclasses import dataclass
 from pprint import pprint
 
-'''
+"""
 Given, rules + facts + query
 Given:
 Male('Rajiv')
@@ -16,7 +16,7 @@ next: query1(X) <= Person(X). It's a rule. previous kb = [Male('Rajiv'), Person(
    take Male('Rajiv') and Person('X'), no match(simple predicate check)
    take Person('Rajiv') and Person(X), there is match, return query1('Rajiv') and add it to kb 
 
-'''
+"""
 
 
 class SimpleDatalog:
@@ -56,7 +56,7 @@ class Atom:
     _terms: List[Term]
 
     def __str__(self):
-        return self._predSym + '(' + ','.join(map(str, self._terms)) + ')'
+        return self._predSym + "(" + ",".join(map(str, self._terms)) + ")"
 
     def __repr__(self):
         return self.__str__()
@@ -72,7 +72,7 @@ class Rule:
     def __str__(self):
         result = str(self._head)
         if self._body:
-            result += ' <= ' + ','.join(map(str, self._body))
+            result += " <= " + ",".join(map(str, self._body))
         return result
 
     def __repr__(self):
@@ -83,22 +83,23 @@ Program = List[Rule]
 KnowledgeBase = List[Atom]
 Substitution = List[Tuple[Term, Term]]
 
-'''
+"""
 
 emptySubstitution :: Substitution
 emptySubstitution = []
-'''
+"""
 # TODO: Is this a constant
 emptySubstitution: Substitution = []
 
-'''
+"""
 isRangeRestricted :: Rule -> Bool
 isRangeRestricted Rule{..} =
   vars _head `isSubsetOf` concatMap vars _body
   where
   isSubsetOf as bs = all (`elem` bs) as
   vars Atom{..} = nub $ filter (\case {Var{} -> True; _ -> False}) _terms
-'''
+"""
+
 elem = lambda element, a_list: element in a_list
 
 
@@ -116,7 +117,7 @@ def isRangeRestricted(rule: Rule) -> bool:
     pass
 
 
-'''
+"""
 solve :: Program -> KnowledgeBase
 solve rules =
   if all isRangeRestricted rules
@@ -130,10 +131,10 @@ solve rules =
       then currentKB
       else f nextKB
 
-'''
+"""
 KnowledgeBaseTransformer = Callable[[KnowledgeBase], KnowledgeBase]
 
-'''
+"""
   step :: (KnowledgeBase -> KnowledgeBase)
        -> (KnowledgeBase -> KnowledgeBase)
   step f currentKB | nextKB <- immediateConsequence rules currentKB =
@@ -141,7 +142,7 @@ KnowledgeBaseTransformer = Callable[[KnowledgeBase], KnowledgeBase]
       then currentKB
       else f nextKB
 
-'''
+"""
 
 
 def fix(rules: Program):
@@ -189,41 +190,6 @@ def substitute(atom: Atom, substitution: Substitution) -> Atom:
     return Atom(_predSym=atom._predSym, _terms=new_terms)
 
 
-# def go_unify(substitution: Substitution) -> Optional[Substitution]:
-#     # print(f'Input:{substitution}')
-#     if not substitution:
-#         return emptySubstitution
-#     left, right = substitution[0]
-#     rest = substitution[1:]
-#     # TODO: use all or use Python MultiMethods?
-#     if isinstance(left, Sym) and isinstance(right, Sym):
-#         if left == right:
-#             result = go_unify(rest)
-#         else:
-#             result = None
-#         pass
-#
-#     v = left
-#     s = right
-#     if isinstance(v, Var) and isinstance(s, Sym):
-#         # print('Left Var, Right Sym')
-#         incompleteSubstitution = go_unify(rest)
-#         if incompleteSubstitution:
-#             s_dash = lookup(incompleteSubstitution, v)
-#             if s_dash and s != s_dash:
-#                 result = None
-#             else:
-#                 result = [(v, s)] + incompleteSubstitution
-#         else:
-#             result = [(v, s)] + incompleteSubstitution
-#
-#     if isinstance(right, Var):
-#         raise ValueError('The second atom is assumed to be ground.')
-#
-#     # print(f"Output:{result}")
-#     return result
-
-
 def go_unify(substitution: Substitution) -> Optional[Substitution]:
     # print(f'Input:{substitution}')
     if not substitution:
@@ -235,7 +201,7 @@ def go_unify(substitution: Substitution) -> Optional[Substitution]:
         if left == right:
             result = go_unify(rest)
         else:
-            result = []
+            result = None
         pass
 
     v = left
@@ -246,21 +212,56 @@ def go_unify(substitution: Substitution) -> Optional[Substitution]:
         if incompleteSubstitution:
             s_dash = lookup(incompleteSubstitution, v)
             if s_dash and s != s_dash:
-                result = []
+                result = None
             else:
                 result = [(v, s)] + incompleteSubstitution
         else:
             result = [(v, s)] + incompleteSubstitution
-            # result = []
 
     if isinstance(right, Var):
-        print('WRONG RAJ:')
-        print(right)
-        raise ValueError('The second atom is assumed to be ground.')
-    # if isinstance(right, Var):
-    #     result = []
+        raise ValueError("The second atom is assumed to be ground.")
+
     # print(f"Output:{result}")
     return result
+
+
+# def go_unify(substitution: Substitution) -> Optional[Substitution]:
+#     # print(f'Input:{substitution}')
+#     if not substitution:
+#         return emptySubstitution
+#     left, right = substitution[0]
+#     rest = substitution[1:]
+#     # TODO: use all or use Python MultiMethods?
+#     if isinstance(left, Sym) and isinstance(right, Sym):
+#         if left == right:
+#             result = go_unify(rest)
+#         else:
+#             result = []
+#         pass
+#
+#     v = left
+#     s = right
+#     if isinstance(v, Var) and isinstance(s, Sym):
+#         # print('Left Var, Right Sym')
+#         incompleteSubstitution = go_unify(rest)
+#         if incompleteSubstitution:
+#             s_dash = lookup(incompleteSubstitution, v)
+#             if s_dash and s != s_dash:
+#                 result = []
+#             else:
+#                 result = [(v, s)] + incompleteSubstitution
+#         else:
+#             result = [(v, s)] + incompleteSubstitution
+#             # result = []
+#
+#     if isinstance(right, Var):
+#         print('WRONG RAJ:')
+#         print(right)
+#         raise ValueError('The second atom is assumed to be ground.')
+#     # if isinstance(right, Var):
+#     #     result = []
+#     # print(f"Output:{result}")
+#     return result
 
 
 def unify(atom1: Atom, atom2: Atom) -> Optional[Substitution]:
@@ -276,17 +277,19 @@ def unify(atom1: Atom, atom2: Atom) -> Optional[Substitution]:
     pass
 
 
-'''
+"""
 evalAtom :: KnowledgeBase -> Atom -> [ Substitution ] -> [ Substitution ]
 evalAtom kb atom substitutions = do
   substitution <- substitutions
   let downToEarthAtom = substitute atom substitution
   extension <- mapMaybe (unify downToEarthAtom) kb
   return $ substitution <> extension
-'''
+"""
 
 
-def evalAtom(kb: KnowledgeBase, atom: Atom, substitutions: List[Substitution]) -> List[Substitution]:
+def evalAtom(
+    kb: KnowledgeBase, atom: Atom, substitutions: List[Substitution]
+) -> List[Substitution]:
     final_result = []
     # print('----------')
     # pprint(f'KnowledgeBase:{kb}')
@@ -310,10 +313,10 @@ def evalAtom(kb: KnowledgeBase, atom: Atom, substitutions: List[Substitution]) -
     pass
 
 
-'''
+"""
 walk :: KnowledgeBase -> [ Atom ] -> [ Substitution ]
 walk kb = foldr (evalAtom kb) [ emptySubstitution ]
-'''
+"""
 import functools
 
 foldr = lambda func, acc, xs: functools.reduce(lambda x, y: func(y, x), xs[::-1], acc)
@@ -332,10 +335,10 @@ def walk(kb: KnowledgeBase, atoms: List[Atom]) -> List[Substitution]:
     return result
 
 
-'''
+"""
 evalRule :: KnowledgeBase -> Rule -> KnowledgeBase
 evalRule kb (Rule head body) = map (substitute head) (walk kb body)
-'''
+"""
 
 
 def evalRule(kb: KnowledgeBase, rule: Rule) -> KnowledgeBase:
@@ -360,11 +363,11 @@ def evalRule(kb: KnowledgeBase, rule: Rule) -> KnowledgeBase:
     return rule_evaluation
 
 
-'''
+"""
 immediateConsequence :: Program -> KnowledgeBase -> KnowledgeBase
 immediateConsequence rules kb =
   nub . (kb <>) . concatMap (evalRule kb) $ rules
-'''
+"""
 from itertools import chain
 
 
@@ -389,7 +392,7 @@ def concatMap(func, it):
 
 
 def immediateConsequence_r(rules: Program, kb: KnowledgeBase) -> KnowledgeBase:
-    '''
+    """
     first the kb is empty. we take Male('Rajiv'), it's a fact so we put it in the knowledge base.
  next: Person(X) <= Male(X). It's a rule. Take the previous kb  and body(i.e. Male(X)) and see if it matches with any fact in the kb. it will match with Male('Rajiv'), so if matched, return Person('Rajiv') and add it to the kb
  next: query1(X) <= Person(X). It's a rule. previous kb = [Male('Rajiv'), Person('Rajiv')]. Take body(i.e. Person(X)).
@@ -401,13 +404,13 @@ def immediateConsequence_r(rules: Program, kb: KnowledgeBase) -> KnowledgeBase:
     :param rules:
     :param kb:
     :return:
-    '''
+    """
 
     pass
 
 
 def immediateConsequence(rules: Program, kb: KnowledgeBase) -> KnowledgeBase:
-    print('KB')
+    print("KB")
     print(kb)
     # print('Rules')
     # pprint(rules)
@@ -428,7 +431,7 @@ def immediateConsequence(rules: Program, kb: KnowledgeBase) -> KnowledgeBase:
 
 ###############################################
 
-'''
+"""
 query :: String -> Program -> [ Substitution ]
 query predSym pr =
   case queryVarsL of
@@ -441,7 +444,7 @@ query predSym pr =
 
   queryRules = filter ((== predSym) . _predSym . _head) pr
   queryVarsL = _terms . _head <$> queryRules
-'''
+"""
 
 
 def query(predSym: str, pr: Program) -> List[Substitution]:
@@ -453,9 +456,11 @@ def query(predSym: str, pr: Program) -> List[Substitution]:
     # relevantKnowledgeBaseSyms = list(map(lambda x: x._terms, relevantKnowledgeBase))
 
     _relevantKnowledgeBaseSyms = list(map(lambda x: x._terms, relevantKnowledgeBase))
-    print('_relevant knowledge based syms!')
+    print("_relevant knowledge based syms!")
     print(_relevantKnowledgeBaseSyms)
-    relevantKnowledgeBaseSyms = list(filter(lambda t: not isinstance(t[0], Var), _relevantKnowledgeBaseSyms))
+    relevantKnowledgeBaseSyms = list(
+        filter(lambda t: not isinstance(t[0], Var), _relevantKnowledgeBaseSyms)
+    )
     print(relevantKnowledgeBaseSyms)
 
     if queryVarsL:
@@ -466,7 +471,7 @@ def query(predSym: str, pr: Program) -> List[Substitution]:
             return list(map(zipper, relevantKnowledgeBaseSyms))
             pass
         else:
-            raise ValueError(f'The query:{predSym} has multiple clauses')
+            raise ValueError(f"The query:{predSym} has multiple clauses")
             pass
     else:
         raise ValueError(f"The query:{predSym} does not exist")
@@ -529,7 +534,7 @@ def query(predSym: str, pr: Program) -> List[Substitution]:
 X = Var("X")
 Y = Var("Y")
 Z = Var("Z")
-Intermediate = Var('Intermediate')
+Intermediate = Var("Intermediate")
 
 ancestor_pred = "academic_ancestor"
 adviser_pred = "adviser"
@@ -539,21 +544,28 @@ adviser = lambda a, b: Atom(adviser_pred, [a, b])
 
 base_rule = Rule(academic_ancestor(X, Y), [adviser(X, Y)])
 
+
 def simple_ancestor():
     raw_facts = [
         [Sym("Alan Mycroft"), Sym("Dominic Orchard")],
-        [Sym("Robin Milner"), Sym("Alan Mycroft")]
+        [Sym("Robin Milner"), Sym("Alan Mycroft")],
     ]
-    facts = [Rule(Atom('adviser', terms), []) for terms in raw_facts]
+    facts = [Rule(Atom("adviser", terms), []) for terms in raw_facts]
 
-    recursive_rule = Rule(academic_ancestor(X, Z), [adviser(X, Y), academic_ancestor(Y, Z)])
+    recursive_rule = Rule(
+        academic_ancestor(X, Z), [adviser(X, Y), academic_ancestor(Y, Z)]
+    )
     rules = [base_rule, recursive_rule]
 
-    raw_valids = [[Sym("Robin Milner"), Var("Intermediate")],
-                  [Var("Intermediate"), Sym("Dominic Orchard")]]
+    raw_valids = [
+        [Sym("Robin Milner"), Var("Intermediate")],
+        [Var("Intermediate"), Sym("Dominic Orchard")],
+    ]
     valid_ancestors = [academic_ancestor(a, b) for a, b in raw_valids]
 
-    invalid_ancestors = [academic_ancestor(Sym("Alan Turing"), Sym("Mistral Contrastin"))]
+    invalid_ancestors = [
+        academic_ancestor(Sym("Alan Turing"), Sym("Mistral Contrastin"))
+    ]
 
     queries = [Rule(Atom("query1", [Intermediate]), valid_ancestors)]
 
@@ -563,11 +575,11 @@ def simple_ancestor():
 def person_query():
     # Facts
     # Male('Rajiv')_
-    facts = [Rule(Atom('Male', [Sym('Rajiv')]), [])]
+    facts = [Rule(Atom("Male", [Sym("Rajiv")]), [])]
     # Rules
     X = Var("X")
-    person = lambda a: Atom('Person', [a])
-    male = lambda a: Atom('Male', [a])
+    person = lambda a: Atom("Person", [a])
+    male = lambda a: Atom("Male", [a])
     # print('Person')
     # print(person(X))
     # person(X) <= male(X)
@@ -582,7 +594,7 @@ def person_query():
     return facts + rules + queries
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # print('-------Query1-------')
     print(query("query1", person_query()))
     # Eval Rule
