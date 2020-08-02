@@ -1,5 +1,9 @@
+from typing import *
 from pathlib import Path
 
+
+def flatten(ll: Sequence[Sequence]) -> Sequence:
+    return [element for a_list in ll for element in a_list]
 
 def remove_dir(a_dir: Path):
     import shutil
