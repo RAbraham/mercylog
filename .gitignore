@@ -1,0 +1,9 @@
+$VIMDATA/
+.history/
+mercylog.egg-info/
+**/__pycache__
+tests/test_mercylog.py
+venv/
+.vscode/
+.idea/
+        

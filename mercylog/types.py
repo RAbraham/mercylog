@@ -73,6 +73,10 @@ https://www.seas.harvard.edu/courses/cs152/2014sp/lectures/lec23-prolog.pdf
 https://www.cs.cmu.edu/~fp/courses/lp/lectures/26-datalog.pdf
 https://www.seas.harvard.edu/courses/cs152/2016sp/lectures/lec19-logicprogramming.pdf
 
+
+**Ground**
+
+A term or atom is ground if no variables appear in it.
 **Declarative Language**:
 A language in which the program can be specified in a high level manner as a specification which allows the interpreter to choose different execution and optimization strategies.
 """
@@ -224,6 +228,30 @@ class Fact:
 def relation(predicate: str) -> RelationCreator:
     return RelationCreator(predicate)
 
+
+
+# def run(data_source: DataSource, program: Program, query: Query):
+
+class DataSource:
+    pass
+
+class Program:
+    pass
+
+class Query:
+    pass
+
+
+class KnowledgeBase:
+    """
+    It is the union of the the Extensional Database(EDB)(base) and the Intensional Database(IDB)(derived). We will refer to EDB
+    as the database D and the IDB as the program P
+
+    Checks to make:
+    - Base predicate symbols can appear in the body of rules in P but not in the head. 
+    - Derived predicate symbols cannot appear in D and their definition is in P .
+    """
+    pass
 
 
 # def require(success: bool, error_message: str) -> Union[bool, str]:
