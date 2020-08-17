@@ -153,7 +153,7 @@ database = [
 Every value in the query should match the value in the fact if they are at the same position within the arguments
 """
 
-def variable_match(fact, query):
+def query_variable_match(fact, query):
     if fact.name != query.name:
         return False
 
@@ -169,7 +169,7 @@ assert query_variable_match(parent("A", "NoMatch"), parent(X, "Bob") ) == False
 
 
 def run_with_filter(database, rules, query):
-    return filter_facts(database, query, variable_match)
+    return filter_facts(database, query, query_variable_match)
 
 
 filtered_result1 =  run_with_filter(database, [], parent(X, "Carl")) 
@@ -193,18 +193,21 @@ The query should return:
 Ans: [human("Bob"), human("George")]
 
 """
+man = lambda x: Relation("man", [x])
+animal = lambda x: Relation("animal", [x])
+human = lambda x: Relation("human", [x])
 X = Variable("X")
 
-abe = Relation("man", ["Bob"])
-bob = Relation("man", ["George"])
-tiger = Relation("animal", ["Tiger"])
-
-head = Relation("human", [X])
-body = [Relation("man", [X])]
+head = human(X) 
+body = [man(X)]
 human_rule = Rule(head, body) # No Pun Intended when first written
-database = [abe, bob, tiger]
+database = [
+    man("Abe"),
+    man("Bob"),
+    animal("Tiger")
+]
 rules = [human_rule]
-query = Relation("human", [X])
+query = human(X)
 
 """
 The simplest rule match. For each rule, for each relation in it's body, if it matches with any of the facts in the database,
@@ -220,8 +223,21 @@ def _run_simple(rules_evaluator, match, database, rules, query):
     knowledgebase = inferred_facts + database
     return filter_facts(knowledgebase, query, match)
 
+# TODO: Delete _run_simple_conjunction after debugging
+def _run_simple_conjunction(rules_evaluator, match, database, rules, query):
+    inferred_facts = []
+    for rule in rules:
+        print("Evaluating rule:" + str(rule))
+        facts = rules_evaluator(rule, database)
+        print('Inferred Facts:' + str(facts))
+        inferred_facts.extend(facts)
+    
+    knowledgebase = inferred_facts + database
+    return filter_facts(knowledgebase, query, match)
+
+
 def run_simplest_rule(database, rules, query):
-    return _run_simple(evaluate_simplest_rule, variable_match, database, rules, query)
+    return _run_simple(evaluate_simplest_rule, query_variable_match, database, rules, query)
 
 def evaluate_simplest_rule(rule: Rule, database: List[Relation]) -> List[Relation]:
     relation = rule.body[0] # we are only considering single clause bodies
@@ -242,11 +258,44 @@ def match_relation_and_fact(relation: Relation, fact: Relation) -> Optional[Tupl
         return tuple(fact.attributes)
 
 
-human_bob = Relation("human", ["Bob"])
-human_george = Relation("human", ["George"])
-
 simplest_rule_result = run_simplest_rule(database, rules, query)
-assert simplest_rule_result == [human_bob, human_george]
+assert simplest_rule_result == [human("Abe"), human("Bob")]
+
+"""
+Next, we introduce logical AND. i.e. Given
+- echange examples of conjunction with father(X, Y) <= parent(X,Y), male(X)
+parent("Abe", "Bob"), # Abe is a parent of Bob
+parent("Abby", "Bob"),
+parent("Bob", "Carl"),
+parent("Bob", "Connor"),
+parent("Beatrice", "Carl"),
+man("Abe"),
+man("Bob"),
+woman("Abby"),
+woman("Beatrice")
+
+We'd like to find all the fathers in the house. A person is a father if he is a parent and he is a man.
+father(X, Y) <- parent(X, Y), man(X)
+
+"""
+woman = lambda x: Relation("woman", [x])
+father = lambda x, y: Relation("father", [x, y])
+
+database = [
+    parent("Abe", "Bob"), # Abe is a parent of Bob
+    parent("Abby", "Bob"),
+    parent("Bob", "Carl"),
+    parent("Bob", "Connor"),
+    parent("Beatrice", "Carl"),
+    man("Abe"),
+    man("Bob"),
+    woman("Abby"),
+    woman("Beatrice")
+]
+
+father_rule = Rule(father(X, Y), [parent(X, Y), man(X)])
+rules = [father_rule]
+query = father(X, Y)
 
 """
 Next, we introduce logical AND. i.e. Given:
@@ -263,24 +312,24 @@ Query:
 avoid_at_party(X) # This should return [avoid_at_party("Rajiv"), avoid_at_party("John")]
 
 """
-X = Variable("X")
-rajiv_loves_datalog = Relation("loves_datalog", ["Rajiv"])
-rich_loves_datalog = Relation("loves_datalog", ["Rich"])
-john_loves_datalog = Relation("loves_datalog",["John"] )
-rajiv_is_boring = Relation("boring", ["Rajiv"])
-john_is_boring = Relation("boring", ["John"])
-# avoid_at_party(X) <- loves_datalog(X), boring(X)
-avoid_head = Relation('avoid_at_party', [X])
-avoid_body = [Relation("loves_datalog", [X]), Relation("boring", [X])]
-avoid_rule = Rule(avoid_head, avoid_body)
+# X = Variable("X")
+# rajiv_loves_datalog = Relation("loves_datalog", ["Rajiv"])
+# rich_loves_datalog = Relation("loves_datalog", ["Rich"])
+# john_loves_datalog = Relation("loves_datalog",["John"] )
+# rajiv_is_boring = Relation("boring", ["Rajiv"])
+# john_is_boring = Relation("boring", ["John"])
+# # avoid_at_party(X) <- loves_datalog(X), boring(X)
+# avoid_head = Relation('avoid_at_party', [X])
+# avoid_body = [Relation("loves_datalog", [X]), Relation("boring", [X])]
+# avoid_rule = Rule(avoid_head, avoid_body)
 
-database = [rajiv_loves_datalog, rich_loves_datalog, john_loves_datalog, rajiv_is_boring, john_is_boring]
-rules = [avoid_rule]
+# database = [rajiv_loves_datalog, rich_loves_datalog, john_loves_datalog, rajiv_is_boring, john_is_boring]
+# rules = [avoid_rule]
 """
 Similar as `run_simplest_rule` but when we match the body to the facts, we have to check if the attributes match for the entire body,
 """
 def run_conjunction(database, rules, query):
-    return _run_simple(evaluate_rule_with_conjunction, variable_match, database, rules, query)
+    return _run_simple_conjunction(evaluate_rule_with_conjunction, query_variable_match, database, rules, query)
 
 def evaluate_rule_with_conjunction(rule: Rule, database: List[Relation]) -> List[Relation]:
     body_attributes = []
@@ -289,6 +338,8 @@ def evaluate_rule_with_conjunction(rule: Rule, database: List[Relation]) -> List
         _attributes = tuple(match_relation_and_database(database, relation))
         body_attributes.append(_attributes)
 
+    print('>>> Body Attributes')
+    print(body_attributes)
     attributes = conjunct(body_attributes)
 
     return [Relation(rule.head.name, list(attr)) for attr in attributes]
@@ -303,14 +354,19 @@ def conjunct(body_attributes: List[Tuple[Tuple]]) -> Set:
     return result_set
 
 
-query = Relation("avoid_at_party", [X])
-avoid_rajiv = Relation("avoid_at_party", ["Rajiv"])
-avoid_john = Relation("avoid_at_party", ["John"])
+# query = Relation("avoid_at_party", [X])
+# avoid_rajiv = Relation("avoid_at_party", ["Rajiv"])
 
-avoid_results = run_conjunction(database, rules, query)
-assert avoid_rajiv in avoid_results
-assert avoid_john in avoid_results
+# avoid_x = Relation("avoid_at_party", ["X"])
+# avoid_john = Relation("avoid_at_party", ["John"])
 
+# avoid_results = run_conjunction(database, rules, query)
+# assert avoid_rajiv in avoid_results
+# assert avoid_john in avoid_results
+
+# ==============================================================
+
+conjunction_results = run_conjunction(database, rules, query)
 
 """
 Next, we introduce the reason why we are interested in Datalog. So far, everthing we have done is easily expressed in other languages like SQL as well. Datalog has the distinctive feature of intuitively capturing hierarchies or recursion. E.g.
