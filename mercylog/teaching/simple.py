@@ -23,7 +23,7 @@ Let's first define a logical variable. It can represent a value. A relation can 
 we can create a variable like this:
 X = Variable('X')
 """
-@dataclass
+@dataclass(frozen=True)
 class Variable:
     name: str
 
@@ -157,6 +157,7 @@ def query_variable_match(fact, query):
     if fact.name != query.name:
         return False
 
+    # TODO: zip is duplicated?
     for query_attribute, fact_attribute in zip(query.attributes, fact.attributes):
         if not isinstance(query_attribute, Variable) and query_attribute != fact_attribute :
                 return False
@@ -243,7 +244,7 @@ def evaluate_simplest_rule(rule: Rule, database: List[Relation]) -> List[Relatio
     relation = rule.body[0] # we are only considering single clause bodies
     attributes = match_relation_and_database(database, relation)
 
-    return [Relation(rule.head.name, list(attr)) for attr in attributes]
+    return [Relation(rule.head.name, list(attr.values())) for attr in attributes]
 
 def match_relation_and_database(database, relation) -> List[Tuple]:
     inferred_attributes = []
@@ -253,9 +254,13 @@ def match_relation_and_database(database, relation) -> List[Tuple]:
             inferred_attributes.append(attributes)
     return inferred_attributes
 
-def match_relation_and_fact(relation: Relation, fact: Relation) -> Optional[Tuple]:
+# def match_relation_and_fact(relation: Relation, fact: Relation) -> Optional[Tuple]:
+#     if relation.name == fact.name:
+#         return tuple(fact.attributes)
+
+def match_relation_and_fact(relation: Relation, fact: Relation) -> Optional[Dict]:
     if relation.name == fact.name:
-        return tuple(fact.attributes)
+        return dict(zip(relation.attributes, fact.attributes))
 
 
 simplest_rule_result = run_simplest_rule(database, rules, query)
@@ -278,6 +283,8 @@ We'd like to find all the fathers in the house. A person is a father if he is a 
 father(X, Y) <- parent(X, Y), man(X)
 
 """
+X = Variable("X")
+Y = Variable("Y")
 woman = lambda x: Relation("woman", [x])
 father = lambda x, y: Relation("father", [x, y])
 
@@ -335,24 +342,56 @@ def evaluate_rule_with_conjunction(rule: Rule, database: List[Relation]) -> List
     body_attributes = []
 
     for relation in rule.body:
-        _attributes = tuple(match_relation_and_database(database, relation))
+        _attributes = match_relation_and_database(database, relation)
         body_attributes.append(_attributes)
 
-    print('>>> Body Attributes')
-    print(body_attributes)
+    # print('>>> Body Attributes')
+    # pprint(body_attributes)
     attributes = conjunct(body_attributes)
+    print('attributes after conjunction')
+    pprint(attributes)
 
+    aaa. extract the values from the attributes
     return [Relation(rule.head.name, list(attr)) for attr in attributes]
 
+# def conjunct(body_attributes: List[List[Dict]]) -> Set:
+#     _body_attributes = [tuple(l) for l in body_attributes]
+#     pprint("Internal Body Attrs")
+#     pprint(_body_attributes)
+#     if not _body_attributes:
+#         return set()
+    
+#     result_set = set(_body_attributes[0])
+#     for ba in _body_attributes[1:]:
+#         result_set = result_set.intersection(set(ba))
+#     return result_set
 
-def conjunct(body_attributes: List[Tuple[Tuple]]) -> Set:
-    if not body_attributes:
+
+
+def _conjunct_attributes(s1: Dict[Variable, Any], s2: Dict[Variable, Any]) -> bool:
+    common_vars = set(s1.keys()).intersection(set(s2.keys()))
+    return all([s1[c] == s2[c] for c in common_vars])
+def pairings(s1: Dict[Variable, Any], s2: Dict[Variable, Any]) -> Dict[Variable, Any]:
+    return {**s1, **s2}
+
+def conjunct(body_attributes: List[List[Dict]]) -> List:
+    _body_attributes = [tuple(l) for l in body_attributes]
+    # pprint("Internal Body Attrs")
+    # pprint(_body_attributes)
+    result = []
+    if not _body_attributes:
         return set()
-    result_set = set(body_attributes[0])
-    for ba in body_attributes[1:]:
-        result_set = result_set.intersection(set(ba))
-    return result_set
-
+    
+    set1 = _body_attributes[0]
+    set2 = _body_attributes[1]
+    for s1 in set1:
+        for s2 in set2:
+            _c = _conjunct_attributes(s1, s2)
+            if _c:
+                result.append(pairings(s1, s2))
+    
+    return result
+    
 
 # query = Relation("avoid_at_party", [X])
 # avoid_rajiv = Relation("avoid_at_party", ["Rajiv"])
@@ -367,6 +406,8 @@ def conjunct(body_attributes: List[Tuple[Tuple]]) -> Set:
 # ==============================================================
 
 conjunction_results = run_conjunction(database, rules, query)
+print('------ COnjunct results')
+pprint(conjunction_results)
 
 """
 Next, we introduce the reason why we are interested in Datalog. So far, everthing we have done is easily expressed in other languages like SQL as well. Datalog has the distinctive feature of intuitively capturing hierarchies or recursion. E.g.
