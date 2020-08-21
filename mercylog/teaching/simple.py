@@ -305,38 +305,17 @@ rules = [father_rule]
 query = father(X, Y)
 
 """
-Next, we introduce logical AND. i.e. Given:
-
-loves_datalog("Rajiv")
-loves_datalog("Rich")
-loves_datalog("John")
-boring("Rajiv")
-boring("John")
-
-avoid_at_party(X) <- loves_datalog(X), boring(X) 
-
-Query:
-avoid_at_party(X) # This should return [avoid_at_party("Rajiv"), avoid_at_party("John")]
-
-"""
-# X = Variable("X")
-# rajiv_loves_datalog = Relation("loves_datalog", ["Rajiv"])
-# rich_loves_datalog = Relation("loves_datalog", ["Rich"])
-# john_loves_datalog = Relation("loves_datalog",["John"] )
-# rajiv_is_boring = Relation("boring", ["Rajiv"])
-# john_is_boring = Relation("boring", ["John"])
-# # avoid_at_party(X) <- loves_datalog(X), boring(X)
-# avoid_head = Relation('avoid_at_party', [X])
-# avoid_body = [Relation("loves_datalog", [X]), Relation("boring", [X])]
-# avoid_rule = Rule(avoid_head, avoid_body)
-
-# database = [rajiv_loves_datalog, rich_loves_datalog, john_loves_datalog, rajiv_is_boring, john_is_boring]
-# rules = [avoid_rule]
-"""
 Similar as `run_simplest_rule` but when we match the body to the facts, we have to check if the attributes match for the entire body,
 """
 def run_conjunction(database, rules, query):
     return _run_simple_conjunction(evaluate_rule_with_conjunction, query_variable_match, database, rules, query)
+
+# def evaluate_simplest_rule(rule: Rule, database: List[Relation]) -> List[Relation]:
+#     relation = rule.body[0] # we are only considering single clause bodies
+#     attributes = match_relation_and_database(database, relation)
+
+#     return [Relation(rule.head.name, list(attr.values())) for attr in attributes]
+
 
 def evaluate_rule_with_conjunction(rule: Rule, database: List[Relation]) -> List[Relation]:
     body_attributes = []
@@ -345,69 +324,46 @@ def evaluate_rule_with_conjunction(rule: Rule, database: List[Relation]) -> List
         _attributes = match_relation_and_database(database, relation)
         body_attributes.append(_attributes)
 
-    # print('>>> Body Attributes')
-    # pprint(body_attributes)
     attributes = conjunct(body_attributes)
-    print('attributes after conjunction')
-    pprint(attributes)
-
-    aaa. extract the values from the attributes
-    return [Relation(rule.head.name, list(attr)) for attr in attributes]
-
-# def conjunct(body_attributes: List[List[Dict]]) -> Set:
-#     _body_attributes = [tuple(l) for l in body_attributes]
-#     pprint("Internal Body Attrs")
-#     pprint(_body_attributes)
-#     if not _body_attributes:
-#         return set()
     
-#     result_set = set(_body_attributes[0])
-#     for ba in _body_attributes[1:]:
-#         result_set = result_set.intersection(set(ba))
-#     return result_set
+    return [Relation(rule.head.name, rule_attributes(rule.head, attr)) for attr in attributes]
 
-
+def rule_attributes(relation: Relation, attr: Dict[Variable, Any]) -> List:
+    return [attr[a] for a in relation.attributes]
 
 def _conjunct_attributes(s1: Dict[Variable, Any], s2: Dict[Variable, Any]) -> bool:
     common_vars = set(s1.keys()).intersection(set(s2.keys()))
     return all([s1[c] == s2[c] for c in common_vars])
+
 def pairings(s1: Dict[Variable, Any], s2: Dict[Variable, Any]) -> Dict[Variable, Any]:
     return {**s1, **s2}
 
 def conjunct(body_attributes: List[List[Dict]]) -> List:
     _body_attributes = [tuple(l) for l in body_attributes]
-    # pprint("Internal Body Attrs")
-    # pprint(_body_attributes)
     result = []
     if not _body_attributes:
-        return set()
+        return [] 
     
-    set1 = _body_attributes[0]
-    set2 = _body_attributes[1]
-    for s1 in set1:
-        for s2 in set2:
-            _c = _conjunct_attributes(s1, s2)
+    attr1 = _body_attributes[0]
+    attr2 = _body_attributes[1]
+    for a1 in attr1:
+        for a2 in attr2:
+            _c = _conjunct_attributes(a1, a2)
             if _c:
-                result.append(pairings(s1, s2))
+                result.append(pairings(a1, a2))
     
     return result
     
 
-# query = Relation("avoid_at_party", [X])
-# avoid_rajiv = Relation("avoid_at_party", ["Rajiv"])
-
-# avoid_x = Relation("avoid_at_party", ["X"])
-# avoid_john = Relation("avoid_at_party", ["John"])
-
-# avoid_results = run_conjunction(database, rules, query)
-# assert avoid_rajiv in avoid_results
-# assert avoid_john in avoid_results
 
 # ==============================================================
 
 conjunction_results = run_conjunction(database, rules, query)
-print('------ COnjunct results')
-pprint(conjunction_results)
+assert len(conjunction_results) == 3
+assert father("Abe", "Bob") in conjunction_results
+assert father("Bob", "Carl") in conjunction_results
+assert father("Bob", "Connor") in conjunction_results
+
 
 """
 Next, we introduce the reason why we are interested in Datalog. So far, everthing we have done is easily expressed in other languages like SQL as well. Datalog has the distinctive feature of intuitively capturing hierarchies or recursion. E.g.
