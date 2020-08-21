@@ -224,17 +224,17 @@ def _run_simple(rules_evaluator, match, database, rules, query):
     knowledgebase = inferred_facts + database
     return filter_facts(knowledgebase, query, match)
 
-# TODO: Delete _run_simple_conjunction after debugging
-def _run_simple_conjunction(rules_evaluator, match, database, rules, query):
-    inferred_facts = []
-    for rule in rules:
-        print("Evaluating rule:" + str(rule))
-        facts = rules_evaluator(rule, database)
-        print('Inferred Facts:' + str(facts))
-        inferred_facts.extend(facts)
+# # TODO: Delete _run_simple_conjunction after debugging
+# def _run_simple_conjunction(rules_evaluator, match, database, rules, query):
+#     inferred_facts = []
+#     for rule in rules:
+#         print("Evaluating rule:" + str(rule))
+#         facts = rules_evaluator(rule, database)
+#         print('Inferred Facts:' + str(facts))
+#         inferred_facts.extend(facts)
     
-    knowledgebase = inferred_facts + database
-    return filter_facts(knowledgebase, query, match)
+#     knowledgebase = inferred_facts + database
+#     return filter_facts(knowledgebase, query, match)
 
 
 def run_simplest_rule(database, rules, query):
@@ -308,13 +308,7 @@ query = father(X, Y)
 Similar as `run_simplest_rule` but when we match the body to the facts, we have to check if the attributes match for the entire body,
 """
 def run_conjunction(database, rules, query):
-    return _run_simple_conjunction(evaluate_rule_with_conjunction, query_variable_match, database, rules, query)
-
-# def evaluate_simplest_rule(rule: Rule, database: List[Relation]) -> List[Relation]:
-#     relation = rule.body[0] # we are only considering single clause bodies
-#     attributes = match_relation_and_database(database, relation)
-
-#     return [Relation(rule.head.name, list(attr.values())) for attr in attributes]
+    return _run_simple(evaluate_rule_with_conjunction, query_variable_match, database, rules, query)
 
 
 def evaluate_rule_with_conjunction(rule: Rule, database: List[Relation]) -> List[Relation]:
@@ -331,29 +325,23 @@ def evaluate_rule_with_conjunction(rule: Rule, database: List[Relation]) -> List
 def rule_attributes(relation: Relation, attr: Dict[Variable, Any]) -> List:
     return [attr[a] for a in relation.attributes]
 
-def _conjunct_attributes(s1: Dict[Variable, Any], s2: Dict[Variable, Any]) -> bool:
-    common_vars = set(s1.keys()).intersection(set(s2.keys()))
-    return all([s1[c] == s2[c] for c in common_vars])
-
-def pairings(s1: Dict[Variable, Any], s2: Dict[Variable, Any]) -> Dict[Variable, Any]:
-    return {**s1, **s2}
-
 def conjunct(body_attributes: List[List[Dict]]) -> List:
-    _body_attributes = [tuple(l) for l in body_attributes]
+    # TODO: This only handles bodies of size 2
     result = []
-    if not _body_attributes:
-        return [] 
-    
-    attr1 = _body_attributes[0]
-    attr2 = _body_attributes[1]
+    attr1 = body_attributes[0]
+    attr2 = body_attributes[1]
     for a1 in attr1:
         for a2 in attr2:
-            _c = _conjunct_attributes(a1, a2)
+            _c = has_common_value(a1, a2)
             if _c:
-                result.append(pairings(a1, a2))
+                result.append({**a1, **a2})
     
     return result
     
+
+def has_common_value(s1: Dict[Variable, Any], s2: Dict[Variable, Any]) -> bool:
+    common_vars = set(s1.keys()).intersection(set(s2.keys()))
+    return all([s1[c] == s2[c] for c in common_vars])
 
 
 # ==============================================================
@@ -434,4 +422,5 @@ human if you are man or if you are woman
 """
 
 
-print('==================================== All Tests Pass ==================================================')
+success_str = '==================================== All Tests Pass ==================================================' 
+print('\x1b[6;30;42m' + success_str + '\x1b[0m')
