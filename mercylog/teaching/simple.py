@@ -224,19 +224,6 @@ def _run_simple(rules_evaluator, match, database, rules, query):
     knowledgebase = inferred_facts + database
     return filter_facts(knowledgebase, query, match)
 
-# # TODO: Delete _run_simple_conjunction after debugging
-# def _run_simple_conjunction(rules_evaluator, match, database, rules, query):
-#     inferred_facts = []
-#     for rule in rules:
-#         print("Evaluating rule:" + str(rule))
-#         facts = rules_evaluator(rule, database)
-#         print('Inferred Facts:' + str(facts))
-#         inferred_facts.extend(facts)
-    
-#     knowledgebase = inferred_facts + database
-#     return filter_facts(knowledgebase, query, match)
-
-
 def run_simplest_rule(database, rules, query):
     return _run_simple(evaluate_simplest_rule, query_variable_match, database, rules, query)
 
@@ -254,9 +241,6 @@ def match_relation_and_database(database, relation) -> List[Tuple]:
             inferred_attributes.append(attributes)
     return inferred_attributes
 
-# def match_relation_and_fact(relation: Relation, fact: Relation) -> Optional[Tuple]:
-#     if relation.name == fact.name:
-#         return tuple(fact.attributes)
 
 def match_relation_and_fact(relation: Relation, fact: Relation) -> Optional[Dict]:
     if relation.name == fact.name:
@@ -264,6 +248,7 @@ def match_relation_and_fact(relation: Relation, fact: Relation) -> Optional[Dict
 
 
 simplest_rule_result = run_simplest_rule(database, rules, query)
+# simplest_rule_result = run_conjunction(database, rules, query)
 assert simplest_rule_result == [human("Abe"), human("Bob")]
 
 """
@@ -326,8 +311,10 @@ def rule_attributes(relation: Relation, attr: Dict[Variable, Any]) -> List:
     return [attr[a] for a in relation.attributes]
 
 def conjunct(body_attributes: List[List[Dict]]) -> List:
-    # TODO: This only handles bodies of size 2
     result = []
+    if len(body_attributes) == 1:
+        return body_attributes[0]
+    
     attr1 = body_attributes[0]
     attr2 = body_attributes[1]
     for a1 in attr1:
@@ -351,6 +338,10 @@ assert len(conjunction_results) == 3
 assert father("Abe", "Bob") in conjunction_results
 assert father("Bob", "Carl") in conjunction_results
 assert father("Bob", "Connor") in conjunction_results
+
+rules = [Rule(human(X), [man(X)])]
+conjunction_result_simple_rule = run_conjunction(database, rules, human(X))
+assert conjunction_result_simple_rule == [human("Abe"), human("Bob")]
 
 
 """
