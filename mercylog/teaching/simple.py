@@ -297,6 +297,8 @@ def run_conjunction(database, rules, query):
 
 
 def evaluate_rule_with_conjunction(rule: Rule, database: List[Relation]) -> List[Relation]:
+    # print('Rule')
+    # pprint(rule)
     body_attributes = []
 
     for relation in rule.body:
@@ -304,6 +306,8 @@ def evaluate_rule_with_conjunction(rule: Rule, database: List[Relation]) -> List
         body_attributes.append(_attributes)
 
     attributes = conjunct(body_attributes)
+    # print('Conjuncted Attributes')
+    # pprint(attributes)
     
     return [Relation(rule.head.name, rule_attributes(rule.head, attr)) for attr in attributes]
 
@@ -333,19 +337,19 @@ def has_common_value(s1: Dict[Variable, Any], s2: Dict[Variable, Any]) -> bool:
 
 # ==============================================================
 
-conjunction_results = run_conjunction(database, rules, query)
-assert len(conjunction_results) == 3
-assert father("Abe", "Bob") in conjunction_results
-assert father("Bob", "Carl") in conjunction_results
-assert father("Bob", "Connor") in conjunction_results
+# conjunction_results = run_conjunction(database, rules, query)
+# assert len(conjunction_results) == 3
+# assert father("Abe", "Bob") in conjunction_results
+# assert father("Bob", "Carl") in conjunction_results
+# assert father("Bob", "Connor") in conjunction_results
 
-rules = [Rule(human(X), [man(X)])]
-conjunction_result_simple_rule = run_conjunction(database, rules, human(X))
-assert conjunction_result_simple_rule == [human("Abe"), human("Bob")]
+# rules = [Rule(human(X), [man(X)])]
+# conjunction_result_simple_rule = run_conjunction(database, rules, human(X))
+# assert conjunction_result_simple_rule == [human("Abe"), human("Bob")]
 
 
 """
-Next, we introduce the reason why we are interested in Datalog. So far, everthing we have done is easily expressed in other languages like SQL as well. Datalog has the distinctive feature of intuitively capturing hierarchies or recursion. E.g.
+Next, we introduce the reason why we are interested in Datalog. Datalog has the distinctive feature of intuitively capturing hierarchies or recursion. E.g. we want to find all who are ancestors of someone
 
 parent("A", "B") # A is the parent of B
 parent("B", "C")
@@ -353,23 +357,34 @@ parent("C", "D")
 parent("AA", "BB")
 parent("BB", "CC")
 
+# A parent X of Y is by definition an ancestor.
 ancestor(X, Y) <= parent(X, Y)
+# If you are a parent of Y and Y is an an ancestor, then you are an ancestor as well.
 ancestor(X, Z) <= parent(X, Y), ancestor(Y, Z)
 
 Query:
 ancestor(X, Y)
 # Should return all the parents above as ancestors 
 ancestor("A", "B") # A is the ancestor of B
+ancestor("A", "C") # A -> B -> C
+ancestor("A", "D") # A -> B -> C -> D
 ancestor("B", "C")
+ancestor("B", "D") # B -> C -> D
 ancestor("C", "D")
 ancestor("AA", "BB")
+ancestor("AA", "CC") # AA -> BB -> CC
 ancestor("BB", "CC")
 
 It's going to start looking a bit ugly so let's define helper methods
 """
-ancestor = lambda ancestor, descendant: Relation('ancestor', [Variable(ancestor), Variable(descendant)])
+ancestor = lambda ancestor, descendant: Relation('ancestor', [ancestor, descendant])
 
-database = [parent("A", "B"), parent("B", "C"), parent("C", "D"), parent("AA", "BB"), parent("BB", "CC")]
+database = [
+    parent("A", "B"), 
+    parent("B", "C"), 
+    parent("C", "D"), 
+    parent("AA", "BB"),
+    parent("BB", "CC")]
 
 
 X = Variable("X")
@@ -380,34 +395,158 @@ ancestor_rule_base = Rule(ancestor(X, Y), [parent(X, Y)])
 # ancestor(X, Z) <= parent(X, Y), ancestor(Y, Z)
 ancestor_rule_recursive = Rule(ancestor(X, Z), [parent(X, Y), ancestor(Y, Z)])
 
-no_rules = [ancestor_rule_base, ancestor_rule_recursive]
+rules = [ancestor_rule_base, ancestor_rule_recursive]
 
 """
-We define the evaluation 
+Alright, let's dive into this. What is different from run_conjunction? It's the hierarchy or recursion. If you see it as hierarchy(I'm visualizing this as a tree), one has to keep on going until we reach the top(or the bottom) of the tree. If we see it as a recursion, we keep on going till we hit the base case which terminates the recursion. So let's imagine how we would process the above example. In the first pass, we would do the simplest inference from base fact to derived fact using the base rule of ancestor(X, Y) <= parent(X, Y) 
+
+
+Pass 1: Base Facts and Inferred facts i.e. KnowledgeBase1
+parent("A", "B"), 
+parent("B", "C"), 
+parent("C", "D"), 
+parent("AA", "BB"),
+parent("BB", "CC")]
+# ----------------- New inferred facts below --------------
+ancestor("A", "B"), 
+ancestor("B", "C"), 
+ancestor("C", "D"), 
+ancestor("AA", "BB"),
+ancestor("BB", "CC")
+
+Now that's done, we can focus on inference from a combination of inferred facts and base facts to new inferred facts using the recursive rule ancestor(X, Z) <= parent(X, Y), ancestor(Y, Z). For e.g. in KnowledgeBase1, we have parent("C","D") and ancestor("B", "C") , so we can infer the fact ancestor("B", "D") i.e grandparents. We keep on doing this till we get:
+
+Pass 2: KnowledgeBase2
+parent("A", "B"), 
+parent("B", "C"), 
+parent("C", "D"), 
+parent("AA", "BB"),
+parent("BB", "CC")]
+ancestor("A", "B"), 
+ancestor("B", "C"), 
+ancestor("C", "D"), 
+ancestor("AA", "BB"),
+ancestor("BB", "CC")
+# ----------------- New inferred facts below --------------
+ancestor("A", "C")
+ancestor("B", "D")
+ancestor("AA", "CC")
+
+Do we stop? No, we have to keep on going till we find all the ancestors. Let's apply the rules to KnowledgeBase2 and get
+
+Pass 3: KnowledgeBase3
+parent("A", "B"), 
+parent("B", "C"), 
+parent("C", "D"), 
+parent("AA", "BB"),
+parent("BB", "CC")]
+ancestor("A", "B"), 
+ancestor("B", "C"), 
+ancestor("C", "D"), 
+ancestor("AA", "BB"),
+ancestor("BB", "CC")
+ancestor("A", "C")
+ancestor("B", "D")
+ancestor("AA", "CC")
+# ----------------- New inferred facts below --------------
+ancestor("A", "D")
+
+i.e A is the great grand parent of D
+
+Do we stop? Yes(if you look at the above example), but the computer does not know that. There could be new inferred facts, so let's try again for KnowledgeBase4
+
+Pass 4: KnowledgeBase4
+parent("A", "B"), 
+parent("B", "C"), 
+parent("C", "D"), 
+parent("AA", "BB"),
+parent("BB", "CC")]
+ancestor("A", "B"), 
+ancestor("B", "C"), 
+ancestor("C", "D"), 
+ancestor("AA", "BB"),
+ancestor("BB", "CC")
+ancestor("A", "C")
+ancestor("B", "D")
+ancestor("AA", "CC")
+ancestor("A", "D")
+# ----------------- New inferred facts below --------------
+
+
+Aha! There are no more new inferred facts. If we do another pass on KnowledgeBase4, it would come out the same. So we can stop!
+
+So the logic to stop would be:
+Take the output of each iteration. If it matches the input stop(as we did not learn any new inferred facts). If not a match, then run another iteration. Let's call this method iterate_until_no_change
+
+"""
+# def iterate_until_no_change(transform, initial_value):
+#     a_input = initial_value
+
+    
+#     while True:
+#         a_output = transform(a_input)
+#         print("============Iteration Output ================")
+#         pprint(a_output)
+#         if a_output == a_input:
+#             return a_output
+#         a_input = a_output
+
+def iterate_until_no_change(transform, initial_value):
+    a_input = initial_value
+    max_iteration = 2
+    current_iteration = 0
+    while current_iteration < max_iteration:
+        a_output = transform(a_input)
+        print(f"============Iteration Output {current_iteration }================")
+        pprint(a_output)
+        if a_output == a_input:
+            return a_output
+        a_input = a_output
+        current_iteration+=1
+
+
+"""
+Now, we already have run_conjunction. That will be our transform function
 """
 
-# def run_recursive(database, rules, query):
-#     return _run_recursive(evaluate_recursive_rule, database, rules, query)
+def run_recursive(database, rules, query):
+    return _run_recursive(evaluate_rule_with_conjunction, query_variable_match, database, rules, query)
 
 
-# def _run_recursive():
-#     pass
+# TODO: Do we have to refactor _run_simple as well as it has some common parts with _run_recursive
+"""[summary]
+RA: define an unique function and it's motivation
+"""
+def generate_knowledgebase(rules_evaluator, database, rules):
+    inferred_facts = []
+    for rule in rules:
+        facts = rules_evaluator(rule, database)
+        inferred_facts.extend(facts)
+    
+    return inferred_facts + database
 
-# def evaluate_recursive_rule(rule: Rule, database: List[Relation]) -> List[Relation]:
-#     pass 
+    
+def _run_recursive(rules_evaluator, match, database, rules, query):
+    tranformer = lambda a_knowledgebase: generate_knowledgebase(rules_evaluator, a_knowledgebase, rules)
+    knowledgebase = iterate_until_no_change(tranformer, database)
+    print('Knowledgebase')
+    pprint(knowledgebase)
+    return filter_facts(knowledgebase, query, match)
 
 """
 Let's define the query
 """
-# query = ancestor(X, Y)
+query = ancestor(X, Y)
 
-# recursive_result = run_recursive(database, rules, query)
-# expected_result = [ancestor("A", "B"), ancestor("B", "C"), ancestor("C", "D"), ancestor("AA", "BB"), ancestor("BB", "CC")]
+recursive_result = run_recursive(database, rules, query)
+expected_result = [ancestor("A", "B"), ancestor("B", "C"), ancestor("C", "D"), ancestor("AA", "BB"), ancestor("BB", "CC")]
 
-# for a in expected_result:
-#     assert a in recursive_result, f"{a} not in {recursive_result}"
+for a in expected_result:
+    assert a in recursive_result, f"{a} not in {recursive_result}"
+
 
 """
+RA: Do Logical OR?
 Next, we introduce logical OR
 human if you are man or if you are woman
 """
@@ -415,3 +554,7 @@ human if you are man or if you are woman
 
 success_str = '==================================== All Tests Pass ==================================================' 
 print('\x1b[6;30;42m' + success_str + '\x1b[0m')
+
+"""[summary]
+* SQL does support recursion. I just find Datalog has a cleaner syntax. RA: Cite SQL Recursion Example
+"""
