@@ -43,13 +43,13 @@ So a relation has a name(e.g. parent) and a list of attributes(e.g. "John" and "
 @dataclass(frozen=True)
 class Relation:
     """
-    man("Bob) is Relation("man", ["Bob"])
-    parent("John", "Chester") is Relation("parent", ["John", "Chester"])
-    man(X) is Relation("man", [Variable("X")])
+    man("Bob) is Relation("man", ("Bob",))
+    parent("John", "Chester") is Relation("parent", ("John", "Chester"))
+    man(X) is Relation("man", (Variable("X"),))
 
     """
     name: str
-    attributes: List
+    attributes: Tuple 
 
 
 """
@@ -85,12 +85,12 @@ This would be similar to a SQL query `select * from man`
 Here's how I would compose it in Python
 """
 X = Variable('X')
-abe = Relation("man", ["Abe"])
-bob = Relation("man", ["Bob"])
-abby = Relation("woman", ["Abby"])
+abe = Relation("man", ("Abe",))
+bob = Relation("man", ("Bob",))
+abby = Relation("woman", ("Abby",))
 database = [abe, bob, abby]
 no_rules = []
-query = Relation("man", [X])
+query = Relation("man", (X,))
 
 
 """
@@ -139,7 +139,7 @@ parent(X, "Carl") is similar to select * from parent where child = "Carl" if the
 """
 Let's code that up. I'm just going to make a helper function to make it easy to express a parent relation
 """
-parent = lambda parent, child: Relation("parent", [parent, child])
+parent = lambda parent, child: Relation("parent", (parent, child))
 database = [
     parent("Abe", "Bob"), # Abe is a parent of Bob
     parent("Abby", "Bob"),
@@ -194,9 +194,9 @@ The query should return:
 Ans: [human("Bob"), human("George")]
 
 """
-man = lambda x: Relation("man", [x])
-animal = lambda x: Relation("animal", [x])
-human = lambda x: Relation("human", [x])
+man = lambda x: Relation("man", (x,))
+animal = lambda x: Relation("animal", (x,))
+human = lambda x: Relation("human", (x,))
 X = Variable("X")
 
 head = human(X) 
@@ -231,7 +231,7 @@ def evaluate_simplest_rule(rule: Rule, database: List[Relation]) -> List[Relatio
     relation = rule.body[0] # we are only considering single clause bodies
     attributes = match_relation_and_database(database, relation)
 
-    return [Relation(rule.head.name, list(attr.values())) for attr in attributes]
+    return [Relation(rule.head.name, tuple(attr.values())) for attr in attributes]
 
 def match_relation_and_database(database, relation) -> List[Tuple]:
     inferred_attributes = []
@@ -249,7 +249,7 @@ def match_relation_and_fact(relation: Relation, fact: Relation) -> Optional[Dict
 
 simplest_rule_result = run_simplest_rule(database, rules, query)
 # simplest_rule_result = run_conjunction(database, rules, query)
-assert simplest_rule_result == [human("Abe"), human("Bob")]
+assert simplest_rule_result == [human("Abe"), human("Bob")], f"result was {simplest_rule_result}"
 
 """
 Next, we introduce logical AND. i.e. Given
@@ -270,8 +270,8 @@ father(X, Y) <- parent(X, Y), man(X)
 """
 X = Variable("X")
 Y = Variable("Y")
-woman = lambda x: Relation("woman", [x])
-father = lambda x, y: Relation("father", [x, y])
+woman = lambda x: Relation("woman", (x,))
+father = lambda x, y: Relation("father", (x, y))
 
 database = [
     parent("Abe", "Bob"), # Abe is a parent of Bob
@@ -311,8 +311,8 @@ def evaluate_rule_with_conjunction(rule: Rule, database: List[Relation]) -> List
     
     return [Relation(rule.head.name, rule_attributes(rule.head, attr)) for attr in attributes]
 
-def rule_attributes(relation: Relation, attr: Dict[Variable, Any]) -> List:
-    return [attr[a] for a in relation.attributes]
+def rule_attributes(relation: Relation, attr: Dict[Variable, Any]) -> Tuple:
+    return tuple([attr[a] for a in relation.attributes])
 
 def conjunct(body_attributes: List[List[Dict]]) -> List:
     result = []
@@ -377,7 +377,7 @@ ancestor("BB", "CC")
 
 It's going to start looking a bit ugly so let's define helper methods
 """
-ancestor = lambda ancestor, descendant: Relation('ancestor', [ancestor, descendant])
+ancestor = lambda ancestor, descendant: Relation('ancestor', (ancestor, descendant))
 
 database = [
     parent("A", "B"), 
@@ -421,7 +421,7 @@ parent("A", "B"),
 parent("B", "C"), 
 parent("C", "D"), 
 parent("AA", "BB"),
-parent("BB", "CC")]
+parent("BB", "CC")
 ancestor("A", "B"), 
 ancestor("B", "C"), 
 ancestor("C", "D"), 
@@ -439,7 +439,7 @@ parent("A", "B"),
 parent("B", "C"), 
 parent("C", "D"), 
 parent("AA", "BB"),
-parent("BB", "CC")]
+parent("BB", "CC")
 ancestor("A", "B"), 
 ancestor("B", "C"), 
 ancestor("C", "D"), 
@@ -460,7 +460,7 @@ parent("A", "B"),
 parent("B", "C"), 
 parent("C", "D"), 
 parent("AA", "BB"),
-parent("BB", "CC")]
+parent("BB", "CC"),
 ancestor("A", "B"), 
 ancestor("B", "C"), 
 ancestor("C", "D"), 
@@ -479,30 +479,32 @@ So the logic to stop would be:
 Take the output of each iteration. If it matches the input stop(as we did not learn any new inferred facts). If not a match, then run another iteration. Let's call this method iterate_until_no_change
 
 """
-# def iterate_until_no_change(transform, initial_value):
-#     a_input = initial_value
-
-    
-#     while True:
-#         a_output = transform(a_input)
-#         print("============Iteration Output ================")
-#         pprint(a_output)
-#         if a_output == a_input:
-#             return a_output
-#         a_input = a_output
-
 def iterate_until_no_change(transform, initial_value):
     a_input = initial_value
-    max_iteration = 2
-    current_iteration = 0
-    while current_iteration < max_iteration:
+
+    
+    while True:
         a_output = transform(a_input)
-        print(f"============Iteration Output {current_iteration }================")
+        print("============Iteration Output ================")
         pprint(a_output)
         if a_output == a_input:
             return a_output
         a_input = a_output
-        current_iteration+=1
+
+# def iterate_until_no_change(transform, initial_value):
+#     a_input = initial_value
+#     max_iteration = 4
+#     current_iteration = 0
+#     while current_iteration < max_iteration:
+#         a_output = transform(a_input)
+#         print(f"============Iteration Output {current_iteration }================")
+#         pprint(a_output)
+#         if a_output == a_input:
+#             return a_output
+#         a_input = a_output
+#         current_iteration+=1
+    
+#     return a_output
 
 
 """
@@ -523,14 +525,13 @@ def generate_knowledgebase(rules_evaluator, database, rules):
         facts = rules_evaluator(rule, database)
         inferred_facts.extend(facts)
     
-    return inferred_facts + database
+    # return set(set(inferred_facts) + database)
+    return set(inferred_facts).union(database) 
 
     
 def _run_recursive(rules_evaluator, match, database, rules, query):
     tranformer = lambda a_knowledgebase: generate_knowledgebase(rules_evaluator, a_knowledgebase, rules)
     knowledgebase = iterate_until_no_change(tranformer, database)
-    print('Knowledgebase')
-    pprint(knowledgebase)
     return filter_facts(knowledgebase, query, match)
 
 """
@@ -539,11 +540,20 @@ Let's define the query
 query = ancestor(X, Y)
 
 recursive_result = run_recursive(database, rules, query)
-expected_result = [ancestor("A", "B"), ancestor("B", "C"), ancestor("C", "D"), ancestor("AA", "BB"), ancestor("BB", "CC")]
 
-for a in expected_result:
-    assert a in recursive_result, f"{a} not in {recursive_result}"
+expected_result = {
+ancestor("A", "B"), 
+ancestor("B", "C"), 
+ancestor("C", "D"), 
+ancestor("AA", "BB"),
+ancestor("BB", "CC"),
+ancestor("A", "C"),
+ancestor("B", "D"),
+ancestor("AA", "CC"),
+ancestor("A", "D")
+}
 
+assert set(recursive_result) == expected_result, f"{recursive_result} not equal to {expected_result}"
 
 """
 RA: Do Logical OR?
