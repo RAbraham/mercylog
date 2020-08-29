@@ -1,6 +1,7 @@
 from typing import *
 from dataclasses import dataclass
 from pprint import pprint
+
 """
 Let's start with a simple Datalog Program. In Datalog, it would be:
 man("Brad")
@@ -19,6 +20,7 @@ X is a logical variable. It is used to refer to values abstractly. So man(X) cou
 """
 Let's first define a logical variable. It can represent a value. A relation can hold either a variable or a value.
 """
+
 """
 we can create a variable like this:
 X = Variable('X')
@@ -230,14 +232,6 @@ def evaluate_simplest_rule(rule: Rule, database: List[Relation]) -> List[Relatio
 
     return [Relation(rule.head.name, tuple(attr.values())) for attr in attributes]
 
-# def match_relation_and_database(database, relation) -> List[Tuple]:
-#     inferred_attributes = []
-#     for fact in database:
-#         attributes = match_relation_and_fact(relation, fact)
-#         if attributes:
-#             inferred_attributes.append(attributes)
-#     return inferred_attributes
-
 
 def match_relation_and_database(database, relation) -> List[Tuple]:
     inferred_attributes = []
@@ -337,7 +331,6 @@ def has_common_value(s1: Dict[Variable, Any], s2: Dict[Variable, Any]) -> bool:
     return all([s1[c] == s2[c] for c in common_vars])
 
 
-# ==============================================================
 
 conjunction_results = run_conjunction(database, rules, query)
 assert len(conjunction_results) == 3
