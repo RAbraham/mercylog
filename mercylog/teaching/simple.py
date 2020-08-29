@@ -40,7 +40,7 @@ It could also be components of a rule e.g.
 So a relation has a name(e.g. parent) and a list of attributes(e.g. "John" and "Chester" or X). 
 """
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=True)
 class Relation:
     """
     man("Bob) is Relation("man", ("Bob",))
@@ -63,10 +63,10 @@ A rule has:
 
 X are Y are logical variables. It represents values. For e.g. man(X) could be matched to man("Bob") so X could be equal to Bob 
 """
-@dataclass
+@dataclass(frozen=True, eq=True)
 class Rule:
     head: Relation
-    body: List[Relation]
+    body: Set[Relation]
 
 """
 Let's start with a simple query. No rules, just facts. Given:
@@ -88,8 +88,8 @@ X = Variable('X')
 abe = Relation("man", ("Abe",))
 bob = Relation("man", ("Bob",))
 abby = Relation("woman", ("Abby",))
-database = [abe, bob, abby]
-no_rules = []
+database = {abe, bob, abby}
+no_rules = [] 
 query = Relation("man", (X,))
 
 
@@ -105,15 +105,14 @@ def name_match(fact, query):
     return fact.name == query.name
 
 def filter_facts(database, query, match):
-    return [fact for fact in database if match(fact, query)]
+    return {fact for fact in database if match(fact, query)}
 
 
 def run_simplest(database, rules, query):
     return filter_facts(database, query, name_match) 
 
 
-
-assert run_simplest(database, no_rules, query) == [abe, bob]
+assert run_simplest(database, no_rules, query) == {abe, bob}
 
 """
 Let's add two tuple facts
@@ -140,13 +139,13 @@ parent(X, "Carl") is similar to select * from parent where child = "Carl" if the
 Let's code that up. I'm just going to make a helper function to make it easy to express a parent relation
 """
 parent = lambda parent, child: Relation("parent", (parent, child))
-database = [
+database = {
     parent("Abe", "Bob"), # Abe is a parent of Bob
     parent("Abby", "Bob"),
     parent("Bob", "Carl"),
     parent("Bob", "Connor"),
     parent("Beatrice", "Carl")
-]
+}
 
 
 """
@@ -174,10 +173,10 @@ def run_with_filter(database, rules, query):
 
 
 filtered_result1 =  run_with_filter(database, [], parent(X, "Carl")) 
-assert filtered_result1 == [parent("Bob", "Carl"), parent("Beatrice", "Carl")]
+assert filtered_result1 == {parent("Bob", "Carl"), parent("Beatrice", "Carl")}
 
 filtered_result2 =  run_with_filter(database, [], parent("Bob", X)) 
-assert filtered_result2 == [parent("Bob", "Carl"), parent("Bob", "Connor")]
+assert filtered_result2 == {parent("Bob", "Carl"), parent("Bob", "Connor")}
 
 
 """
@@ -200,13 +199,13 @@ human = lambda x: Relation("human", (x,))
 X = Variable("X")
 
 head = human(X) 
-body = [man(X)]
+body = {man(X)}
 human_rule = Rule(head, body) # No Pun Intended when first written
-database = [
+database = {
     man("Abe"),
     man("Bob"),
     animal("Tiger")
-]
+}
 rules = [human_rule]
 query = human(X)
 
@@ -216,22 +215,29 @@ then get the attributes of that fact and transfer it to the head.
 
 """
 def _run_simple(rules_evaluator, match, database, rules, query):
-    inferred_facts = []
+    knowledge_base = database
     for rule in rules:
-        facts = rules_evaluator(rule, database)
-        inferred_facts.extend(facts)
+        knowledge_base = knowledge_base.union(rules_evaluator(rule, database))
     
-    knowledgebase = inferred_facts + database
-    return filter_facts(knowledgebase, query, match)
+    return filter_facts(knowledge_base, query, match)
 
 def run_simplest_rule(database, rules, query):
     return _run_simple(evaluate_simplest_rule, query_variable_match, database, rules, query)
 
 def evaluate_simplest_rule(rule: Rule, database: List[Relation]) -> List[Relation]:
-    relation = rule.body[0] # we are only considering single clause bodies
+    relation = list(rule.body)[0] # we are only considering single clause bodies
     attributes = match_relation_and_database(database, relation)
 
     return [Relation(rule.head.name, tuple(attr.values())) for attr in attributes]
+
+# def match_relation_and_database(database, relation) -> List[Tuple]:
+#     inferred_attributes = []
+#     for fact in database:
+#         attributes = match_relation_and_fact(relation, fact)
+#         if attributes:
+#             inferred_attributes.append(attributes)
+#     return inferred_attributes
+
 
 def match_relation_and_database(database, relation) -> List[Tuple]:
     inferred_attributes = []
@@ -249,7 +255,7 @@ def match_relation_and_fact(relation: Relation, fact: Relation) -> Optional[Dict
 
 simplest_rule_result = run_simplest_rule(database, rules, query)
 # simplest_rule_result = run_conjunction(database, rules, query)
-assert simplest_rule_result == [human("Abe"), human("Bob")], f"result was {simplest_rule_result}"
+assert simplest_rule_result == {human("Abe"), human("Bob")}, f"result was {simplest_rule_result}"
 
 """
 Next, we introduce logical AND. i.e. Given
@@ -273,7 +279,7 @@ Y = Variable("Y")
 woman = lambda x: Relation("woman", (x,))
 father = lambda x, y: Relation("father", (x, y))
 
-database = [
+database = {
     parent("Abe", "Bob"), # Abe is a parent of Bob
     parent("Abby", "Bob"),
     parent("Bob", "Carl"),
@@ -283,9 +289,9 @@ database = [
     man("Bob"),
     woman("Abby"),
     woman("Beatrice")
-]
+}
 
-father_rule = Rule(father(X, Y), [parent(X, Y), man(X)])
+father_rule = Rule(father(X, Y), {parent(X, Y), man(X)})
 rules = [father_rule]
 query = father(X, Y)
 
@@ -295,10 +301,7 @@ Similar as `run_simplest_rule` but when we match the body to the facts, we have 
 def run_conjunction(database, rules, query):
     return _run_simple(evaluate_rule_with_conjunction, query_variable_match, database, rules, query)
 
-
-def evaluate_rule_with_conjunction(rule: Rule, database: List[Relation]) -> List[Relation]:
-    # print('Rule')
-    # pprint(rule)
+def evaluate_rule_with_conjunction(rule: Rule, database: List[Relation]) -> Set[Relation]:
     body_attributes = []
 
     for relation in rule.body:
@@ -306,10 +309,9 @@ def evaluate_rule_with_conjunction(rule: Rule, database: List[Relation]) -> List
         body_attributes.append(_attributes)
 
     attributes = conjunct(body_attributes)
-    # print('Conjuncted Attributes')
-    # pprint(attributes)
     
-    return [Relation(rule.head.name, rule_attributes(rule.head, attr)) for attr in attributes]
+    return {Relation(rule.head.name, rule_attributes(rule.head, attr)) for attr in attributes}
+
 
 def rule_attributes(relation: Relation, attr: Dict[Variable, Any]) -> Tuple:
     return tuple([attr[a] for a in relation.attributes])
@@ -337,15 +339,15 @@ def has_common_value(s1: Dict[Variable, Any], s2: Dict[Variable, Any]) -> bool:
 
 # ==============================================================
 
-# conjunction_results = run_conjunction(database, rules, query)
-# assert len(conjunction_results) == 3
-# assert father("Abe", "Bob") in conjunction_results
-# assert father("Bob", "Carl") in conjunction_results
-# assert father("Bob", "Connor") in conjunction_results
+conjunction_results = run_conjunction(database, rules, query)
+assert len(conjunction_results) == 3
+assert father("Abe", "Bob") in conjunction_results
+assert father("Bob", "Carl") in conjunction_results
+assert father("Bob", "Connor") in conjunction_results
 
-# rules = [Rule(human(X), [man(X)])]
-# conjunction_result_simple_rule = run_conjunction(database, rules, human(X))
-# assert conjunction_result_simple_rule == [human("Abe"), human("Bob")]
+rules = [Rule(human(X), {man(X)})]
+conjunction_result_simple_rule = run_conjunction(database, rules, human(X))
+assert conjunction_result_simple_rule == {human("Abe"), human("Bob")}
 
 
 """
@@ -379,12 +381,13 @@ It's going to start looking a bit ugly so let's define helper methods
 """
 ancestor = lambda ancestor, descendant: Relation('ancestor', (ancestor, descendant))
 
-database = [
+database = {
     parent("A", "B"), 
     parent("B", "C"), 
     parent("C", "D"), 
     parent("AA", "BB"),
-    parent("BB", "CC")]
+    parent("BB", "CC")
+}
 
 
 X = Variable("X")
@@ -393,7 +396,7 @@ Z = Variable("Z")
 # ancestor(X, Y) <= parent(X, Y)
 ancestor_rule_base = Rule(ancestor(X, Y), [parent(X, Y)])
 # ancestor(X, Z) <= parent(X, Y), ancestor(Y, Z)
-ancestor_rule_recursive = Rule(ancestor(X, Z), [parent(X, Y), ancestor(Y, Z)])
+ancestor_rule_recursive = Rule(ancestor(X, Z), {parent(X, Y), ancestor(Y, Z)})
 
 rules = [ancestor_rule_base, ancestor_rule_recursive]
 
@@ -482,29 +485,11 @@ Take the output of each iteration. If it matches the input stop(as we did not le
 def iterate_until_no_change(transform, initial_value):
     a_input = initial_value
 
-    
     while True:
         a_output = transform(a_input)
-        print("============Iteration Output ================")
-        pprint(a_output)
         if a_output == a_input:
             return a_output
         a_input = a_output
-
-# def iterate_until_no_change(transform, initial_value):
-#     a_input = initial_value
-#     max_iteration = 4
-#     current_iteration = 0
-#     while current_iteration < max_iteration:
-#         a_output = transform(a_input)
-#         print(f"============Iteration Output {current_iteration }================")
-#         pprint(a_output)
-#         if a_output == a_input:
-#             return a_output
-#         a_input = a_output
-#         current_iteration+=1
-    
-#     return a_output
 
 
 """
@@ -516,17 +501,12 @@ def run_recursive(database, rules, query):
 
 
 # TODO: Do we have to refactor _run_simple as well as it has some common parts with _run_recursive
-"""[summary]
-RA: define an unique function and it's motivation
-"""
 def generate_knowledgebase(rules_evaluator, database, rules):
-    inferred_facts = []
+    result = database 
     for rule in rules:
-        facts = rules_evaluator(rule, database)
-        inferred_facts.extend(facts)
-    
-    # return set(set(inferred_facts) + database)
-    return set(inferred_facts).union(database) 
+        evaluation = rules_evaluator(rule, database)
+        result = result.union(evaluation)
+    return result 
 
     
 def _run_recursive(rules_evaluator, match, database, rules, query):
@@ -553,8 +533,19 @@ ancestor("AA", "CC"),
 ancestor("A", "D")
 }
 
-assert set(recursive_result) == expected_result, f"{recursive_result} not equal to {expected_result}"
+assert recursive_result == expected_result, f"{recursive_result} not equal to {expected_result}"
 
+"""
+
+We want to query the data that is represented explicitly and implicitly. Here are some example queries:
+
+?- academicAncestor("Robin Milner", Intermediate),
+   academicAncestor(Intermediate, "Mistral Contrastin").
+?- academicAncestor("Alan Turing", "Mistral Contrastin").
+?- academicAncestor("David Wheeler", "Mistral Contrastin").
+
+The first one says “is there an academic ancestorial connection between Robin Milner and I and if so who?”. The second one says “is Alan Turing my academic ancestor?” and the third one is the same question but for David Wheeler.
+"""
 """
 RA: Do Logical OR?
 Next, we introduce logical OR
@@ -565,6 +556,8 @@ human if you are man or if you are woman
 success_str = '==================================== All Tests Pass ==================================================' 
 print('\x1b[6;30;42m' + success_str + '\x1b[0m')
 
-"""[summary]
+"""
+
 * SQL does support recursion. I just find Datalog has a cleaner syntax. RA: Cite SQL Recursion Example
+
 """
