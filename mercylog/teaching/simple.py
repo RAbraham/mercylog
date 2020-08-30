@@ -248,7 +248,6 @@ def match_relation_and_fact(relation: Relation, fact: Relation) -> Optional[Dict
 
 
 simplest_rule_result = run_simplest_rule(database, rules, query)
-# simplest_rule_result = run_conjunction(database, rules, query)
 assert simplest_rule_result == {human("Abe"), human("Bob")}, f"result was {simplest_rule_result}"
 
 """
@@ -421,7 +420,7 @@ ancestor_rule_recursive = Rule(ancestor(X, Z), {parent(X, Y), ancestor(Y, Z)})
 rules = [ancestor_rule_base, ancestor_rule_recursive]
 
 """
-Alright, let's dive into this. What is different from run_conjunction? It's the hierarchy or recursion. If you see it as hierarchy(I'm visualizing this as a tree), one has to keep on going until we reach the top(or the bottom) of the tree. If we see it as a recursion, we keep on going till we hit the base case which terminates the recursion. So let's imagine how we would process the above example. In the first pass, we would do the simplest inference from base fact to derived fact using the base rule of ancestor(X, Y) <= parent(X, Y) 
+Alright, let's dive into this. What is different from run_logical_operator? It's the hierarchy or recursion. If you see it as hierarchy(I'm visualizing this as a tree), one has to keep on going until we reach the top(or the bottom) of the tree. If we see it as a recursion, we keep on going till we hit the base case which terminates the recursion. So let's imagine how we would process the above example. In the first pass, we would do the simplest inference from base fact to derived fact using the base rule of ancestor(X, Y) <= parent(X, Y) 
 
 
 Pass 1: Base Facts and Inferred facts i.e. KnowledgeBase1
@@ -513,7 +512,7 @@ def iterate_until_no_change(transform, initial_value):
 
 
 """
-Now, we already have run_conjunction. That will be our transform function
+Now, we already have run_logical_operator. That will be our transform function
 """
 
 def run_recursive(database, rules, query):
