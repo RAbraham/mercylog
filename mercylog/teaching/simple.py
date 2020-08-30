@@ -560,19 +560,25 @@ Let's explore other queries we can ask.
 Is AA the ancestor of C(No)
 
 """
-# query = ancestor("AA", "C")
+query = ancestor("AA", "C")
 
-# assert run_recursive(database, rules, query) == set()
+assert run_recursive(database, rules, query) == set()
 
 """
 What if I want to find all ancestors of C
 """
-# query = ancestor(X, "C")
-# assert run_recursive(database, rules, query) == {ancestor("A", "C"), ancestor("B", "C")}
+query = ancestor(X, "C")
+assert run_recursive(database, rules, query) == {ancestor("A", "C"), ancestor("B", "C")}
 
+"""
+What if I want to find who all are the descendants of AA. The beauty of the Datalog query style is that I can use the same query but just reverse the order! 
+"""
+query = ancestor("AA", X)
+assert run_recursive(database, rules, query) == {ancestor("AA", "BB"), ancestor("AA", "CC")}
 
 """
 Finally, who are the intermediates between A and D i.e. B and C
+Z is an intermediate of X and Y if X is it's ancestor and Y is its descendant
 intermediate(Z, X, Y) <= ancestor(X, Z), ancestor(Z, Y)
 """
 intermediate = lambda intermediate, start, end: Relation("intermediate", (intermediate, start, end) )
@@ -581,7 +587,6 @@ intermediate_body = {ancestor(X, Z), ancestor(Z, Y)}
 intermediate_rule = Rule(intermediate_head, intermediate_body)
 
 rules = [ancestor_rule_base, ancestor_rule_recursive, intermediate_rule]
-# rules = [intermediate_rule]
 query = intermediate(Z, "A", "D")
 
 assert run_recursive(database, rules, query) == {intermediate("B", "A", "D"), intermediate("C", "A", "D")}
