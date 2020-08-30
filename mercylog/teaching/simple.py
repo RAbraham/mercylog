@@ -538,7 +538,7 @@ Let's define the query
 """
 query = ancestor(X, Y)
 
-# recursive_result = run_recursive(database, rules, query)
+recursive_result = run_recursive(database, rules, query)
 
 expected_result = {
 ancestor("A", "B"), 
@@ -552,7 +552,7 @@ ancestor("AA", "CC"),
 ancestor("A", "D")
 }
 
-# assert recursive_result == expected_result, f"{recursive_result} not equal to {expected_result}"
+assert recursive_result == expected_result, f"{recursive_result} not equal to {expected_result}"
 
 """
 Let's explore other queries we can ask.
