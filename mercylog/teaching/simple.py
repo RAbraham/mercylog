@@ -253,7 +253,6 @@ assert simplest_rule_result == {human("Abe"), human("Bob")}, f"result was {simpl
 
 """
 Next, we introduce logical AND. i.e. Given
-- echange examples of conjunction with father(X, Y) <= parent(X,Y), male(X)
 parent("Abe", "Bob"), # Abe is a parent of Bob
 parent("Abby", "Bob"),
 parent("Bob", "Carl"),
@@ -292,7 +291,7 @@ query = father(X, Y)
 """
 Similar as `run_simplest_rule` but when we match the body to the facts, we have to check if the attributes match for the entire body,
 """
-def run_conjunction(database, rules, query):
+def run_logical_operators(database, rules, query):
     return _run_simple(evaluate_rule_with_conjunction, query_variable_match, database, rules, query)
 
 def evaluate_rule_with_conjunction(rule: Rule, database: List[Relation]) -> Set[Relation]:
@@ -332,16 +331,44 @@ def has_common_value(s1: Dict[Variable, Any], s2: Dict[Variable, Any]) -> bool:
 
 
 
-conjunction_results = run_conjunction(database, rules, query)
+conjunction_results = run_logical_operators(database, rules, query)
 assert len(conjunction_results) == 3
 assert father("Abe", "Bob") in conjunction_results
 assert father("Bob", "Carl") in conjunction_results
 assert father("Bob", "Connor") in conjunction_results
 
 rules = [Rule(human(X), {man(X)})]
-conjunction_result_simple_rule = run_conjunction(database, rules, human(X))
+conjunction_result_simple_rule = run_logical_operators(database, rules, human(X))
 assert conjunction_result_simple_rule == {human("Abe"), human("Bob")}
 
+"""
+Logical OR is just specifying two separate rules with the same head. E.g.
+human(X) <= man(X)
+human(X) <= woman(X)
+
+"""
+database = {
+    animal("Tiger"),
+    man("Abe"),
+    man("Bob"),
+    woman("Abby"),
+    woman("Beatrice")
+}
+
+
+man_rule = Rule(human(X), {man(X)})
+woman_rule = Rule(human(X), {woman(X)})
+rules = [man_rule, woman_rule]
+query = human(X)
+
+
+
+assert run_logical_operators(database, rules, query) == {
+    human("Abe"),
+    human("Bob"),
+    human("Abby"),
+    human("Beatrice")
+}
 
 """
 Next, we introduce the reason why we are interested in Datalog. Datalog has the distinctive feature of intuitively capturing hierarchies or recursion. E.g. we want to find all who are ancestors of someone
@@ -512,7 +539,7 @@ Let's define the query
 """
 query = ancestor(X, Y)
 
-recursive_result = run_recursive(database, rules, query)
+# recursive_result = run_recursive(database, rules, query)
 
 expected_result = {
 ancestor("A", "B"), 
@@ -526,24 +553,39 @@ ancestor("AA", "CC"),
 ancestor("A", "D")
 }
 
-assert recursive_result == expected_result, f"{recursive_result} not equal to {expected_result}"
+# assert recursive_result == expected_result, f"{recursive_result} not equal to {expected_result}"
 
 """
+Let's explore other queries we can ask.
+Is AA the ancestor of C(No)
 
-We want to query the data that is represented explicitly and implicitly. Here are some example queries:
+"""
+# query = ancestor("AA", "C")
 
-?- academicAncestor("Robin Milner", Intermediate),
-   academicAncestor(Intermediate, "Mistral Contrastin").
-?- academicAncestor("Alan Turing", "Mistral Contrastin").
-?- academicAncestor("David Wheeler", "Mistral Contrastin").
+# assert run_recursive(database, rules, query) == set()
 
-The first one says “is there an academic ancestorial connection between Robin Milner and I and if so who?”. The second one says “is Alan Turing my academic ancestor?” and the third one is the same question but for David Wheeler.
 """
+What if I want to find all ancestors of C
 """
-RA: Do Logical OR?
-Next, we introduce logical OR
-human if you are man or if you are woman
+# query = ancestor(X, "C")
+# assert run_recursive(database, rules, query) == {ancestor("A", "C"), ancestor("B", "C")}
+
+
 """
+Finally, who are the intermediates between A and D i.e. B and C
+intermediate(Z, X, Y) <= ancestor(X, Z), ancestor(Z, Y)
+"""
+intermediate = lambda intermediate, start, end: Relation("intermediate", (intermediate, start, end) )
+intermediate_head = intermediate(Z, X, Y)
+intermediate_body = {ancestor(X, Z), ancestor(Z, Y)} 
+intermediate_rule = Rule(intermediate_head, intermediate_body)
+
+rules = [ancestor_rule_base, ancestor_rule_recursive, intermediate_rule]
+# rules = [intermediate_rule]
+query = intermediate(Z, "A", "D")
+
+assert run_recursive(database, rules, query) == {intermediate("B", "A", "D"), intermediate("C", "A", "D")}
+
 
 
 success_str = '==================================== All Tests Pass ==================================================' 
