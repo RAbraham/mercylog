@@ -3,26 +3,24 @@ from dataclasses import dataclass
 from pprint import pprint
 
 """
-Let's start with a simple Datalog Program. In Datalog, it would be:
+Let's start with a simple Datalog Program. 
+
 man("Brad")
 man("Abe")
-person(X) <- man(X) # If someone is a man, then he is a person.
+person(X) :- man(X) # If someone is a man, then he is a person.
 
-Let's define the above concepts.
-`man` is like a table in the database, also called a base relation. `man("Bob")` is also called a `fact`
+`person(X) :- man(X)` is called a rule.
 
-`person` is a derived relation, as it is derived from a base relation `man`, like a view in the database.
-`person(X) <- man(X)` is called a rule.
-X is a logical variable. It is used to refer to values abstractly. So man(X) could be used to abstractly refer to all man relations.
+`man` is like a table in a database. `man("Bob")` is a relation in that table. We'll call it a `base` relation i.e. a simple `fact`
 
+`person(X)` is a derived relation, as it is derived from some base relation `man(X)`, similar to a view in the database.
+
+X is a logical variable. It is used to refer to values abstractly. So man(X) could be used to abstractly refer to all man relations. 
 """
 
-"""
-Let's first define a logical variable. It can represent a value. A relation can hold either a variable or a value.
-"""
 
 """
-we can create a variable like this:
+we can create a logical variable like this:
 X = Variable('X')
 """
 @dataclass(frozen=True)
@@ -36,16 +34,15 @@ man("Bob")
 parent("John", "Chester") # John is a parent of Chester
 
 It could also be components of a rule e.g.
-`man(X)` or `person(x)` in `person(X) <- man(X)`
+`man(X)` or `person(X)` in `person(X) :- man(X)`
 
-
-So a relation has a name(e.g. parent) and a list of attributes(e.g. "John" and "Chester" or X). 
+So a relation has a name(e.g. `parent`) and a list of attributes(e.g. "John" and "Chester" or X). 
 """
 
 @dataclass(frozen=True, eq=True)
 class Relation:
     """
-    man("Bob) is Relation("man", ("Bob",))
+    man("Bob) is Relation("man", ("Bob",)) # ("Bob",) is a single valued tuple
     parent("John", "Chester") is Relation("parent", ("John", "Chester"))
     man(X) is Relation("man", (Variable("X"),))
 
@@ -53,17 +50,21 @@ class Relation:
     name: str
     attributes: Tuple 
 
-
 """
 A rule could be:
-- person(X) <- man(X) i.e. X is a person if he is man.
-- father(X, Y) <- man(X), parent(X, Y) i.e. X is a father of Y if X is a man and X is the parent of Y
+- person(X) :- man(X) i.e. X is a person if he is man.
+- father(X, Y) :- man(X), parent(X, Y) i.e. X is a father of Y if X is a man and X is the parent of Y
 
 A rule has:
-- a head relation which is on the left of the `<-` symbol e.g. person(X) or father(X, Y)
-- a body of relations which is on the right of the `<-` symbol e.g. man(X) or parent(X, Y)
+- a head relation which is on the left of the `:-` symbol e.g. person(X) and father(X, Y) above
+- a body of relations which is on the right of the `:-` symbol e.g. man(X) and man(X), parent(X, Y) above
 
-X are Y are logical variables. It represents values. For e.g. man(X) could be matched to man("Bob") so X could be equal to Bob 
+Since Datalog is declarative, the order of the relations in the body does not matter. Both the statements below have the same meaning:
+father(X, Y) :- man(X), parent(X, Y) 
+father(X, Y) :- parent(X, Y), man(X) # reversing the order does not matter
+
+So, the body can be represented as a set
+
 """
 @dataclass(frozen=True, eq=True)
 class Rule:
@@ -71,16 +72,16 @@ class Rule:
     body: Set[Relation]
 
 """
-Let's start with a simple query. No rules, just facts. Given:
+The last element of Datalog is the query. The simplest query is no rules, just facts. Given:
 man("Abe)
 man("Bob")
 woman("Abby")
 
-Query:
+A query could be:
 man(X) # Find me all men 
 
 The query should return:
-Ans: [man("Bob"), man("George")]
+[man("Bob"), man("George")]
 
 This would be similar to a SQL query `select * from man`
 
@@ -94,30 +95,28 @@ database = {abe, bob, abby}
 no_rules = [] 
 query = Relation("man", (X,))
 
+"""
+For some function `run_simplest`, I expect:
+assert run_simplest(database, no_rules, query) == {abe, bob}
+"""
 
 """
-The simplest run would iterate through all the facts and collect those which match the query
-assert simplest_run(database, rules, query) == [fact1, fact2]
+The simplest run would iterate through all the facts and filter those facts those which match the query by relation name.
 """
 
-"""
-`name_match`. A fact matches a query if the fact and query match in relation name. 
-"""
-def name_match(fact, query):
+def name_match(fact: Relation, query: Relation) -> bool:
     return fact.name == query.name
 
-def filter_facts(database, query, match):
+def filter_facts(database: Set[Relation], query: Relation, match: Callable) -> Set[Relation]:
     return {fact for fact in database if match(fact, query)}
 
-
-def run_simplest(database, rules, query):
+def run_simplest(database: Set[Relation], rules: List[Rule], query: Relation) -> Set[Relation]:
     return filter_facts(database, query, name_match) 
-
 
 assert run_simplest(database, no_rules, query) == {abe, bob}
 
 """
-Let's add two tuple facts
+Let's add some facts of length two 
 parent("Abe", "Bob") # Abe is a parent of Bob
 parent("Abby", "Bob")
 parent("Bob", "Carl")
@@ -126,19 +125,18 @@ parent("Beatrice", "Carl")
 
 I may want to query who are the parents of Carl
 Query:
-parent(X, "Carl") # Should return [parent("Bob", "Carl"), parent("Beatrice", "Carl")
+parent(X, "Carl") # Should return {parent("Bob", "Carl"), parent("Beatrice", "Carl")}
+
+parent(X, "Carl") is similar to `select * from parent where child = "Carl"` if there was a table parent with columns `parent` and `child`)
+
 
 The beauty of Datalog is that you can ask the inverse without additional code e.g. Who are the children of Bob
-parent("Bob", X) # Should return [parent("Bob", "Carl"), parent("Bob", "Connor")]
-
-
-parent(X, "Carl") is similar to select * from parent where child = "Carl" if there was a table parent with columns `parent` and `child`)
-
+parent("Bob", X) # Should return {parent("Bob", "Carl"), parent("Bob", "Connor")}
 
 """
 
 """
-Let's code that up. I'm just going to make a helper function to make it easy to express a parent relation
+Let's code that up. Also from now on, I'm going to make a helper function to make it easy to express relations
 """
 parent = lambda parent, child: Relation("parent", (parent, child))
 database = {
@@ -149,12 +147,21 @@ database = {
     parent("Beatrice", "Carl")
 }
 
+"""
+For an enhanced function `run_with_filter`, we should have:
+parents_carl =  run_with_filter(database, [], parent(X, "Carl")) 
+assert parents_carl == {parent("Bob", "Carl"), parent("Beatrice", "Carl")}
+
+children_bob =  run_with_filter(database, [], parent("Bob", X)) 
+assert children_bob == {parent("Bob", "Carl"), parent("Bob", "Connor")}
 
 """
-Every value in the query should match the value in the fact if they are at the same position within the arguments
+
+"""
+Now, to the implementation. For a query to match, an argument at position N in the query should match the argument at position N in the fact.
 """
 
-def query_variable_match(fact, query):
+def query_variable_match(fact: Relation, query: Relation) -> bool:
     if fact.name != query.name:
         return False
 
@@ -168,17 +175,14 @@ assert query_variable_match(parent("A", "Bob"), parent(X, "Bob") ) == True
 assert query_variable_match(parent("A", "Bob"), parent("A", X)) == True
 assert query_variable_match(parent("A", "NoMatch"), parent(X, "Bob") ) == False 
 
-
-
-def run_with_filter(database, rules, query):
+def run_with_filter(database: Set[Relation], rules: List[Rule], query: Relation) -> Set[Relation]:
     return filter_facts(database, query, query_variable_match)
 
+parents_carl =  run_with_filter(database, [], parent(X, "Carl")) 
+assert parents_carl == {parent("Bob", "Carl"), parent("Beatrice", "Carl")}
 
-filtered_result1 =  run_with_filter(database, [], parent(X, "Carl")) 
-assert filtered_result1 == {parent("Bob", "Carl"), parent("Beatrice", "Carl")}
-
-filtered_result2 =  run_with_filter(database, [], parent("Bob", X)) 
-assert filtered_result2 == {parent("Bob", "Carl"), parent("Bob", "Connor")}
+children_bob =  run_with_filter(database, [], parent("Bob", X)) 
+assert children_bob == {parent("Bob", "Carl"), parent("Bob", "Connor")}
 
 
 """
@@ -186,13 +190,13 @@ Let's add a rule to our program
 man("Bob")
 man("George")
 animal("Tiger")
-human(X) <- man(X) # You are human if you are man.
+human(X) :- man(X) # You are human if you are man.
 
 Query:
 human(X) # Find me all humans
 
 The query should return:
-Ans: [human("Bob"), human("George")]
+Ans: {human("Bob"), human("George")}
 
 """
 man = lambda x: Relation("man", (x,))
@@ -201,8 +205,8 @@ human = lambda x: Relation("human", (x,))
 X = Variable("X")
 
 head = human(X) 
-body = {man(X)}
-human_rule = Rule(head, body) # No Pun Intended when first written
+body = [man(X)]
+human_rule = Rule(head, body) # No pun was intended
 database = {
     man("Abe"),
     man("Bob"),
@@ -211,26 +215,28 @@ database = {
 rules = [human_rule]
 query = human(X)
 
+aaa
 """
 The simplest rule match. For each rule, for each relation in it's body, if it matches with any of the facts in the database,
 then get the attributes of that fact and transfer it to the head.
 
 """
-def _run_simple(rules_evaluator, match, database, rules, query):
+def _run_simple(evaluate: Callable, match: Callable, database: Set[Relation], rules: List[Rule], query: Set[Relation]) -> Set[Relation]:
     knowledge_base = database
     for rule in rules:
-        knowledge_base = knowledge_base.union(rules_evaluator(rule, database))
+        knowledge_base = knowledge_base.union(evaluate(rule, database))
     
     return filter_facts(knowledge_base, query, match)
 
-def run_simplest_rule(database, rules, query):
+def run_simplest_rule(database: Set[Relation], rules: List[Rule], query: Relation):
     return _run_simple(evaluate_simplest_rule, query_variable_match, database, rules, query)
 
-def evaluate_simplest_rule(rule: Rule, database: List[Relation]) -> List[Relation]:
+
+def evaluate_simplest_rule(rule: Rule, database: Set[Relation]) -> Set[Relation]:
     relation = list(rule.body)[0] # we are only considering single clause bodies
     attributes = match_relation_and_database(database, relation)
-
-    return [Relation(rule.head.name, tuple(attr.values())) for attr in attributes]
+    # We use the Python feature below that if we call `values` on a dictionary, it will preserve the order that was given when the dictionary was created i.e. in the `zip` inside `match_relation_and_database`. Thank God.
+    return {Relation(rule.head.name, tuple(attr.values())) for attr in attributes}
 
 
 def match_relation_and_database(database, relation) -> List[Tuple]:
@@ -263,7 +269,7 @@ woman("Abby"),
 woman("Beatrice")
 
 We'd like to find all the fathers in the house. A person is a father if he is a parent and he is a man.
-father(X, Y) <- parent(X, Y), man(X)
+father(X, Y) :- parent(X, Y), man(X)
 
 """
 X = Variable("X")
@@ -342,8 +348,8 @@ assert conjunction_result_simple_rule == {human("Abe"), human("Bob")}
 
 """
 Logical OR is just specifying two separate rules with the same head. E.g.
-human(X) <= man(X)
-human(X) <= woman(X)
+human(X) :- man(X)
+human(X) :- woman(X)
 
 """
 database = {
@@ -379,9 +385,9 @@ parent("AA", "BB")
 parent("BB", "CC")
 
 # A parent X of Y is by definition an ancestor.
-ancestor(X, Y) <= parent(X, Y)
+ancestor(X, Y) :- parent(X, Y)
 # If you are a parent of Y and Y is an an ancestor, then you are an ancestor as well.
-ancestor(X, Z) <= parent(X, Y), ancestor(Y, Z)
+ancestor(X, Z) :- parent(X, Y), ancestor(Y, Z)
 
 Query:
 ancestor(X, Y)
@@ -412,15 +418,15 @@ database = {
 X = Variable("X")
 Y = Variable("Y")
 Z = Variable("Z")
-# ancestor(X, Y) <= parent(X, Y)
+# ancestor(X, Y) :- parent(X, Y)
 ancestor_rule_base = Rule(ancestor(X, Y), [parent(X, Y)])
-# ancestor(X, Z) <= parent(X, Y), ancestor(Y, Z)
+# ancestor(X, Z) :- parent(X, Y), ancestor(Y, Z)
 ancestor_rule_recursive = Rule(ancestor(X, Z), {parent(X, Y), ancestor(Y, Z)})
 
 rules = [ancestor_rule_base, ancestor_rule_recursive]
 
 """
-Alright, let's dive into this. What is different from run_logical_operator? It's the hierarchy or recursion. If you see it as hierarchy(I'm visualizing this as a tree), one has to keep on going until we reach the top(or the bottom) of the tree. If we see it as a recursion, we keep on going till we hit the base case which terminates the recursion. So let's imagine how we would process the above example. In the first pass, we would do the simplest inference from base fact to derived fact using the base rule of ancestor(X, Y) <= parent(X, Y) 
+Alright, let's dive into this. What is different from run_logical_operator? It's the hierarchy or recursion. If you see it as hierarchy(I'm visualizing this as a tree), one has to keep on going until we reach the top(or the bottom) of the tree. If we see it as a recursion, we keep on going till we hit the base case which terminates the recursion. So let's imagine how we would process the above example. In the first pass, we would do the simplest inference from base fact to derived fact using the base rule of ancestor(X, Y) :- parent(X, Y) 
 
 
 Pass 1: Base Facts and Inferred facts i.e. KnowledgeBase1
@@ -436,7 +442,7 @@ ancestor("C", "D"),
 ancestor("AA", "BB"),
 ancestor("BB", "CC")
 
-Now that's done, we can focus on inference from a combination of inferred facts and base facts to new inferred facts using the recursive rule ancestor(X, Z) <= parent(X, Y), ancestor(Y, Z). For e.g. in KnowledgeBase1, we have parent("C","D") and ancestor("B", "C") , so we can infer the fact ancestor("B", "D") i.e grandparents. We keep on doing this till we get:
+Now that's done, we can focus on inference from a combination of inferred facts and base facts to new inferred facts using the recursive rule ancestor(X, Z) :- parent(X, Y), ancestor(Y, Z). For e.g. in KnowledgeBase1, we have parent("C","D") and ancestor("B", "C") , so we can infer the fact ancestor("B", "D") i.e grandparents. We keep on doing this till we get:
 
 Pass 2: KnowledgeBase2
 parent("A", "B"), 
@@ -578,7 +584,7 @@ assert run_recursive(database, rules, query) == {ancestor("AA", "BB"), ancestor(
 """
 Finally, who are the intermediates between A and D i.e. B and C
 Z is an intermediate of X and Y if X is it's ancestor and Y is its descendant
-intermediate(Z, X, Y) <= ancestor(X, Z), ancestor(Z, Y)
+intermediate(Z, X, Y) :- ancestor(X, Z), ancestor(Z, Y)
 """
 intermediate = lambda intermediate, start, end: Relation("intermediate", (intermediate, start, end) )
 intermediate_head = intermediate(Z, X, Y)
@@ -591,12 +597,11 @@ query = intermediate(Z, "A", "D")
 assert run_recursive(database, rules, query) == {intermediate("B", "A", "D"), intermediate("C", "A", "D")}
 
 
-
-success_str = '==================================== All Tests Pass ==================================================' 
-print('\x1b[6;30;42m' + success_str + '\x1b[0m')
-
 """
 
 * SQL does support recursion. I just find Datalog has a cleaner syntax. RA: Cite SQL Recursion Example
-
+* One aspect of Datalog being declarative is that the order of rules does not matter either. So technically, instead of `rules = [rule1, rule2]`, we could have used `rules = frozenset([rule1, rule2])`. The latter is a bit more clutter so I used simple lists. Why `frozenset`? Because of [this](https://stackoverflow.com/questions/37105696/how-to-have-a-set-of-sets-in-python?lq=1)
 """
+
+success_str = '==================================== All Tests Pass ==================================================' 
+print('\x1b[6;30;42m' + success_str + '\x1b[0m')
