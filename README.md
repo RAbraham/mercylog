@@ -4,9 +4,9 @@ NOTE: EXPERIMENTAL. Do not use in production !!
 
 Merycylog will be a Datalog based library which allows developers to build
 - Applications: 
-  - Datalog's expressiveness can allow us to reduce the code required to build applications(Yedalog, Overlog) 
-  - Query data sources with higher expressivity of Datalog(Datomic, Datahike, DataScript). 
-  - Using Python, we can have one language to code end to end(Transcrypt/Pyodide for browsers/phones, Python Extensions for Postgresql)
+  - Datalog's expressiveness can allow us to reduce the code required to build applications([Overlog](https://dl.acm.org/citation.cfm?id=1755913.1755937), [Yedalog](https://storage.googleapis.com/pub-tools-public-publication-data/pdf/43462.pdf)) 
+  - Query data sources with higher expressivity of Datalog([Datomic](https://docs.datomic.com/on-prem/tutorial.html), [DataScript](https://github.com/tonsky/datascript)).
+  - Using Python, we can have one language to code end to end(Brython/Pyodide for browsers/phones, Python Extensions for Postgresql)
   - Because Datalog is declarative(capturing the 'What'), when a new technology/library comes along, we can quickly build backends for Mercylog to move from one technology to another, hence maintaining our algorithmic knowledge, business logic and not having to code them again for the new technology(e.g. moving from tensorflow to pytorch, or like Bashlog which is Datalog to bash scripts)
   - We can build specifications which could easily be translatable to code. (Object-role modeling)
 
