@@ -8,6 +8,7 @@ Inspiration
 ^^^^^^^^^^^^
 * Read about AI and Prolog initiatives like KProblog. It seemed exciting. Got a sense that it would not scale. 
 * Read ML at scale by Borkar and how Datalog was a natural fit for ML. This got me really interested in Datalog. 
+* Read the paper of Datalog on Spark and how it was faster than Spark libraries :)
 * Read about Dyna for AI (suggested by David Barbour). The creativity of using Datalog for AI and Analytics hit me hard. It's like my mind was pried open.
 * Read about Yedalog at Google. It was like what I wanted to build. The dream
 * Read about a different twist on Logic Programming i.e. I think the MiniKanren approach. First read about the 'pitfalls' of classic Prolog by Oleg K. He talked about Hansei?
@@ -25,3 +26,7 @@ Inspiration
 2019:
 ^^^^^
 * Read the Bashlog paper. They compiled Datalog to Bash Scripts It excited me to bits. Bashlog showed amazing performance just using core UNIX software and had a comparable performance to most state of the art Datalog impelmentation. I decided to just build a Python wrapper around it. Though I was working all day with my startup, I would work on it for 20 mins a day at night before I slept :). That was the first iteration of mercylog and it worked!
+* Wrote a DataScript Wrapper in Brython :). That was some work but it was fun and it worked! The blog article took a month or so to write. lol
+* PyDatalog
+* Bud
+* VMWare DDLog
