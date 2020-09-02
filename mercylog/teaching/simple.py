@@ -233,7 +233,7 @@ def match_relation_and_database(database: Set[Relation], relation: Relation) -> 
     return inferred_attributes
 
 
-def evaluate_simplest_rule(rule: Rule, database: Set[Relation]) -> Set[Relation]:
+def evaluate_rule_simple(rule: Rule, database: Set[Relation]) -> Set[Relation]:
     relation = list(rule.body)[0] # For now, our body has only one relation
     all_matches = match_relation_and_database(database, relation)
     # We use the Python feature below that if we call `values` on a dictionary, it will preserve the order that was given when the dictionary was created i.e. in the `zip` inside `match_relation_and_database`. Thank God.
@@ -250,7 +250,7 @@ def generate_knowledgebase(evaluate: Callable, database: Set[Relation], rules: L
     return knowledge_base 
 
 def run_rule_simple(database: Set[Relation], rules: List[Rule], query: Relation):
-    knowledge_base = generate_knowledgebase(evaluate_simplest_rule, database, rules)
+    knowledge_base = generate_knowledgebase(evaluate_rule_simple, database, rules)
     return filter_facts(knowledge_base, query, query_variable_match)
 
 # Test Cases
