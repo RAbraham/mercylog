@@ -295,7 +295,7 @@ rules = [father_rule]
 query = father(X, Y)
 
 """
-Similar as `run_simplest_rule` but when we match the body to the facts, we have to check if the attributes match for the entire body,
+Similar as `run_rule_simple` but when we match the body to the facts, we have to check if the attributes match for the entire body,
 """
 def run_logical_operators(database, rules, query):
     knowledge_base = generate_knowledgebase(evaluate_logical_operators_in_rule, database, rules)
