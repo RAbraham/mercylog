@@ -4,8 +4,8 @@ Inspiration
 * I got inspired about DSL's by Alan Kay. I was on a constant search for DSLs. I think some way down that path, I learned about declarative languages and Prolog, leading me to know about Datalog.
 * I first wanted to build Datalog over Hadoop. And found Cascalog(a Clojure over Hadoop). It seems defunct now and do not go their site! It's taken over and bombarded with SEO text. 
 
-2016 - 2018
-^^^^^^^^^^^
+2016 - 2018:
+^^^^^^^^^^^^
 * Read about AI and Prolog initiatives like KProblog. It seemed exciting. Got a sense that it would not scale. 
 * Read ML at scale by Borkar and how Datalog was a natural fit for ML. This got me really interested in Datalog. 
 * Read about Dyna for AI (suggested by David Barbour). The creativity of using Datalog for AI and Analytics hit me hard. It's like my mind was pried open.
@@ -21,3 +21,7 @@ Inspiration
 * Read the Dedalus paper in part. Got excited about the idea of declaratively specifying time and space in addition to computation.
 * Read the MLog paper. My mind started churning. MLog talks about iteration with time steps. Dedalus is about state in time steps. Can they both be combined?
 * Read the differential dataflow work by Frank McSherry. Got excited about having a runtime for Dedalus.
+
+2019:
+^^^^^
+* Read the Bashlog paper. They compiled Datalog to Bash Scripts It excited me to bits. Bashlog showed amazing performance just using core UNIX software and had a comparable performance to most state of the art Datalog impelmentation. I decided to just build a Python wrapper around it. Though I was working all day with my startup, I would work on it for 20 mins a day at night before I slept :). That was the first iteration of mercylog and it worked!
