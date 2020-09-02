@@ -239,8 +239,8 @@ def evaluate_rule_simple(rule: Rule, database: Set[Relation]) -> Set[Relation]:
     # We use the Python feature below that if we call `values` on a dictionary, it will preserve the order that was given when the dictionary was created i.e. in the `zip` inside `match_relation_and_database`. Thank God.
     return {Relation(rule.head.name, tuple(attributes.values())) for attributes in all_matches}
 
-"""[summary]
-This evaluate_simplest_rule can be passed to a function which will evaluate it on each rule for the database to generate the final knowledge base.
+"""
+This evaluate_rule_simple can be passed to a function which will `evaluate` it on each rule for the database to generate the final knowledge base.
 """
 def generate_knowledgebase(evaluate: Callable, database: Set[Relation], rules: List[Rule]):
     knowledge_base = database 
