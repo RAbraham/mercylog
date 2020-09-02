@@ -215,31 +215,16 @@ database = {
 rules = [human_rule]
 query = human(X)
 
-aaa
 """
-The simplest rule match. For each rule, for each relation in it's body, if it matches with any of the facts in the database,
+For each rule, for each relation in it's body, if it matches with any of the facts in the database,
 then get the attributes of that fact and transfer it to the head.
-
 """
-def _run_simple(evaluate: Callable, match: Callable, database: Set[Relation], rules: List[Rule], query: Set[Relation]) -> Set[Relation]:
-    knowledge_base = database
-    for rule in rules:
-        knowledge_base = knowledge_base.union(evaluate(rule, database))
-    
-    return filter_facts(knowledge_base, query, match)
 
-def run_simplest_rule(database: Set[Relation], rules: List[Rule], query: Relation):
-    return _run_simple(evaluate_simplest_rule, query_variable_match, database, rules, query)
+def match_relation_and_fact(relation: Relation, fact: Relation) -> Optional[Dict]:
+    if relation.name == fact.name:
+        return dict(zip(relation.attributes, fact.attributes))
 
-
-def evaluate_simplest_rule(rule: Rule, database: Set[Relation]) -> Set[Relation]:
-    relation = list(rule.body)[0] # we are only considering single clause bodies
-    attributes = match_relation_and_database(database, relation)
-    # We use the Python feature below that if we call `values` on a dictionary, it will preserve the order that was given when the dictionary was created i.e. in the `zip` inside `match_relation_and_database`. Thank God.
-    return {Relation(rule.head.name, tuple(attr.values())) for attr in attributes}
-
-
-def match_relation_and_database(database, relation) -> List[Tuple]:
+def match_relation_and_database(database: Set[Relation], relation: Relation) -> List[Dict]:
     inferred_attributes = []
     for fact in database:
         attributes = match_relation_and_fact(relation, fact)
@@ -248,12 +233,28 @@ def match_relation_and_database(database, relation) -> List[Tuple]:
     return inferred_attributes
 
 
-def match_relation_and_fact(relation: Relation, fact: Relation) -> Optional[Dict]:
-    if relation.name == fact.name:
-        return dict(zip(relation.attributes, fact.attributes))
+def evaluate_simplest_rule(rule: Rule, database: Set[Relation]) -> Set[Relation]:
+    relation = list(rule.body)[0] # For now, our body has only one relation
+    all_matches = match_relation_and_database(database, relation)
+    # We use the Python feature below that if we call `values` on a dictionary, it will preserve the order that was given when the dictionary was created i.e. in the `zip` inside `match_relation_and_database`. Thank God.
+    return {Relation(rule.head.name, tuple(attributes.values())) for attributes in all_matches}
 
+"""[summary]
+This evaluate_simplest_rule can be passed to a function which will evaluate it on each rule for the database to generate the final knowledge base.
+"""
+def generate_knowledgebase(evaluate: Callable, database: Set[Relation], rules: List[Rule]):
+    knowledge_base = database 
+    for rule in rules:
+        evaluation = evaluate(rule, database)
+        knowledge_base = knowledge_base.union(evaluation)
+    return knowledge_base 
 
-simplest_rule_result = run_simplest_rule(database, rules, query)
+def run_rule_simple(database: Set[Relation], rules: List[Rule], query: Relation):
+    knowledge_base = generate_knowledgebase(evaluate_simplest_rule, database, rules)
+    return filter_facts(knowledge_base, query, query_variable_match)
+
+# Test Cases
+simplest_rule_result = run_rule_simple(database, rules, query)
 assert simplest_rule_result == {human("Abe"), human("Bob")}, f"result was {simplest_rule_result}"
 
 """
@@ -297,9 +298,10 @@ query = father(X, Y)
 Similar as `run_simplest_rule` but when we match the body to the facts, we have to check if the attributes match for the entire body,
 """
 def run_logical_operators(database, rules, query):
-    return _run_simple(evaluate_rule_with_conjunction, query_variable_match, database, rules, query)
+    knowledge_base = generate_knowledgebase(evaluate_logical_operators_in_rule, database, rules)
+    return filter_facts(knowledge_base, query, query_variable_match)
 
-def evaluate_rule_with_conjunction(rule: Rule, database: List[Relation]) -> Set[Relation]:
+def evaluate_logical_operators_in_rule(rule: Rule, database: List[Relation]) -> Set[Relation]:
     body_attributes = []
 
     for relation in rule.body:
@@ -522,16 +524,8 @@ Now, we already have run_logical_operator. That will be our transform function
 """
 
 def run_recursive(database, rules, query):
-    return _run_recursive(evaluate_rule_with_conjunction, query_variable_match, database, rules, query)
+    return _run_recursive(evaluate_logical_operators_in_rule, query_variable_match, database, rules, query)
 
-
-# TODO: Do we have to refactor _run_simple as well as it has some common parts with _run_recursive
-def generate_knowledgebase(rules_evaluator, database, rules):
-    result = database 
-    for rule in rules:
-        evaluation = rules_evaluator(rule, database)
-        result = result.union(evaluation)
-    return result 
 
     
 def _run_recursive(rules_evaluator, match, database, rules, query):
