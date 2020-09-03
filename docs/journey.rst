@@ -26,7 +26,12 @@ Inspiration
 2019:
 ^^^^^
 * Read the Bashlog paper. They compiled Datalog to Bash Scripts It excited me to bits. Bashlog showed amazing performance just using core UNIX software and had a comparable performance to most state of the art Datalog impelmentation. I decided to just build a Python wrapper around it. Though I was working all day with my startup, I would work on it for 20 mins a day at night before I slept :). That was the first iteration of mercylog and it worked!
+
+2020:
+^^^^
 * Wrote a DataScript Wrapper in Brython :). That was some work but it was fun and it worked! The blog article took a month or so to write. lol
 * PyDatalog
 * Bud
 * VMWare DDLog
+* Tried to port over an excellent example of a toy Datalog in Haskell. Spent a few days debugging why it wasn't working and got confused in the recursive calls. I got frustrated and decided to build my own from scratch :). It came out so well(.. to me).
+
