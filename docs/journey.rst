@@ -29,9 +29,10 @@ Inspiration
 
 2020:
 ^^^^
-* Wrote a DataScript Wrapper in Brython :). That was some work but it was fun and it worked! The blog article took a month or so to write. lol
-* PyDatalog
-* Bud
 * VMWare DDLog
+* Wrote a DataScript Wrapper in Brython :). That was some work but it was fun and it worked! The blog article took a month or so to write. lol
+* Downloaded and played with Bud from the Dedalus team. Since it was in Ruby, I thought I could just translate the code to Python along with the tests and then make the tests pass. But the code was too complex. I despaired. Then Greg Resenblatt mentioned that it wasn't difficult to build Dedalus over standard Datalog. I then decided to first build the standard datalog version in Python.
+
+* Read and played with PyDatalog. Considered building Dedalus over pyDatalog. However, it hasn't been maintained for years and the author said he may have introduced bugs with his last significant modification. I went to a version below that and tried out a simple piece of code and it did not work. At that point, I just decided to write my own. I have to understand the internals of Datalog
 * Tried to port over an excellent example of a toy Datalog in Haskell. Spent a few days debugging why it wasn't working and got confused in the recursive calls. I got frustrated and decided to build my own from scratch :). It came out so well(.. to me).
 
