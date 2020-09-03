@@ -249,6 +249,9 @@ def generate_knowledgebase(evaluate: Callable, database: Set[Relation], rules: L
         knowledge_base = knowledge_base.union(evaluation)
     return knowledge_base 
 
+"""
+And finally, we have
+"""
 def run_rule_simple(database: Set[Relation], rules: List[Rule], query: Relation):
     knowledge_base = generate_knowledgebase(evaluate_rule_simple, database, rules)
     return filter_facts(knowledge_base, query, query_variable_match)
@@ -257,8 +260,9 @@ def run_rule_simple(database: Set[Relation], rules: List[Rule], query: Relation)
 simplest_rule_result = run_rule_simple(database, rules, query)
 assert simplest_rule_result == {human("Abe"), human("Bob")}, f"result was {simplest_rule_result}"
 
+
 """
-Next, we introduce logical AND. i.e. Given
+Next, we introduce logical AND(conjunction). i.e. Given a few parents
 parent("Abe", "Bob"), # Abe is a parent of Bob
 parent("Abby", "Bob"),
 parent("Bob", "Carl"),
@@ -295,28 +299,22 @@ rules = [father_rule]
 query = father(X, Y)
 
 """
-Similar as `run_rule_simple` but when we match the body to the facts, we have to check if the attributes match for the entire body,
+How does the match change? We need to add logic for the conjunction i.e. when we match the body to the facts, we have to check if the attributes of the fact match across the entire body,
+e.g. for the body `parent(X, Y), man(X)`
+* parent("Abe", "Bob"), man("Abe") is a match as there is a common value Abe across the entire body
+* parent("Abby", "Bob") does not match as there is no common value "Abby" for parent and man. 
+
+Let's first code up this common value logic
 """
-def run_logical_operators(database, rules, query):
-    knowledge_base = generate_knowledgebase(evaluate_logical_operators_in_rule, database, rules)
-    return filter_facts(knowledge_base, query, query_variable_match)
+def has_common_value(attrs1: Dict[Variable, Any], attrs2: Dict[Variable, Any]) -> bool:
+    common_vars = set(attrs1.keys()).intersection(set(attrs2.keys()))
+    return all([attrs1[c] == attrs2[c] for c in common_vars])
 
-def evaluate_logical_operators_in_rule(rule: Rule, database: List[Relation]) -> Set[Relation]:
-    body_attributes = []
-
-    for relation in rule.body:
-        _attributes = match_relation_and_database(database, relation)
-        body_attributes.append(_attributes)
-
-    attributes = conjunct(body_attributes)
-    
-    return {Relation(rule.head.name, rule_attributes(rule.head, attr)) for attr in attributes}
-
-
-def rule_attributes(relation: Relation, attr: Dict[Variable, Any]) -> Tuple:
-    return tuple([attr[a] for a in relation.attributes])
-
+"""
+So given a list of body_attributes which each match a fact in the database, it's time to conjunct. Just hacking it for now.
+"""
 def conjunct(body_attributes: List[List[Dict]]) -> List:
+    # TODO: Does not cover body lengths greater than 2
     result = []
     if len(body_attributes) == 1:
         return body_attributes[0]
@@ -332,21 +330,48 @@ def conjunct(body_attributes: List[List[Dict]]) -> List:
     return result
     
 
-def has_common_value(s1: Dict[Variable, Any], s2: Dict[Variable, Any]) -> bool:
-    common_vars = set(s1.keys()).intersection(set(s2.keys()))
-    return all([s1[c] == s2[c] for c in common_vars])
+"""
+I also realized that though the body can return many attributes which have 'conjuncted', we only need those which are in the head.
+e.g. for a rule `relation1(X) :- relation2(X,Y), relation3(X)`, I just want X in relation1 from the return values of X,Y
+"""
+def rule_attributes(relation: Relation, attr: Dict[Variable, Any]) -> Tuple:
+    return tuple([attr[a] for a in relation.attributes])
 
+"""
+So the final `evaluate` function becomes
+"""
+def evaluate_logical_operators_in_rule(rule: Rule, database: List[Relation]) -> Set[Relation]:
+    body_attributes = []
 
+    for relation in rule.body:
+        _attributes = match_relation_and_database(database, relation)
+        body_attributes.append(_attributes)
 
-conjunction_results = run_logical_operators(database, rules, query)
-assert len(conjunction_results) == 3
-assert father("Abe", "Bob") in conjunction_results
-assert father("Bob", "Carl") in conjunction_results
-assert father("Bob", "Connor") in conjunction_results
+    attributes = conjunct(body_attributes)
+    
+    return {Relation(rule.head.name, rule_attributes(rule.head, attr)) for attr in attributes}
 
-rules = [Rule(human(X), {man(X)})]
-conjunction_result_simple_rule = run_logical_operators(database, rules, human(X))
-assert conjunction_result_simple_rule == {human("Abe"), human("Bob")}
+def run_logical_operators(database, rules, query):
+    knowledge_base = generate_knowledgebase(evaluate_logical_operators_in_rule, database, rules)
+    return filter_facts(knowledge_base, query, query_variable_match)
+
+"""
+Let's test that it works for single relation bodies, preventing any regressions.
+"""
+simple_conjunct_rules = [Rule(human(X), {man(X)})]
+assert run_logical_operators(database, simple_conjunct_rules, human(X)) == {human("Abe"), human("Bob")}
+
+"""
+And our final test
+"""
+# conjunction_results = run_logical_operators(database, rules, query)
+
+# assert len(conjunction_results) == 3
+# assert father("Abe", "Bob") in conjunction_results
+# assert father("Bob", "Carl") in conjunction_results
+# assert father("Bob", "Connor") in conjunction_results
+
+assert run_logical_operators(database, rules, query) == {father("Abe", "Bob"), father("Bob", "Carl"), father("Bob", "Connor")}
 
 """
 Logical OR is just specifying two separate rules with the same head. E.g.
@@ -368,8 +393,6 @@ woman_rule = Rule(human(X), {woman(X)})
 rules = [man_rule, woman_rule]
 query = human(X)
 
-
-
 assert run_logical_operators(database, rules, query) == {
     human("Abe"),
     human("Bob"),
@@ -378,8 +401,8 @@ assert run_logical_operators(database, rules, query) == {
 }
 
 """
-Next, we introduce the reason why we are interested in Datalog. Datalog has the distinctive feature of intuitively capturing hierarchies or recursion. E.g. we want to find all who are ancestors of someone
-
+Next, we introduce the reason why we are interested in Datalog. Datalog intuitively captures hierarchies or recursion. E.g. we want to find all who are ancestors of someone.
+Given:
 parent("A", "B") # A is the parent of B
 parent("B", "C")
 parent("C", "D")
@@ -404,7 +427,6 @@ ancestor("AA", "BB")
 ancestor("AA", "CC") # AA -> BB -> CC
 ancestor("BB", "CC")
 
-It's going to start looking a bit ugly so let's define helper methods
 """
 ancestor = lambda ancestor, descendant: Relation('ancestor', (ancestor, descendant))
 
@@ -444,7 +466,7 @@ ancestor("C", "D"),
 ancestor("AA", "BB"),
 ancestor("BB", "CC")
 
-Now that's done, we can focus on inference from a combination of inferred facts and base facts to new inferred facts using the recursive rule ancestor(X, Z) :- parent(X, Y), ancestor(Y, Z). For e.g. in KnowledgeBase1, we have parent("C","D") and ancestor("B", "C") , so we can infer the fact ancestor("B", "D") i.e grandparents. We keep on doing this till we get:
+Now that's done, we can focus on inference from a combination of inferred facts and base facts to new inferred facts using the recursive rule `ancestor(X, Z) :- parent(X, Y), ancestor(Y, Z)`. For e.g. in KnowledgeBase1, we have parent("C","D") and ancestor("B", "C") , so we can infer the fact ancestor("B", "D") i.e grandparents. We keep on doing this till we get:
 
 Pass 2: KnowledgeBase2
 parent("A", "B"), 
@@ -501,12 +523,12 @@ ancestor("B", "D")
 ancestor("AA", "CC")
 ancestor("A", "D")
 # ----------------- New inferred facts below --------------
-
+No New Facts
 
 Aha! There are no more new inferred facts. If we do another pass on KnowledgeBase4, it would come out the same. So we can stop!
 
 So the logic to stop would be:
-Take the output of each iteration. If it matches the input stop(as we did not learn any new inferred facts). If not a match, then run another iteration. Let's call this method iterate_until_no_change
+Take the output of each iteration. If it matches the input to that iteration, stop(as we did not learn any new inferred facts). If not a match, then run another iteration. Let's call this method iterate_until_no_change
 
 """
 def iterate_until_no_change(transform, initial_value):
@@ -520,18 +542,13 @@ def iterate_until_no_change(transform, initial_value):
 
 
 """
-Now, we already have run_logical_operator. That will be our transform function
+Now, we already have run_logical_operator. That will be our `transform` function above.
 """
 
 def run_recursive(database, rules, query):
-    return _run_recursive(evaluate_logical_operators_in_rule, query_variable_match, database, rules, query)
-
-
-    
-def _run_recursive(rules_evaluator, match, database, rules, query):
-    tranformer = lambda a_knowledgebase: generate_knowledgebase(rules_evaluator, a_knowledgebase, rules)
+    tranformer = lambda a_knowledgebase: generate_knowledgebase(evaluate_logical_operators_in_rule, a_knowledgebase, rules)
     knowledgebase = iterate_until_no_change(tranformer, database)
-    return filter_facts(knowledgebase, query, match)
+    return filter_facts(knowledgebase, query, query_variable_match)
 
 """
 Let's define the query
@@ -541,22 +558,22 @@ query = ancestor(X, Y)
 recursive_result = run_recursive(database, rules, query)
 
 expected_result = {
-ancestor("A", "B"), 
-ancestor("B", "C"), 
-ancestor("C", "D"), 
-ancestor("AA", "BB"),
-ancestor("BB", "CC"),
-ancestor("A", "C"),
-ancestor("B", "D"),
-ancestor("AA", "CC"),
-ancestor("A", "D")
+    ancestor("A", "B"), 
+    ancestor("B", "C"), 
+    ancestor("C", "D"), 
+    ancestor("AA", "BB"),
+    ancestor("BB", "CC"),
+    ancestor("A", "C"),
+    ancestor("B", "D"),
+    ancestor("AA", "CC"),
+    ancestor("A", "D")
 }
 
 assert recursive_result == expected_result, f"{recursive_result} not equal to {expected_result}"
 
 """
 Let's explore other queries we can ask.
-Is AA the ancestor of C(No)
+Is AA the ancestor of C(No! Such an impolite question)
 
 """
 query = ancestor("AA", "C")
@@ -570,7 +587,7 @@ query = ancestor(X, "C")
 assert run_recursive(database, rules, query) == {ancestor("A", "C"), ancestor("B", "C")}
 
 """
-What if I want to find who all are the descendants of AA. The beauty of the Datalog query style is that I can use the same query but just reverse the order! 
+What if I want to find who all are the descendants of AA. Again, use the same query but just reverse the order! 
 """
 query = ancestor("AA", X)
 assert run_recursive(database, rules, query) == {ancestor("AA", "BB"), ancestor("AA", "CC")}
@@ -580,7 +597,7 @@ Finally, who are the intermediates between A and D i.e. B and C
 Z is an intermediate of X and Y if X is it's ancestor and Y is its descendant
 intermediate(Z, X, Y) :- ancestor(X, Z), ancestor(Z, Y)
 """
-intermediate = lambda intermediate, start, end: Relation("intermediate", (intermediate, start, end) )
+intermediate = lambda intermediate, start, end: Relation("intermediate", (intermediate, start, end))
 intermediate_head = intermediate(Z, X, Y)
 intermediate_body = {ancestor(X, Z), ancestor(Z, Y)} 
 intermediate_rule = Rule(intermediate_head, intermediate_body)
@@ -592,9 +609,11 @@ assert run_recursive(database, rules, query) == {intermediate("B", "A", "D"), in
 
 
 """
+For the critics ... and the lovers:
 
-* SQL does support recursion. I just find Datalog has a cleaner syntax. RA: Cite SQL Recursion Example
-* One aspect of Datalog being declarative is that the order of rules does not matter either. So technically, instead of `rules = [rule1, rule2]`, we could have used `rules = frozenset([rule1, rule2])`. The latter is a bit more clutter so I used simple lists. Why `frozenset`? Because of [this](https://stackoverflow.com/questions/37105696/how-to-have-a-set-of-sets-in-python?lq=1)
+* SQL does support recursion(https://dba.stackexchange.com/a/94944/146211). I just find Datalog has a cleaner syntax.
+
+* One aspect of Datalog being declarative is that the order of rules does not matter either. So technically, instead of `rules = [rule1, rule2]`, we could have used `rules = frozenset([rule1, rule2])`. The latter is a bit more clutter so I used simple lists.
 """
 
 success_str = '==================================== All Tests Pass ==================================================' 
