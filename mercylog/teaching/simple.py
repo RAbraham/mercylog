@@ -610,7 +610,7 @@ assert run_recursive(database, rules, query) == {intermediate("B", "A", "D"), in
 
 """
 For the critics ... and the lovers:
-
+* This post was inspired by https://dodisturb.me/posts/2018-12-25-The-Essence-of-Datalog.html. 
 * SQL does support recursion(https://dba.stackexchange.com/a/94944/146211). I just find Datalog has a cleaner syntax.
 
 * One aspect of Datalog being declarative is that the order of rules does not matter either. So technically, instead of `rules = [rule1, rule2]`, we could have used `rules = frozenset([rule1, rule2])`. The latter is a bit more clutter so I used simple lists.
