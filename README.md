@@ -1,4 +1,4 @@
-NOTE: EXPERIMENTAL. Do not use in production !!
+NOTE: EXPERIMENTAL. PROTOTYPE FOR DESIGN PURPOSES. Do not use !!
 
 # Vision
 
