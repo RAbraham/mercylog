@@ -1,0 +1,961 @@
+
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>An Unnecessarily Long-Winded Introduction to the Essence of Datalog &#8212; Mercylog</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
+    <link href="../_static/css/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-dropdown.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/sphinx-book-theme.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/sphinx-book-theme.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="&lt;no title&gt;" href="teaching.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="docsearch:language" content="en">
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../index.html">
+  
+  <img src="../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Mercylog</h1>
+  
+</a>
+</div>
+
+<form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../intro.html">
+   Welcome to Mercylog
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Deep Dive
+ </span>
+</p>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   The Essence of Datalog
+  </a>
+ </li>
+</ul>
+
+</nav>
+
+ <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="row topbar fixed-top container-xl">
+    <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show">
+    </div>
+    <div class="col pl-2 topbar-main">
+        
+        <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+            data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+            aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+            title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+            <i class="fas fa-bars"></i>
+            <i class="fas fa-arrow-left"></i>
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        
+        <div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        <a class="dropdown-buttons"
+            href="../_sources/teaching/essence.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download notebook file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/teaching/essence.md"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.md</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+    
+</div>
+        <!-- Source interaction buttons -->
+
+
+        <!-- Full screen (wrap in <a> to have style consistency -->
+        <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                data-placement="bottom" onclick="toggleFullScreen()" title="Fullscreen mode"><i
+                    class="fas fa-expand"></i></button></a>
+
+        <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/teaching/essence.md"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
+    </div>
+
+    <!-- Table of contents -->
+    <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#datalog-concepts">
+   Datalog Concepts
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#simple-relation-query">
+   Simple Relation Query
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#simple-rule-query">
+   Simple Rule Query
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#logical-and-query">
+   Logical AND Query
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#logical-or-query">
+   Logical OR Query
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#recursive-relations-query">
+   Recursive Relations Query
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#for-the-lovers-and-haters">
+   For the lovers and haters
+  </a>
+ </li>
+</ul>
+
+        </nav>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="an-unnecessarily-long-winded-introduction-to-the-essence-of-datalog">
+<h1>An Unnecessarily Long-Winded Introduction to the Essence of Datalog<a class="headerlink" href="#an-unnecessarily-long-winded-introduction-to-the-essence-of-datalog" title="Permalink to this headline">¶</a></h1>
+<p>In this post, I’ll iteratively write a naive implementation of the Datalog runtime in Python.</p>
+<div class="section" id="datalog-concepts">
+<h2>Datalog Concepts<a class="headerlink" href="#datalog-concepts" title="Permalink to this headline">¶</a></h2>
+<p>Let’s start with a simple Datalog Program.</p>
+<p>We have simple <code class="docutils literal notranslate"><span class="pre">facts</span></code>.
+Brad is a man. Abe is a man
+<code class="docutils literal notranslate"><span class="pre">man(&quot;Brad&quot;)</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">man(&quot;Abe&quot;)</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">man</span></code> is like a table in a database. <code class="docutils literal notranslate"><span class="pre">man(&quot;Bob&quot;)</span></code> is a relation in that table. We’ll also call it a <code class="docutils literal notranslate"><span class="pre">base</span></code> relation as it is a simple fact</p>
+<p>Next, we create the business logic i.e. <code class="docutils literal notranslate"><span class="pre">rules</span></code>
+Someone is a person if he is a man
+<code class="docutils literal notranslate"><span class="pre">person(X)</span> <span class="pre">:-</span> <span class="pre">man(X)</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">person(X)</span></code> is a derived relation, as it is derived from some base relation <code class="docutils literal notranslate"><span class="pre">man(X)</span></code>, similar to a view in the database.</p>
+<p><code class="docutils literal notranslate"><span class="pre">X</span></code> is a <code class="docutils literal notranslate"><span class="pre">logical</span> <span class="pre">variable</span></code>. It is used to refer to values abstractly. So <code class="docutils literal notranslate"><span class="pre">man(X)</span></code> could be used to abstractly refer to all <code class="docutils literal notranslate"><span class="pre">man</span></code> relations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can create a logical variable like this:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Variable</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>A relation could be:</p>
+<p><code class="docutils literal notranslate"><span class="pre">man(&quot;Bob&quot;)</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">parent(&quot;John&quot;,</span> <span class="pre">&quot;Chester&quot;)</span></code> # John is a parent of Chester</p>
+<p>It could also be components of a rule e.g.
+<code class="docutils literal notranslate"><span class="pre">man(X)</span></code> or <code class="docutils literal notranslate"><span class="pre">person(X)</span></code> in <code class="docutils literal notranslate"><span class="pre">person(X)</span> <span class="pre">:-</span> <span class="pre">man(X)</span></code></p>
+<p>So a relation has a name(e.g. <code class="docutils literal notranslate"><span class="pre">parent</span></code>) and a list of attributes(e.g. <code class="docutils literal notranslate"><span class="pre">&quot;John&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;Chester&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">X</span></code>).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">eq</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Relation</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    man(&quot;Bob) is Relation(&quot;man&quot;, (&quot;Bob&quot;,)) # (&quot;Bob&quot;,) is a single valued tuple</span>
+<span class="sd">    parent(&quot;John&quot;, &quot;Chester&quot;) is Relation(&quot;parent&quot;, (&quot;John&quot;, &quot;Chester&quot;))</span>
+<span class="sd">    man(X) is Relation(&quot;man&quot;, (Variable(&quot;X&quot;),))</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">attributes</span><span class="p">:</span> <span class="n">Tuple</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>A rule could be:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">person(X)</span> <span class="pre">:-</span> <span class="pre">man(X)</span></code> i.e. <code class="docutils literal notranslate"><span class="pre">X</span></code> is a person if he is man.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">father(X,</span> <span class="pre">Y)</span> <span class="pre">:-</span> <span class="pre">man(X),</span> <span class="pre">parent(X,</span> <span class="pre">Y)</span></code> i.e. X is a father of Y if X is a man and X is the parent of Y</p></li>
+</ul>
+<p>A rule has:</p>
+<ul class="simple">
+<li><p>a head relation which is on the left of the <code class="docutils literal notranslate"><span class="pre">:-</span></code> symbol e.g. <code class="docutils literal notranslate"><span class="pre">person(X)</span></code> and <code class="docutils literal notranslate"><span class="pre">father(X,</span> <span class="pre">Y)</span></code> above</p></li>
+<li><p>a body of relations which is on the right of the <code class="docutils literal notranslate"><span class="pre">:-</span></code> symbol e.g. <code class="docutils literal notranslate"><span class="pre">man(X)</span></code> and <code class="docutils literal notranslate"><span class="pre">man(X),</span> <span class="pre">parent(X,</span> <span class="pre">Y)</span></code> above</p></li>
+</ul>
+<p>Since Datalog is declarative, the order of the relations in the body does not matter. Both the statements below have the same meaning:</p>
+<p><code class="docutils literal notranslate"><span class="pre">father(X,</span> <span class="pre">Y)</span> <span class="pre">:-</span> <span class="pre">man(X),</span> <span class="pre">parent(X,</span> <span class="pre">Y)</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">father(X,</span> <span class="pre">Y)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y),</span> <span class="pre">man(X)</span></code> # reversing the order does not matter</p>
+<p>So, the body can be represented as a set</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">eq</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Rule</span><span class="p">:</span>
+    <span class="n">head</span><span class="p">:</span> <span class="n">Relation</span>
+    <span class="n">body</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Relation</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The last element of Datalog is the query. The simplest query is no rules, just facts.</p>
+<p>Given:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">man</span><span class="p">(</span><span class="s2">&quot;Abe)</span>
+<span class="n">man</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">)</span>
+<span class="n">woman</span><span class="p">(</span><span class="s2">&quot;Abby&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A query could be:
+<code class="docutils literal notranslate"><span class="pre">man(X)</span></code> # Find me all men</p>
+<p>The query should return:
+<code class="docutils literal notranslate"><span class="pre">{man(&quot;Bob&quot;),</span> <span class="pre">man(&quot;George&quot;)}</span></code></p>
+<p>This would be similar to a SQL query <code class="docutils literal notranslate"><span class="pre">select</span> <span class="pre">*</span> <span class="pre">from</span> <span class="pre">man</span></code></p>
+<p>Here’s how I would compose it in Python</p>
+</div>
+<div class="section" id="simple-relation-query">
+<h2>Simple Relation Query<a class="headerlink" href="#simple-relation-query" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">)</span>
+<span class="n">abe</span> <span class="o">=</span> <span class="n">Relation</span><span class="p">(</span><span class="s2">&quot;man&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Abe&quot;</span><span class="p">,))</span>
+<span class="n">bob</span> <span class="o">=</span> <span class="n">Relation</span><span class="p">(</span><span class="s2">&quot;man&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,))</span>
+<span class="n">abby</span> <span class="o">=</span> <span class="n">Relation</span><span class="p">(</span><span class="s2">&quot;woman&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Abby&quot;</span><span class="p">,))</span>
+<span class="n">database</span> <span class="o">=</span> <span class="p">{</span><span class="n">abe</span><span class="p">,</span> <span class="n">bob</span><span class="p">,</span> <span class="n">abby</span><span class="p">}</span>
+<span class="n">no_rules</span> <span class="o">=</span> <span class="p">[]</span> 
+<span class="n">query</span> <span class="o">=</span> <span class="n">Relation</span><span class="p">(</span><span class="s2">&quot;man&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">X</span><span class="p">,))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>For some function <code class="docutils literal notranslate"><span class="pre">run_simplest</span></code>, I expect:
+<code class="docutils literal notranslate"><span class="pre">assert</span> <span class="pre">run_simplest(database,</span> <span class="pre">no_rules,</span> <span class="pre">query)</span> <span class="pre">==</span> <span class="pre">{abe,</span> <span class="pre">bob}</span></code></p>
+<p>The simplest run would iterate through all the facts and filter those facts that match the query by relation name.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">name_match</span><span class="p">(</span><span class="n">fact</span><span class="p">:</span> <span class="n">Relation</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Relation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">fact</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">query</span><span class="o">.</span><span class="n">name</span>
+
+<span class="k">def</span> <span class="nf">filter_facts</span><span class="p">(</span><span class="n">database</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Relation</span><span class="p">],</span> <span class="n">query</span><span class="p">:</span> <span class="n">Relation</span><span class="p">,</span> <span class="n">match</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">Relation</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">fact</span> <span class="k">for</span> <span class="n">fact</span> <span class="ow">in</span> <span class="n">database</span> <span class="k">if</span> <span class="n">match</span><span class="p">(</span><span class="n">fact</span><span class="p">,</span> <span class="n">query</span><span class="p">)}</span>
+
+<span class="k">def</span> <span class="nf">run_simplest</span><span class="p">(</span><span class="n">database</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Relation</span><span class="p">],</span> <span class="n">rules</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Rule</span><span class="p">],</span> <span class="n">query</span><span class="p">:</span> <span class="n">Relation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">Relation</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="n">filter_facts</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">name_match</span><span class="p">)</span> 
+
+<span class="k">assert</span> <span class="n">run_simplest</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">no_rules</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="n">abe</span><span class="p">,</span> <span class="n">bob</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s add some facts of length two</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Abe&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">)</span> <span class="c1"># Abe is a parent of Bob</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Abby&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">)</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="p">)</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Connor&quot;</span><span class="p">)</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Beatrice&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>I may want to query who are the parents of Carl</p>
+<p><code class="docutils literal notranslate"><span class="pre">parent(X,</span> <span class="pre">&quot;Carl&quot;)</span></code> # Should return <code class="docutils literal notranslate"><span class="pre">{parent(&quot;Bob&quot;,</span> <span class="pre">&quot;Carl&quot;),</span> <span class="pre">parent(&quot;Beatrice&quot;,</span> <span class="pre">&quot;Carl&quot;)}</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">parent(X,</span> <span class="pre">&quot;Carl&quot;)</span></code> is similar to <code class="docutils literal notranslate"><span class="pre">select</span> <span class="pre">*</span> <span class="pre">from</span> <span class="pre">parent</span> <span class="pre">where</span> <span class="pre">child</span> <span class="pre">=</span> <span class="pre">&quot;Carl&quot;</span></code> if there was a table <code class="docutils literal notranslate"><span class="pre">parent</span></code> with columns <code class="docutils literal notranslate"><span class="pre">parent</span></code> and <code class="docutils literal notranslate"><span class="pre">child</span></code>)</p>
+<p>The beauty of Datalog is that you can ask the inverse without additional code e.g. Who are the children of Bob</p>
+<p><code class="docutils literal notranslate"><span class="pre">parent(&quot;Bob&quot;,</span> <span class="pre">X)</span></code> # Should return <code class="docutils literal notranslate"><span class="pre">{parent(&quot;Bob&quot;,</span> <span class="pre">&quot;Carl&quot;),</span> <span class="pre">parent(&quot;Bob&quot;,</span> <span class="pre">&quot;Connor&quot;)}</span></code></p>
+<p>Let’s code that up. Also from now on, I’m going to make a helper functions to make it easy to express relations like the lambda <code class="docutils literal notranslate"><span class="pre">parent</span></code> below.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">parent</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">parent</span><span class="p">,</span> <span class="n">child</span><span class="p">:</span> <span class="n">Relation</span><span class="p">(</span><span class="s2">&quot;parent&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">child</span><span class="p">))</span>
+<span class="n">database</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Abe&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">),</span> <span class="c1"># Abe is a parent of Bob</span>
+    <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Abby&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">),</span>
+    <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="p">),</span>
+    <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Connor&quot;</span><span class="p">),</span>
+    <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Beatrice&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, to the implementation. For a query to match, an argument at position N in the query should match the argument at position N in the fact.
+For e.g
+<code class="docutils literal notranslate"><span class="pre">assert</span> <span class="pre">query_variable_match(parent(&quot;A&quot;,</span> <span class="pre">&quot;Bob&quot;),</span> <span class="pre">parent(X,</span> <span class="pre">&quot;Bob&quot;)</span> <span class="pre">)</span> <span class="pre">==</span> <span class="pre">True</span></code></p>
+<p>Logical variables are special. They get a free pass like <code class="docutils literal notranslate"><span class="pre">X</span></code> above.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">query_variable_match</span><span class="p">(</span><span class="n">fact</span><span class="p">:</span> <span class="n">Relation</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Relation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">fact</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">query</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># TODO: zip is duplicated?</span>
+    <span class="k">for</span> <span class="n">query_attribute</span><span class="p">,</span> <span class="n">fact_attribute</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">attributes</span><span class="p">,</span> <span class="n">fact</span><span class="o">.</span><span class="n">attributes</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query_attribute</span><span class="p">,</span> <span class="n">Variable</span><span class="p">)</span> <span class="ow">and</span> <span class="n">query_attribute</span> <span class="o">!=</span> <span class="n">fact_attribute</span> <span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>  
+
+<span class="k">assert</span> <span class="n">query_variable_match</span><span class="p">(</span><span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">),</span> <span class="n">parent</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">)</span> <span class="p">)</span> <span class="o">==</span> <span class="kc">True</span>
+<span class="k">assert</span> <span class="n">query_variable_match</span><span class="p">(</span><span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">),</span> <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="n">X</span><span class="p">))</span> <span class="o">==</span> <span class="kc">True</span>
+<span class="k">assert</span> <span class="n">query_variable_match</span><span class="p">(</span><span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;NoMatch&quot;</span><span class="p">),</span> <span class="n">parent</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">)</span> <span class="p">)</span> <span class="o">==</span> <span class="kc">False</span> 
+
+<span class="k">def</span> <span class="nf">run_with_filter</span><span class="p">(</span><span class="n">database</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Relation</span><span class="p">],</span> <span class="n">rules</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Rule</span><span class="p">],</span> <span class="n">query</span><span class="p">:</span> <span class="n">Relation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">Relation</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="n">filter_facts</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">query_variable_match</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>So does it work?</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">parents_carl</span> <span class="o">=</span>  <span class="n">run_with_filter</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="p">[],</span> <span class="n">parent</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="p">))</span> 
+<span class="k">assert</span> <span class="n">parents_carl</span> <span class="o">==</span> <span class="p">{</span><span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="p">),</span> <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Beatrice&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="p">)}</span>
+
+<span class="n">children_bob</span> <span class="o">=</span>  <span class="n">run_with_filter</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="p">[],</span> <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="n">X</span><span class="p">))</span> 
+<span class="k">assert</span> <span class="n">children_bob</span> <span class="o">==</span> <span class="p">{</span><span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="p">),</span> <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Connor&quot;</span><span class="p">)}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="simple-rule-query">
+<h2>Simple Rule Query<a class="headerlink" href="#simple-rule-query" title="Permalink to this headline">¶</a></h2>
+<p>Let’s add a rule to our program
+man(“Bob”)
+man(“George”)
+animal(“Tiger”)
+human(X) :- man(X) # You are human if you are man.</p>
+<p>Query:
+human(X) # Find me all humans</p>
+<p>The query should return:
+Ans: {human(“Bob”), human(“George”)}</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">man</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Relation</span><span class="p">(</span><span class="s2">&quot;man&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,))</span>
+<span class="n">animal</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Relation</span><span class="p">(</span><span class="s2">&quot;animal&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,))</span>
+<span class="n">human</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Relation</span><span class="p">(</span><span class="s2">&quot;human&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,))</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">)</span>
+
+<span class="n">head</span> <span class="o">=</span> <span class="n">human</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> 
+<span class="n">body</span> <span class="o">=</span> <span class="p">[</span><span class="n">man</span><span class="p">(</span><span class="n">X</span><span class="p">)]</span>
+<span class="n">human_rule</span> <span class="o">=</span> <span class="n">Rule</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span> <span class="c1"># No pun was intended</span>
+<span class="n">database</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">man</span><span class="p">(</span><span class="s2">&quot;Abe&quot;</span><span class="p">),</span>
+    <span class="n">man</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">),</span>
+    <span class="n">animal</span><span class="p">(</span><span class="s2">&quot;Tiger&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="n">rules</span> <span class="o">=</span> <span class="p">[</span><span class="n">human_rule</span><span class="p">]</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">human</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>For each rule, for each relation in it’s body, if it matches with any of the facts in the database,
+then get the attributes of that fact and transfer it to the head.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">match_relation_and_fact</span><span class="p">(</span><span class="n">relation</span><span class="p">:</span> <span class="n">Relation</span><span class="p">,</span> <span class="n">fact</span><span class="p">:</span> <span class="n">Relation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">relation</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">fact</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">relation</span><span class="o">.</span><span class="n">attributes</span><span class="p">,</span> <span class="n">fact</span><span class="o">.</span><span class="n">attributes</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">match_relation_and_database</span><span class="p">(</span><span class="n">database</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Relation</span><span class="p">],</span> <span class="n">relation</span><span class="p">:</span> <span class="n">Relation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+    <span class="n">inferred_attributes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">fact</span> <span class="ow">in</span> <span class="n">database</span><span class="p">:</span>
+        <span class="n">attributes</span> <span class="o">=</span> <span class="n">match_relation_and_fact</span><span class="p">(</span><span class="n">relation</span><span class="p">,</span> <span class="n">fact</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">attributes</span><span class="p">:</span>
+            <span class="n">inferred_attributes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">inferred_attributes</span>
+
+
+<span class="k">def</span> <span class="nf">evaluate_rule_simple</span><span class="p">(</span><span class="n">rule</span><span class="p">:</span> <span class="n">Rule</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Relation</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">Relation</span><span class="p">]:</span>
+    <span class="n">relation</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">rule</span><span class="o">.</span><span class="n">body</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># For now, our body has only one relation</span>
+    <span class="n">all_matches</span> <span class="o">=</span> <span class="n">match_relation_and_database</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">relation</span><span class="p">)</span>
+    <span class="c1"># We use the Python feature below that if we call `values` on a dictionary, it will preserve the order that was given when the dictionary was created i.e. in the `zip` inside `match_relation_and_database`. Thank God.</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">Relation</span><span class="p">(</span><span class="n">rule</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">attributes</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span> <span class="k">for</span> <span class="n">attributes</span> <span class="ow">in</span> <span class="n">all_matches</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This evaluate_rule_simple can be passed to a function which will <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> it on each rule for the database to generate the final knowledge base.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">generate_knowledgebase</span><span class="p">(</span><span class="n">evaluate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Relation</span><span class="p">],</span> <span class="n">rules</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Rule</span><span class="p">]):</span>
+    <span class="n">knowledge_base</span> <span class="o">=</span> <span class="n">database</span> 
+    <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">rules</span><span class="p">:</span>
+        <span class="n">evaluation</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">rule</span><span class="p">,</span> <span class="n">database</span><span class="p">)</span>
+        <span class="n">knowledge_base</span> <span class="o">=</span> <span class="n">knowledge_base</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">evaluation</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">knowledge_base</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<p>And finally, we have</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_rule_simple</span><span class="p">(</span><span class="n">database</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Relation</span><span class="p">],</span> <span class="n">rules</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Rule</span><span class="p">],</span> <span class="n">query</span><span class="p">:</span> <span class="n">Relation</span><span class="p">):</span>
+    <span class="n">knowledge_base</span> <span class="o">=</span> <span class="n">generate_knowledgebase</span><span class="p">(</span><span class="n">evaluate_rule_simple</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">filter_facts</span><span class="p">(</span><span class="n">knowledge_base</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">query_variable_match</span><span class="p">)</span>
+
+<span class="c1"># Test Cases</span>
+<span class="n">simplest_rule_result</span> <span class="o">=</span> <span class="n">run_rule_simple</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">simplest_rule_result</span> <span class="o">==</span> <span class="p">{</span><span class="n">human</span><span class="p">(</span><span class="s2">&quot;Abe&quot;</span><span class="p">),</span> <span class="n">human</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">)},</span> <span class="sa">f</span><span class="s2">&quot;result was </span><span class="si">{</span><span class="n">simplest_rule_result</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="logical-and-query">
+<h2>Logical AND Query<a class="headerlink" href="#logical-and-query" title="Permalink to this headline">¶</a></h2>
+<p>Next, we introduce logical AND(conjunction). i.e. Given a few parents
+parent(“Abe”, “Bob”), # Abe is a parent of Bob
+parent(“Abby”, “Bob”),
+parent(“Bob”, “Carl”),
+parent(“Bob”, “Connor”),
+parent(“Beatrice”, “Carl”),
+man(“Abe”),
+man(“Bob”),
+woman(“Abby”),
+woman(“Beatrice”)</p>
+<p>We’d like to find all the fathers in the house. A person is a father if he is a parent and he is a man.
+father(X, Y) :- parent(X, Y), man(X)</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">)</span>
+<span class="n">woman</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Relation</span><span class="p">(</span><span class="s2">&quot;woman&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,))</span>
+<span class="n">father</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Relation</span><span class="p">(</span><span class="s2">&quot;father&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+
+<span class="n">database</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Abe&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">),</span> <span class="c1"># Abe is a parent of Bob</span>
+    <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Abby&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">),</span>
+    <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="p">),</span>
+    <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Connor&quot;</span><span class="p">),</span>
+    <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Beatrice&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="p">),</span>
+    <span class="n">man</span><span class="p">(</span><span class="s2">&quot;Abe&quot;</span><span class="p">),</span>
+    <span class="n">man</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">),</span>
+    <span class="n">woman</span><span class="p">(</span><span class="s2">&quot;Abby&quot;</span><span class="p">),</span>
+    <span class="n">woman</span><span class="p">(</span><span class="s2">&quot;Beatrice&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">father_rule</span> <span class="o">=</span> <span class="n">Rule</span><span class="p">(</span><span class="n">father</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">),</span> <span class="p">{</span><span class="n">parent</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">),</span> <span class="n">man</span><span class="p">(</span><span class="n">X</span><span class="p">)})</span>
+<span class="n">rules</span> <span class="o">=</span> <span class="p">[</span><span class="n">father_rule</span><span class="p">]</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">father</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>How does the match change? We need to add logic for the conjunction i.e. when we match the body to the facts, we have to check if the attributes of the fact match across the entire body,
+e.g. for the body <code class="docutils literal notranslate"><span class="pre">parent(X,</span> <span class="pre">Y),</span> <span class="pre">man(X)</span></code></p>
+<ul class="simple">
+<li><p>parent(“Abe”, “Bob”), man(“Abe”) is a match as there is a common value Abe across the entire body</p></li>
+<li><p>parent(“Abby”, “Bob”) does not match as there is no common value “Abby” for parent and man.</p></li>
+</ul>
+<p>Let’s first code up this common value logic</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">has_common_value</span><span class="p">(</span><span class="n">attrs1</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">attrs2</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">common_vars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">attrs1</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">attrs2</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="nb">all</span><span class="p">([</span><span class="n">attrs1</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">==</span> <span class="n">attrs2</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">common_vars</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>So given a list of body_attributes which each match a fact in the database, it’s time to conjunct. Just hacking it for now.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">conjunct</span><span class="p">(</span><span class="n">body_attributes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+    <span class="c1"># TODO: Does not cover body lengths greater than 2</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">body_attributes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">body_attributes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="n">attr1</span> <span class="o">=</span> <span class="n">body_attributes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">attr2</span> <span class="o">=</span> <span class="n">body_attributes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">a1</span> <span class="ow">in</span> <span class="n">attr1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">a2</span> <span class="ow">in</span> <span class="n">attr2</span><span class="p">:</span>
+            <span class="n">_c</span> <span class="o">=</span> <span class="n">has_common_value</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">_c</span><span class="p">:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="o">**</span><span class="n">a1</span><span class="p">,</span> <span class="o">**</span><span class="n">a2</span><span class="p">})</span>
+    
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>I also realized that though the body can return many attributes which have ‘conjuncted’, we only need those which are in the head.
+e.g. for a rule <code class="docutils literal notranslate"><span class="pre">relation1(X)</span> <span class="pre">:-</span> <span class="pre">relation2(X,Y),</span> <span class="pre">relation3(X)</span></code>, I just want X in relation1 from the return values of X,Y</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">rule_attributes</span><span class="p">(</span><span class="n">relation</span><span class="p">:</span> <span class="n">Relation</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">attr</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">relation</span><span class="o">.</span><span class="n">attributes</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>So the final <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> function becomes</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluate_logical_operators_in_rule</span><span class="p">(</span><span class="n">rule</span><span class="p">:</span> <span class="n">Rule</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Relation</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">Relation</span><span class="p">]:</span>
+    <span class="n">body_attributes</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">relation</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">body</span><span class="p">:</span>
+        <span class="n">_attributes</span> <span class="o">=</span> <span class="n">match_relation_and_database</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">relation</span><span class="p">)</span>
+        <span class="n">body_attributes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_attributes</span><span class="p">)</span>
+
+    <span class="n">attributes</span> <span class="o">=</span> <span class="n">conjunct</span><span class="p">(</span><span class="n">body_attributes</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="p">{</span><span class="n">Relation</span><span class="p">(</span><span class="n">rule</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">rule_attributes</span><span class="p">(</span><span class="n">rule</span><span class="o">.</span><span class="n">head</span><span class="p">,</span> <span class="n">attr</span><span class="p">))</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">run_logical_operators</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+    <span class="n">knowledge_base</span> <span class="o">=</span> <span class="n">generate_knowledgebase</span><span class="p">(</span><span class="n">evaluate_logical_operators_in_rule</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">filter_facts</span><span class="p">(</span><span class="n">knowledge_base</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">query_variable_match</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s test that it works for single relation bodies, preventing any regressions.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simple_conjunct_rules</span> <span class="o">=</span> <span class="p">[</span><span class="n">Rule</span><span class="p">(</span><span class="n">human</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="p">{</span><span class="n">man</span><span class="p">(</span><span class="n">X</span><span class="p">)})]</span>
+<span class="k">assert</span> <span class="n">run_logical_operators</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">simple_conjunct_rules</span><span class="p">,</span> <span class="n">human</span><span class="p">(</span><span class="n">X</span><span class="p">))</span> <span class="o">==</span> <span class="p">{</span><span class="n">human</span><span class="p">(</span><span class="s2">&quot;Abe&quot;</span><span class="p">),</span> <span class="n">human</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">)}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And our final test</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">run_logical_operators</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="n">father</span><span class="p">(</span><span class="s2">&quot;Abe&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">),</span> <span class="n">father</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="p">),</span> <span class="n">father</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Connor&quot;</span><span class="p">)}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="logical-or-query">
+<h2>Logical OR Query<a class="headerlink" href="#logical-or-query" title="Permalink to this headline">¶</a></h2>
+<p>Logical OR is just specifying two separate rules with the same head. E.g.
+human(X) :- man(X)
+human(X) :- woman(X)</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">database</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">animal</span><span class="p">(</span><span class="s2">&quot;Tiger&quot;</span><span class="p">),</span>
+    <span class="n">man</span><span class="p">(</span><span class="s2">&quot;Abe&quot;</span><span class="p">),</span>
+    <span class="n">man</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">),</span>
+    <span class="n">woman</span><span class="p">(</span><span class="s2">&quot;Abby&quot;</span><span class="p">),</span>
+    <span class="n">woman</span><span class="p">(</span><span class="s2">&quot;Beatrice&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">man_rule</span> <span class="o">=</span> <span class="n">Rule</span><span class="p">(</span><span class="n">human</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="p">{</span><span class="n">man</span><span class="p">(</span><span class="n">X</span><span class="p">)})</span>
+<span class="n">woman_rule</span> <span class="o">=</span> <span class="n">Rule</span><span class="p">(</span><span class="n">human</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="p">{</span><span class="n">woman</span><span class="p">(</span><span class="n">X</span><span class="p">)})</span>
+<span class="n">rules</span> <span class="o">=</span> <span class="p">[</span><span class="n">man_rule</span><span class="p">,</span> <span class="n">woman_rule</span><span class="p">]</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">human</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">run_logical_operators</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+    <span class="n">human</span><span class="p">(</span><span class="s2">&quot;Abe&quot;</span><span class="p">),</span>
+    <span class="n">human</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">),</span>
+    <span class="n">human</span><span class="p">(</span><span class="s2">&quot;Abby&quot;</span><span class="p">),</span>
+    <span class="n">human</span><span class="p">(</span><span class="s2">&quot;Beatrice&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="recursive-relations-query">
+<h2>Recursive Relations Query<a class="headerlink" href="#recursive-relations-query" title="Permalink to this headline">¶</a></h2>
+<p>Next, we introduce the reason why we are interested in Datalog. Datalog intuitively captures hierarchies or recursion. E.g. we want to find all who are ancestors of someone.
+Given:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">)</span> <span class="c1"># A is the parent of B</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">)</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A parent X of Y is by definition an ancestor.
+<code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Y)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y)</span></code></p>
+<p>If you are a parent of Y and Y is an an ancestor, then you are an ancestor as well.
+<code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Z)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y),</span> <span class="pre">ancestor(Y,</span> <span class="pre">Z)</span></code></p>
+<p>Query: <code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Y)</span></code> should return all the parents above as ancestors</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">)</span> <span class="c1"># A is the ancestor of B</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span> <span class="c1"># A -&gt; B -&gt; C</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span> <span class="c1"># A -&gt; B -&gt; C -&gt; D</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span> <span class="c1"># B -&gt; C -&gt; D</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span> <span class="c1"># AA -&gt; BB -&gt; CC</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ancestor</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">ancestor</span><span class="p">,</span> <span class="n">descendant</span><span class="p">:</span> <span class="n">Relation</span><span class="p">(</span><span class="s1">&#39;ancestor&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">ancestor</span><span class="p">,</span> <span class="n">descendant</span><span class="p">))</span>
+
+<span class="n">database</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
+    <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
+    <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
+    <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+    <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">)</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">)</span>
+<span class="c1"># ancestor(X, Y) :- parent(X, Y)</span>
+<span class="n">ancestor_rule_base</span> <span class="o">=</span> <span class="n">Rule</span><span class="p">(</span><span class="n">ancestor</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">),</span> <span class="p">[</span><span class="n">parent</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)])</span>
+<span class="c1"># ancestor(X, Z) :- parent(X, Y), ancestor(Y, Z)</span>
+<span class="n">ancestor_rule_recursive</span> <span class="o">=</span> <span class="n">Rule</span><span class="p">(</span><span class="n">ancestor</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Z</span><span class="p">),</span> <span class="p">{</span><span class="n">parent</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">),</span> <span class="n">ancestor</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">)})</span>
+
+<span class="n">rules</span> <span class="o">=</span> <span class="p">[</span><span class="n">ancestor_rule_base</span><span class="p">,</span> <span class="n">ancestor_rule_recursive</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Alright, let’s dive into this. What is different from run_logical_operator? It’s the hierarchy or recursion. If you see it as hierarchy(I’m visualizing this as a tree), one has to keep on going until we reach the top(or the bottom) of the tree. If we see it as a recursion, we keep on going till we hit the base case which terminates the recursion. So let’s imagine how we would process the above example. In the first pass, we would do the simplest inference from base fact to derived fact using the base rule of ancestor(X, Y) :- parent(X, Y)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Pass</span> <span class="mi">1</span><span class="p">:</span> <span class="n">Base</span> <span class="n">Facts</span> <span class="ow">and</span> <span class="n">Inferred</span> <span class="n">facts</span> <span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span> <span class="n">KnowledgeBase1</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)]</span>
+<span class="c1"># ----------------- New inferred facts below --------------</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now that’s done, we can focus on inference from a combination of inferred facts and base facts to new inferred facts using the recursive rule <code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Z)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y),</span> <span class="pre">ancestor(Y,</span> <span class="pre">Z)</span></code>. For e.g. in KnowledgeBase1, we have parent(“C”,”D”) and ancestor(“B”, “C”) , so we can infer the fact ancestor(“B”, “D”) i.e grandparents. We keep on doing this till we get:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Pass</span> <span class="mi">2</span><span class="p">:</span> <span class="n">KnowledgeBase2</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+<span class="c1"># ----------------- New inferred facts below --------------</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Do we stop? No, we have to keep on going till we find all the ancestors. Let’s apply the rules to KnowledgeBase2 and get</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Pass</span> <span class="mi">3</span><span class="p">:</span> <span class="n">KnowledgeBase3</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+<span class="c1"># ----------------- New inferred facts below --------------</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>i.e A is the great grand parent of D</p>
+<p>Do we stop? Yes(if you look at the above example), but the computer does not know that. There could be new inferred facts, so let’s try again for KnowledgeBase4</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Pass</span> <span class="mi">4</span><span class="p">:</span> <span class="n">KnowledgeBase4</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+<span class="c1"># ----------------- New inferred facts below --------------</span>
+
+<span class="n">No</span> <span class="n">New</span> <span class="n">Facts</span>
+</pre></div>
+</div>
+<p>Aha! There are no more new inferred facts. If we do another pass on KnowledgeBase4, it would come out the same. So we can stop!</p>
+<p>So the logic to stop would be:
+Take the output of each iteration. If it matches the input to that iteration, stop(as we did not learn any new inferred facts). If not a match, then run another iteration. Let’s call this method iterate_until_no_change</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">iterate_until_no_change</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">initial_value</span><span class="p">):</span>
+    <span class="n">a_input</span> <span class="o">=</span> <span class="n">initial_value</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">a_output</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">a_input</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">a_output</span> <span class="o">==</span> <span class="n">a_input</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">a_output</span>
+        <span class="n">a_input</span> <span class="o">=</span> <span class="n">a_output</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, we already have run_logical_operator. That will be our <code class="docutils literal notranslate"><span class="pre">transform</span></code> function above.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_recursive</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+    <span class="n">tranformer</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a_knowledgebase</span><span class="p">:</span> <span class="n">generate_knowledgebase</span><span class="p">(</span><span class="n">evaluate_logical_operators_in_rule</span><span class="p">,</span> <span class="n">a_knowledgebase</span><span class="p">,</span> <span class="n">rules</span><span class="p">)</span>
+    <span class="n">knowledgebase</span> <span class="o">=</span> <span class="n">iterate_until_no_change</span><span class="p">(</span><span class="n">tranformer</span><span class="p">,</span> <span class="n">database</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">filter_facts</span><span class="p">(</span><span class="n">knowledgebase</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">query_variable_match</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s define the query</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="n">ancestor</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+
+<span class="n">recursive_result</span> <span class="o">=</span> <span class="n">run_recursive</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+
+<span class="n">expected_result</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
+    <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
+    <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
+    <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+    <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">),</span>
+    <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span>
+    <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span>
+    <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">),</span>
+    <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">assert</span> <span class="n">recursive_result</span> <span class="o">==</span> <span class="n">expected_result</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">recursive_result</span><span class="si">}</span><span class="s2"> not equal to </span><span class="si">{</span><span class="n">expected_result</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s explore other queries we can ask.
+Is AA the ancestor of C(No! Such an impolite question)</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">run_recursive</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>What if I want to find all ancestors of C</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="n">ancestor</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">run_recursive</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>What if I want to find who all are the descendants of AA. Again, use the same query but just reverse the order!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">run_recursive</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span> <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Finally, who are the intermediates between A and D i.e. B and C
+Z is an intermediate of X and Y if X is it’s ancestor and Y is its descendant
+intermediate(Z, X, Y) :- ancestor(X, Z), ancestor(Z, Y)</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">intermediate</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">intermediate</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="n">Relation</span><span class="p">(</span><span class="s2">&quot;intermediate&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">intermediate</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
+<span class="n">intermediate_head</span> <span class="o">=</span> <span class="n">intermediate</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+<span class="n">intermediate_body</span> <span class="o">=</span> <span class="p">{</span><span class="n">ancestor</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Z</span><span class="p">),</span> <span class="n">ancestor</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">Y</span><span class="p">)}</span> 
+<span class="n">intermediate_rule</span> <span class="o">=</span> <span class="n">Rule</span><span class="p">(</span><span class="n">intermediate_head</span><span class="p">,</span> <span class="n">intermediate_body</span><span class="p">)</span>
+
+<span class="n">rules</span> <span class="o">=</span> <span class="p">[</span><span class="n">ancestor_rule_base</span><span class="p">,</span> <span class="n">ancestor_rule_recursive</span><span class="p">,</span> <span class="n">intermediate_rule</span><span class="p">]</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">intermediate</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">run_recursive</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="n">intermediate</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> <span class="n">intermediate</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="for-the-lovers-and-haters">
+<h2>For the lovers and haters<a class="headerlink" href="#for-the-lovers-and-haters" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>This post was inspired by https://dodisturb.me/posts/2018-12-25-The-Essence-of-Datalog.html.</p></li>
+<li><p>SQL does support recursion(https://dba.stackexchange.com/a/94944/146211). I just find Datalog has a cleaner syntax.</p></li>
+<li><p>One aspect of Datalog being declarative is that the order of rules does not matter either. So technically, instead of <code class="docutils literal notranslate"><span class="pre">rules</span> <span class="pre">=</span> <span class="pre">[rule1,</span> <span class="pre">rule2]</span></code>, we could have used <code class="docutils literal notranslate"><span class="pre">rules</span> <span class="pre">=</span> <span class="pre">frozenset([rule1,</span> <span class="pre">rule2])</span></code>. The latter is a bit more clutter so I used simple lists.</p></li>
+</ul>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python38564bitvenvvenvf10b41cff9014ab2ae676a586aa9af64",
+            path: "./teaching"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python38564bitvenvvenvf10b41cff9014ab2ae676a586aa9af64'</script>
+
+              </div>
+              
+        </div>
+    </div>
+    
+    
+    <div class='prev-next-bottom'>
+        
+    <a class='left-prev' id="prev-link" href="teaching.html" title="previous page">&lt;no title&gt;</a>
+
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Rajiv Abraham<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    <script src="../_static/js/index.js"></script>
+    
+  </body>
+</html>
