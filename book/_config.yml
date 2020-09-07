@@ -3,6 +3,8 @@ title: Mercylog
 author: Rajiv Abraham 
 logo: logo.png
 
+launch_buttons:
+  binderhub_url: "https://mybinder.org" 
 latex:
   latex_documents:
     targetname: book.tex
