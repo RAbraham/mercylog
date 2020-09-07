@@ -3,8 +3,14 @@ title: Mercylog
 author: Rajiv Abraham 
 logo: logo.png
 
+repository:
+  url                       : https://github.com/RAbraham/mercylog
+  path_to_book              : book  # Optional path to your book, relative to the repository root
+  branch                    : master  # Which branch of the repository should be used when creating links (optional)
+
 launch_buttons:
   binderhub_url: "https://mybinder.org" 
+
 latex:
   latex_documents:
     targetname: book.tex
