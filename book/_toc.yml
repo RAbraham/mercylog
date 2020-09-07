@@ -1,5 +1,12 @@
 - file: intro
-- file: content
-  sections:
-    - file: markdown
-    - file: notebooks
+- part: Deep Dive
+  chapters:
+  - file: teaching/teaching
+    title: Introduction
+  - file: teaching/essence
+    title: The Essence of Datalog
+
+#- file: content
+#  sections:
+#    - file: markdown
+#    - file: notebooks
