@@ -17,7 +17,7 @@ kernelspec:
 
 +++
 
-In this post, I'll iteratively write a naive implementation of the Datalog runtime in Python.
+In this post, I'll gradually build up a naive implementation of the Datalog engine. An updated version of this post can be found [here](https://rabraham.github.io/mercylog/teaching/essence.html)
 
 +++
 
@@ -25,21 +25,23 @@ In this post, I'll iteratively write a naive implementation of the Datalog runti
 
 Let's start with a simple Datalog Program.
 
-We have simple `facts`. 
-Brad is a man. Abe is a man
-`man("Brad")`
+We can have simple `facts` in our database. e.g. Bob is a man. Abe is a man. In Datalog, we write it as:
 
-`man("Abe")`
+```{raw-cell}
+man("Bob")
+man("Abe")
+```
 
-`man` is like a table in a database. `man("Bob")` is a relation in that table. We'll also call it a `base` relation as it is a simple fact
+`man` is like a table in a database. `man("Bob")` is a relation in that table. We'll also call it a `base` relation.
 
-Next, we create the business logic i.e. `rules`
+Next, we create the business logic i.e. `rules`.
+
 Someone is a person if he is a man
 `person(X) :- man(X)`
 
-`person(X)` is a derived relation, as it is derived from some base relation `man(X)`, similar to a view in the database.
+`person(X)` is a `derived` relation, as it is derived from some base relation `man(X)`. This is similar to a view in the database.
 
-`X` is a `logical variable`. It is used to refer to values abstractly. So `man(X)` could be used to abstractly refer to all `man` relations.
+`X` is a `logical variable`. So `man(X)` could be used to refer to all `man` relations in the database.
 
 ```{code-cell} ipython3
 from typing import *
@@ -109,25 +111,26 @@ class Rule:
 The last element of Datalog is the query. The simplest query is no rules, just facts.
 
 Given:
-```
+
+```{raw-cell}
 man("Abe)
 man("Bob")
 woman("Abby")
 ```
 
-A query could be:
-`man(X)` # Find me all men 
+A query could be: `man(X)` # Find me all men
 
-The query should return:
-`{man("Bob"), man("George")}`
+The query should return: `{man("Bob"), man("George")}`
 
 This would be similar to a SQL query `select * from man`
-
-Here's how I would compose it in Python
 
 +++
 
 ## Simple Relation Query
+
++++
+
+The simplest query is to find a matching relation. Taking the above example, let's code that up in Python.
 
 ```{code-cell} ipython3
 X = Variable('X')
@@ -158,24 +161,26 @@ def run_simplest(database: Set[Relation], rules: List[Rule], query: Relation) ->
 assert run_simplest(database, no_rules, query) == {abe, bob}
 ```
 
-Let's add some facts of length two 
-```
+Let's add some facts of length two:
+
+```{raw-cell}
 parent("Abe", "Bob") # Abe is a parent of Bob
 parent("Abby", "Bob")
 parent("Bob", "Carl")
 parent("Bob", "Connor")
 parent("Beatrice", "Carl")
 ```
+
 I may want to query who are the parents of Carl
 
 
-`parent(X, "Carl")` # Should return `{parent("Bob", "Carl"), parent("Beatrice", "Carl")}`
+`parent(X, "Carl")` should return `{parent("Bob", "Carl"), parent("Beatrice", "Carl")}`
 
 `parent(X, "Carl")` is similar to `select * from parent where child = "Carl"` if there was a table `parent` with columns `parent` and `child`)
 
 The beauty of Datalog is that you can ask the inverse without additional code e.g. Who are the children of Bob
 
-`parent("Bob", X)` # Should return `{parent("Bob", "Carl"), parent("Bob", "Connor")}`
+`parent("Bob", X)` should return `{parent("Bob", "Carl"), parent("Bob", "Connor")}`
 
 
 Let's code that up. Also from now on, I'm going to make a helper functions to make it easy to express relations like the lambda `parent` below.
@@ -230,17 +235,27 @@ assert children_bob == {parent("Bob", "Carl"), parent("Bob", "Connor")}
 
 +++
 
-Let's add a rule to our program
+Next, consider a database. 
+
+```{raw-cell}
 man("Bob")
 man("George")
 animal("Tiger")
+```
+
+Let's add a rule to our program.
+
+```{raw-cell}
 human(X) :- man(X) # You are human if you are man.
+```
+
 
 Query:
-human(X) # Find me all humans
+
+```human(X)``` # Find me all humans
 
 The query should return:
-Ans: {human("Bob"), human("George")}
+```{human("Bob"), human("George")}```
 
 ```{code-cell} ipython3
 man = lambda x: Relation("man", (x,))
@@ -261,7 +276,8 @@ query = human(X)
 ```
 
 For each rule, for each relation in it's body, if it matches with any of the facts in the database,
-then get the attributes of that fact and transfer it to the head.
+then get the attributes of that fact and create a derived relation with those attributes.
+E.g., since we have `man("Abe")` and our rule `human(X) :- man(X)`, we add a derived relation to our database `human("Abe")`
 
 ```{code-cell} ipython3
 def match_relation_and_fact(relation: Relation, fact: Relation) -> Optional[Dict]:
@@ -280,11 +296,13 @@ def match_relation_and_database(database: Set[Relation], relation: Relation) -> 
 def evaluate_rule_simple(rule: Rule, database: Set[Relation]) -> Set[Relation]:
     relation = list(rule.body)[0] # For now, our body has only one relation
     all_matches = match_relation_and_database(database, relation)
-    # We use the Python feature below that if we call `values` on a dictionary, it will preserve the order that was given when the dictionary was created i.e. in the `zip` inside `match_relation_and_database`. Thank God.
+    # We use the Python feature below that if we call `values` on a dictionary, 
+    # it will preserve the order that was given when the dictionary was created
+    # i.e. in the `zip` inside `match_relation_and_database`. Thank God.
     return {Relation(rule.head.name, tuple(attributes.values())) for attributes in all_matches}
 ```
 
-This evaluate_rule_simple can be passed to a function which will `evaluate` it on each rule for the database to generate the final knowledge base.
+This `evaluate_rule_simple` can be passed to a function which will `evaluate` it on each rule for the database to generate the final knowledge base.
 
 ```{code-cell} ipython3
 def generate_knowledgebase(evaluate: Callable, database: Set[Relation], rules: List[Rule]):
@@ -312,6 +330,8 @@ assert simplest_rule_result == {human("Abe"), human("Bob")}, f"result was {simpl
 +++
 
 Next, we introduce logical AND(conjunction). i.e. Given a few parents
+
+```{raw-cell}
 parent("Abe", "Bob"), # Abe is a parent of Bob
 parent("Abby", "Bob"),
 parent("Bob", "Carl"),
@@ -321,9 +341,10 @@ man("Abe"),
 man("Bob"),
 woman("Abby"),
 woman("Beatrice")
+```
 
-We'd like to find all the fathers in the house. A person is a father if he is a parent and he is a man.
-father(X, Y) :- parent(X, Y), man(X)
+We'd like to find all the fathers in the house. A person is a father if he is a parent and he is a man. i.e.
+`father(X, Y) :- parent(X, Y), man(X)`
 
 ```{code-cell} ipython3
 X = Variable("X")
@@ -348,12 +369,16 @@ rules = [father_rule]
 query = father(X, Y)
 ```
 
-How does the match change? We need to add logic for the conjunction i.e. when we match the body to the facts, we have to check if the attributes of the fact match across the entire body,
+How does the match change? We need to add logic for the conjunction i.e. when we match the body to the facts, we have to check if the attributes of the facts match across the entire body,
 e.g. for the body `parent(X, Y), man(X)`
-* parent("Abe", "Bob"), man("Abe") is a match as there is a common value Abe across the entire body
-* parent("Abby", "Bob") does not match as there is no common value "Abby" for parent and man. 
+* parent("Abe", "Bob"), man("Abe") is a match as there is a common value `Abe` across the entire body at same place as `X`.
+* parent("Abby", "Bob") does not match as there is no `man("Abby")`.
 
-Let's first code up this common value logic
+Let's first code up this common value logic as `has_common_value`. We also have to start pairing variables to values e.g. `{'X': 'Abe'}`
+
+This combination below:
+
+`has_common_value({ X: 'Abe', Y: 'Bob'}, {X: 'Abe'})` # returns True
 
 ```{code-cell} ipython3
 def has_common_value(attrs1: Dict[Variable, Any], attrs2: Dict[Variable, Any]) -> bool:
@@ -361,10 +386,30 @@ def has_common_value(attrs1: Dict[Variable, Any], attrs2: Dict[Variable, Any]) -
     return all([attrs1[c] == attrs2[c] for c in common_vars])
 ```
 
-So given a list of body_attributes which each match a fact in the database, it's time to conjunct. Just hacking it for now.
+aaa. Reverse Y and X and read through conjunction section again to see if it flows well.
+
+So given a list of body attributes which each match a fact in the database, it's time to conjunct. We may get some pseudo input like:
+```
+[[{Y: 'Carl', X: 'Bob'},
+  {Y: 'Carl', X: 'Beatrice'},
+  {Y: 'Bob', X: 'Abe'},
+  {Y: 'Bob', X: 'Abby'},
+  {Y: 'Connor', X: 'Bob'}], # <= All facts that match parent(X,Y)
+ [{X: 'Bob'}, X: 'Abe'}]]   # <= All facts that match man(X)
+```
+For the body `man(X), parent(X,Y)`And we expect back.
+```
+[{Y: 'Carl', X: 'Bob'},
+ {Y: 'Bob', X: 'Abe'},
+ {Y: 'Connor', X: 'Bob'}]
+```
+
+Just hacking it for now.
 
 ```{code-cell} ipython3
 def conjunct(body_attributes: List[List[Dict]]) -> List:
+    pprint("Body Attributes")
+    pprint(body_attributes)
     # TODO: Does not cover body lengths greater than 2
     result = []
     if len(body_attributes) == 1:
@@ -377,7 +422,8 @@ def conjunct(body_attributes: List[List[Dict]]) -> List:
             _c = has_common_value(a1, a2)
             if _c:
                 result.append({**a1, **a2})
-    
+    pprint('Result')
+    pprint(result)
     return result
 ```
 
