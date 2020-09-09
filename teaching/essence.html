@@ -498,7 +498,7 @@ E.g., since we have <code class="docutils literal notranslate"><span class="pre"
 </div>
 <div class="section" id="logical-and-query">
 <h2>Logical AND Query<a class="headerlink" href="#logical-and-query" title="Permalink to this headline">¶</a></h2>
-<p>Next, we introduce logical AND(conjunction). i.e. Given a few parents</p>
+<p>Next, we introduce logical AND(conjunction). i.e. Given</p>
 <p>We’d like to find all the fathers in the house. A person is a father if he is a parent and he is a man. i.e.
 <code class="docutils literal notranslate"><span class="pre">father(X,</span> <span class="pre">Y)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y),</span> <span class="pre">man(X)</span></code></p>
 <div class="cell docutils container">
@@ -535,7 +535,7 @@ e.g. for the body <code class="docutils literal notranslate"><span class="pre">p
 </ul>
 <p>Let’s first code up this common value logic as <code class="docutils literal notranslate"><span class="pre">has_common_value</span></code>. We also have to start pairing variables to values e.g. <code class="docutils literal notranslate"><span class="pre">{'X':</span> <span class="pre">'Abe'}</span></code></p>
 <p>This combination below:</p>
-<p><code class="docutils literal notranslate"><span class="pre">has_common_value({</span> <span class="pre">X:</span> <span class="pre">'Abe',</span> <span class="pre">Y:</span> <span class="pre">'Bob'},</span> <span class="pre">{X:</span> <span class="pre">'Abe'})</span></code> # returns True</p>
+<p><code class="docutils literal notranslate"><span class="pre">has_common_value({</span> <span class="pre">X:</span> <span class="pre">'Abe',</span> <span class="pre">Y:</span> <span class="pre">'Bob'},</span> <span class="pre">{X:</span> <span class="pre">'Abe'})</span></code> should return <code class="docutils literal notranslate"><span class="pre">True</span></code></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">has_common_value</span><span class="p">(</span><span class="n">attrs1</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">attrs2</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -545,28 +545,12 @@ e.g. for the body <code class="docutils literal notranslate"><span class="pre">p
 </div>
 </div>
 </div>
-<p>aaa. Reverse Y and X and read through conjunction section again to see if it flows well.</p>
-<p>So given a list of body attributes which each match a fact in the database, it’s time to conjunct. We may get some pseudo input like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[{</span><span class="n">Y</span><span class="p">:</span> <span class="s1">&#39;Carl&#39;</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Bob&#39;</span><span class="p">},</span>
-  <span class="p">{</span><span class="n">Y</span><span class="p">:</span> <span class="s1">&#39;Carl&#39;</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Beatrice&#39;</span><span class="p">},</span>
-  <span class="p">{</span><span class="n">Y</span><span class="p">:</span> <span class="s1">&#39;Bob&#39;</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Abe&#39;</span><span class="p">},</span>
-  <span class="p">{</span><span class="n">Y</span><span class="p">:</span> <span class="s1">&#39;Bob&#39;</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Abby&#39;</span><span class="p">},</span>
-  <span class="p">{</span><span class="n">Y</span><span class="p">:</span> <span class="s1">&#39;Connor&#39;</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Bob&#39;</span><span class="p">}],</span> <span class="c1"># &lt;= All facts that match parent(X,Y)</span>
- <span class="p">[{</span><span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Bob&#39;</span><span class="p">},</span> <span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Abe&#39;</span><span class="p">}]]</span>   <span class="c1"># &lt;= All facts that match man(X)</span>
-</pre></div>
-</div>
-<p>For the body <code class="docutils literal notranslate"><span class="pre">man(X),</span> <span class="pre">parent(X,Y)</span></code>And we expect back.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="n">Y</span><span class="p">:</span> <span class="s1">&#39;Carl&#39;</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Bob&#39;</span><span class="p">},</span>
- <span class="p">{</span><span class="n">Y</span><span class="p">:</span> <span class="s1">&#39;Bob&#39;</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Abe&#39;</span><span class="p">},</span>
- <span class="p">{</span><span class="n">Y</span><span class="p">:</span> <span class="s1">&#39;Connor&#39;</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Bob&#39;</span><span class="p">}]</span>
-</pre></div>
-</div>
+<p>Once we have that, we know that <code class="docutils literal notranslate"><span class="pre">match_relation_and_database</span></code> will return as before, a list of body attributes which each match a fact in the database. It’s time to conjunct. We may get some input like:</p>
+<p>For the body <code class="docutils literal notranslate"><span class="pre">man(X),</span> <span class="pre">parent(X,</span> <span class="pre">Y)</span></code>, we expect back from a function <code class="docutils literal notranslate"><span class="pre">conjunct</span></code>:</p>
 <p>Just hacking it for now.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">conjunct</span><span class="p">(</span><span class="n">body_attributes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
-    <span class="n">pprint</span><span class="p">(</span><span class="s2">&quot;Body Attributes&quot;</span><span class="p">)</span>
-    <span class="n">pprint</span><span class="p">(</span><span class="n">body_attributes</span><span class="p">)</span>
     <span class="c1"># TODO: Does not cover body lengths greater than 2</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">body_attributes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -579,15 +563,13 @@ e.g. for the body <code class="docutils literal notranslate"><span class="pre">p
             <span class="n">_c</span> <span class="o">=</span> <span class="n">has_common_value</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">_c</span><span class="p">:</span>
                 <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="o">**</span><span class="n">a1</span><span class="p">,</span> <span class="o">**</span><span class="n">a2</span><span class="p">})</span>
-    <span class="n">pprint</span><span class="p">(</span><span class="s1">&#39;Result&#39;</span><span class="p">)</span>
-    <span class="n">pprint</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">result</span>
 </pre></div>
 </div>
 </div>
 </div>
 <p>I also realized that though the body can return many attributes which have ‘conjuncted’, we only need those which are in the head.
-e.g. for a rule <code class="docutils literal notranslate"><span class="pre">relation1(X)</span> <span class="pre">:-</span> <span class="pre">relation2(X,Y),</span> <span class="pre">relation3(X)</span></code>, I just want X in relation1 from the return values of X,Y</p>
+e.g. for a rule <code class="docutils literal notranslate"><span class="pre">relation1(X)</span> <span class="pre">:-</span> <span class="pre">relation2(X,Y),</span> <span class="pre">relation3(X)</span></code>, <code class="docutils literal notranslate"><span class="pre">relation1</span></code> just needs <code class="docutils literal notranslate"><span class="pre">X</span></code> so I’ll just pull that.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">rule_attributes</span><span class="p">(</span><span class="n">relation</span><span class="p">:</span> <span class="n">Relation</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
@@ -625,12 +607,6 @@ e.g. for a rule <code class="docutils literal notranslate"><span class="pre">rel
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;Abe&#39;}, {Variable(name=&#39;X&#39;): &#39;Bob&#39;}]]
-</pre></div>
-</div>
-</div>
 </div>
 <p>And our final test</p>
 <div class="cell docutils container">
@@ -639,28 +615,12 @@ e.g. for a rule <code class="docutils literal notranslate"><span class="pre">rel
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;Abe&#39;}, {Variable(name=&#39;X&#39;): &#39;Bob&#39;}],
- [{Variable(name=&#39;X&#39;): &#39;Bob&#39;, Variable(name=&#39;Y&#39;): &#39;Connor&#39;},
-  {Variable(name=&#39;X&#39;): &#39;Abe&#39;, Variable(name=&#39;Y&#39;): &#39;Bob&#39;},
-  {Variable(name=&#39;X&#39;): &#39;Bob&#39;, Variable(name=&#39;Y&#39;): &#39;Carl&#39;},
-  {Variable(name=&#39;X&#39;): &#39;Beatrice&#39;, Variable(name=&#39;Y&#39;): &#39;Carl&#39;},
-  {Variable(name=&#39;X&#39;): &#39;Abby&#39;, Variable(name=&#39;Y&#39;): &#39;Bob&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;Abe&#39;, Variable(name=&#39;Y&#39;): &#39;Bob&#39;},
- {Variable(name=&#39;X&#39;): &#39;Bob&#39;, Variable(name=&#39;Y&#39;): &#39;Connor&#39;},
- {Variable(name=&#39;X&#39;): &#39;Bob&#39;, Variable(name=&#39;Y&#39;): &#39;Carl&#39;}]
-</pre></div>
-</div>
-</div>
 </div>
 </div>
 <div class="section" id="logical-or-query">
 <h2>Logical OR Query<a class="headerlink" href="#logical-or-query" title="Permalink to this headline">¶</a></h2>
-<p>Logical OR is just specifying two separate rules with the same head. E.g.
-human(X) :- man(X)
-human(X) :- woman(X)</p>
+<p>Logical OR is just specifying two separate rules with the same head. E.g.</p>
+<p>In Python, given:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">database</span> <span class="o">=</span> <span class="p">{</span>
@@ -685,14 +645,6 @@ human(X) :- woman(X)</p>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;Bob&#39;}, {Variable(name=&#39;X&#39;): &#39;Abe&#39;}]]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;Beatrice&#39;}, {Variable(name=&#39;X&#39;): &#39;Abby&#39;}]]
-</pre></div>
-</div>
-</div>
 </div>
 </div>
 <div class="section" id="recursive-relations-query">
@@ -706,10 +658,10 @@ Given:</p>
 <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>A parent X of Y is by definition an ancestor.
-<code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Y)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y)</span></code></p>
-<p>If you are a parent of Y and Y is an an ancestor, then you are an ancestor as well.
-<code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Z)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y),</span> <span class="pre">ancestor(Y,</span> <span class="pre">Z)</span></code></p>
+<p>A parent X of Y is by definition an ancestor.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Y)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y)</span></code></p>
+<p>If you are a parent of Y and Y is an an ancestor, then you are an ancestor as well.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Z)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y),</span> <span class="pre">ancestor(Y,</span> <span class="pre">Z)</span></code></p>
 <p>Query: <code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Y)</span></code> should return all the parents above as ancestors</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">)</span> <span class="c1"># A is the ancestor of B</span>
 <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span> <span class="c1"># A -&gt; B -&gt; C</span>
@@ -722,6 +674,7 @@ Given:</p>
 <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>In Python,</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ancestor</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">ancestor</span><span class="p">,</span> <span class="n">descendant</span><span class="p">:</span> <span class="n">Relation</span><span class="p">(</span><span class="s1">&#39;ancestor&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">ancestor</span><span class="p">,</span> <span class="n">descendant</span><span class="p">))</span>
@@ -748,40 +701,16 @@ Given:</p>
 </div>
 </div>
 </div>
-<p>Alright, let’s dive into this. What is different from run_logical_operator? It’s the hierarchy or recursion. If you see it as hierarchy(I’m visualizing this as a tree), one has to keep on going until we reach the top(or the bottom) of the tree. If we see it as a recursion, we keep on going till we hit the base case which terminates the recursion. So let’s imagine how we would process the above example. In the first pass, we would do the simplest inference from base fact to derived fact using the base rule of ancestor(X, Y) :- parent(X, Y)</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Pass</span> <span class="mi">1</span><span class="p">:</span> <span class="n">Base</span> <span class="n">Facts</span> <span class="ow">and</span> <span class="n">Inferred</span> <span class="n">facts</span> <span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span> <span class="n">KnowledgeBase1</span>
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)]</span>
-<span class="c1"># ----------------- New inferred facts below --------------</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Now that’s done, we can focus on inference from a combination of inferred facts and base facts to new inferred facts using the recursive rule <code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Z)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y),</span> <span class="pre">ancestor(Y,</span> <span class="pre">Z)</span></code>. For e.g. in KnowledgeBase1, we have parent(“C”,”D”) and ancestor(“B”, “C”) , so we can infer the fact ancestor(“B”, “D”) i.e grandparents. We keep on doing this till we get:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Pass</span> <span class="mi">2</span><span class="p">:</span> <span class="n">KnowledgeBase2</span>
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
-<span class="c1"># ----------------- New inferred facts below --------------</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
+<p>Alright, let’s dive into this. What is different from run_logical_operator? It’s the hierarchy or recursion. If you see it as hierarchy(I’m visualizing this as a tree), one has to keep on going until we reach the top of the tree.</p>
+<p><img alt="" src="../_images/ancestor-hierarchy.png" /></p>
+<p>If we see it as a recursion, we keep on going till we hit the base case which terminates the recursion. So let’s imagine how we would process the above example. In the first pass, we would do the simplest inference from base fact to derived fact using the base rule of <code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Y)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y)</span></code>.</p>
+<p>Showing one hierarchy as an example(starting from <code class="docutils literal notranslate"><span class="pre">A</span></code>).</p>
+<p><img alt="" src="../_images/iterative-ancestry-depth1.png" /></p>
+<p>aaa. Proof Read Below.</p>
+<p>Now that’s done, we can focus on inference from a combination of inferred facts and base facts to new inferred facts using the recursive rule <code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Z)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y),</span> <span class="pre">ancestor(Y,</span> <span class="pre">Z)</span></code>. For e.g. in KnowledgeBase1, we have <code class="docutils literal notranslate"><span class="pre">parent(&quot;C&quot;,&quot;D&quot;)</span></code> and <code class="docutils literal notranslate"><span class="pre">ancestor(&quot;B&quot;,</span> <span class="pre">&quot;C&quot;)</span></code> , so we can infer the fact <code class="docutils literal notranslate"><span class="pre">ancestor(&quot;B&quot;,</span> <span class="pre">&quot;D&quot;)</span></code> i.e grandparents. We keep on doing this till we get:</p>
+<p><img alt="" src="../_images/iterative-ancestry-depth2.png" /></p>
 <p>Do we stop? No, we have to keep on going till we find all the ancestors. Let’s apply the rules to KnowledgeBase2 and get</p>
+<p><img alt="" src="../_images/iterative-ancestry-depth3.png" /></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Pass</span> <span class="mi">3</span><span class="p">:</span> <span class="n">KnowledgeBase3</span>
 <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
 <span class="n">parent</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
@@ -873,97 +802,6 @@ Take the output of each iteration. If it matches the input to that iteration, st
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;}],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;}],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}]
-</pre></div>
-</div>
-</div>
 </div>
 <p>Let’s explore other queries we can ask.
 Is AA the ancestor of C(No! Such an impolite question)</p>
@@ -972,97 +810,6 @@ Is AA the ancestor of C(No! Such an impolite question)</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span>
 
 <span class="k">assert</span> <span class="n">run_recursive</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;}],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;}],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}]
 </pre></div>
 </div>
 </div>
@@ -1075,194 +822,12 @@ Is AA the ancestor of C(No! Such an impolite question)</p>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;}],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;}],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}]
-</pre></div>
-</div>
-</div>
 </div>
 <p>What if I want to find who all are the descendants of AA. Again, use the same query but just reverse the order!</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
 <span class="k">assert</span> <span class="n">run_recursive</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span> <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)}</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;}],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;}],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}]
 </pre></div>
 </div>
 </div>
@@ -1281,164 +846,6 @@ intermediate(Z, X, Y) :- ancestor(X, Z), ancestor(Z, Y)</p>
 <span class="n">query</span> <span class="o">=</span> <span class="n">intermediate</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
 
 <span class="k">assert</span> <span class="n">run_recursive</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="n">intermediate</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> <span class="n">intermediate</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)}</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[]
-&#39;Body Attributes&#39;
-[[], []]
-&#39;Result&#39;
-[]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;}],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;}],
- [{Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;A&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;CC&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;D&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;AA&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;}]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;}],
- [{Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;}],
- [{Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;A&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;CC&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;D&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;D&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;AA&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;CC&#39;, Variable(name=&#39;Z&#39;): &#39;AA&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;A&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;}]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}],
- [{Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}]
-&#39;Body Attributes&#39;
-[[{Variable(name=&#39;X&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Z&#39;): &#39;CC&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Z&#39;): &#39;D&#39;}],
- [{Variable(name=&#39;Y&#39;): &#39;CC&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;D&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;BB&#39;, Variable(name=&#39;Z&#39;): &#39;AA&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;CC&#39;, Variable(name=&#39;Z&#39;): &#39;AA&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;B&#39;, Variable(name=&#39;Z&#39;): &#39;A&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;D&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;A&#39;},
-  {Variable(name=&#39;Y&#39;): &#39;D&#39;, Variable(name=&#39;Z&#39;): &#39;A&#39;}]]
-&#39;Result&#39;
-[{Variable(name=&#39;X&#39;): &#39;AA&#39;, Variable(name=&#39;Y&#39;): &#39;CC&#39;, Variable(name=&#39;Z&#39;): &#39;BB&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;C&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;, Variable(name=&#39;Z&#39;): &#39;B&#39;},
- {Variable(name=&#39;X&#39;): &#39;B&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;},
- {Variable(name=&#39;X&#39;): &#39;A&#39;, Variable(name=&#39;Y&#39;): &#39;D&#39;, Variable(name=&#39;Z&#39;): &#39;C&#39;}]
 </pre></div>
 </div>
 </div>

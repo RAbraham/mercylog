@@ -235,7 +235,7 @@ assert children_bob == {parent("Bob", "Carl"), parent("Bob", "Connor")}
 
 +++
 
-Next, consider a database. 
+Next, consider a database.
 
 ```{raw-cell}
 man("Bob")
@@ -248,7 +248,6 @@ Let's add a rule to our program.
 ```{raw-cell}
 human(X) :- man(X) # You are human if you are man.
 ```
-
 
 Query:
 
@@ -329,7 +328,7 @@ assert simplest_rule_result == {human("Abe"), human("Bob")}, f"result was {simpl
 
 +++
 
-Next, we introduce logical AND(conjunction). i.e. Given a few parents
+Next, we introduce logical AND(conjunction). i.e. Given
 
 ```{raw-cell}
 parent("Abe", "Bob"), # Abe is a parent of Bob
@@ -378,7 +377,7 @@ Let's first code up this common value logic as `has_common_value`. We also have 
 
 This combination below:
 
-`has_common_value({ X: 'Abe', Y: 'Bob'}, {X: 'Abe'})` # returns True
+`has_common_value({ X: 'Abe', Y: 'Bob'}, {X: 'Abe'})` should return `True`
 
 ```{code-cell} ipython3
 def has_common_value(attrs1: Dict[Variable, Any], attrs2: Dict[Variable, Any]) -> bool:
@@ -386,30 +385,32 @@ def has_common_value(attrs1: Dict[Variable, Any], attrs2: Dict[Variable, Any]) -
     return all([attrs1[c] == attrs2[c] for c in common_vars])
 ```
 
-aaa. Reverse Y and X and read through conjunction section again to see if it flows well.
+Once we have that, we know that `match_relation_and_database` will return as before, a list of body attributes which each match a fact in the database. It's time to conjunct. We may get some input like:
 
-So given a list of body attributes which each match a fact in the database, it's time to conjunct. We may get some pseudo input like:
+```{raw-cell}
+
+[[{X: 'Bob', Y: 'Carl'},    # <= All facts that match parent(X,Y)
+  {X: 'Beatrice', Y: 'Carl'},
+  {X: 'Abe', Y: 'Bob'},
+  {X: 'Abby', Y: 'Bob'},
+  {X: 'Bob', Y: 'Connor'}],
+ [{X: 'Bob'},               # <= All facts that match man(X)
+  {X: 'Abe'}]]
 ```
-[[{Y: 'Carl', X: 'Bob'},
-  {Y: 'Carl', X: 'Beatrice'},
-  {Y: 'Bob', X: 'Abe'},
-  {Y: 'Bob', X: 'Abby'},
-  {Y: 'Connor', X: 'Bob'}], # <= All facts that match parent(X,Y)
- [{X: 'Bob'}, X: 'Abe'}]]   # <= All facts that match man(X)
-```
-For the body `man(X), parent(X,Y)`And we expect back.
-```
-[{Y: 'Carl', X: 'Bob'},
- {Y: 'Bob', X: 'Abe'},
- {Y: 'Connor', X: 'Bob'}]
+
+For the body `man(X), parent(X, Y)`, we expect back from a function `conjunct`:
+
+```{raw-cell}
+[{X: 'Bob', Y: 'Carl'},
+ {X: 'Abe', Y: 'Bob'},
+ {X: 'Bob', Y: 'Connor'}]
+
 ```
 
 Just hacking it for now.
 
 ```{code-cell} ipython3
 def conjunct(body_attributes: List[List[Dict]]) -> List:
-    pprint("Body Attributes")
-    pprint(body_attributes)
     # TODO: Does not cover body lengths greater than 2
     result = []
     if len(body_attributes) == 1:
@@ -422,13 +423,12 @@ def conjunct(body_attributes: List[List[Dict]]) -> List:
             _c = has_common_value(a1, a2)
             if _c:
                 result.append({**a1, **a2})
-    pprint('Result')
-    pprint(result)
     return result
 ```
 
 I also realized that though the body can return many attributes which have 'conjuncted', we only need those which are in the head.
-e.g. for a rule `relation1(X) :- relation2(X,Y), relation3(X)`, I just want X in relation1 from the return values of X,Y
+e.g. for a rule `relation1(X) :- relation2(X,Y), relation3(X)`, `relation1` just needs `X` so I'll just pull that.
+
 
 ```{code-cell} ipython3
 def rule_attributes(relation: Relation, attr: Dict[Variable, Any]) -> Tuple:
@@ -472,9 +472,11 @@ assert run_logical_operators(database, rules, query) == {father("Abe", "Bob"), f
 +++
 
 Logical OR is just specifying two separate rules with the same head. E.g.
+```{raw-cell}
 human(X) :- man(X)
 human(X) :- woman(X)
-
+```
+In Python, given:
 ```{code-cell} ipython3
 database = {
     animal("Tiger"),
@@ -512,9 +514,11 @@ parent("BB", "CC")
 ```
 
 A parent X of Y is by definition an ancestor.
+
 `ancestor(X, Y) :- parent(X, Y)`
 
 If you are a parent of Y and Y is an an ancestor, then you are an ancestor as well.
+
 `ancestor(X, Z) :- parent(X, Y), ancestor(Y, Z)`
 
 Query: `ancestor(X, Y)` should return all the parents above as ancestors 
@@ -529,7 +533,7 @@ ancestor("AA", "BB")
 ancestor("AA", "CC") # AA -> BB -> CC
 ancestor("BB", "CC")
 ```
-
+In Python,
 ```{code-cell} ipython3
 ancestor = lambda ancestor, descendant: Relation('ancestor', (ancestor, descendant))
 
@@ -553,9 +557,17 @@ ancestor_rule_recursive = Rule(ancestor(X, Z), {parent(X, Y), ancestor(Y, Z)})
 rules = [ancestor_rule_base, ancestor_rule_recursive]
 ```
 
-Alright, let's dive into this. What is different from run_logical_operator? It's the hierarchy or recursion. If you see it as hierarchy(I'm visualizing this as a tree), one has to keep on going until we reach the top(or the bottom) of the tree. If we see it as a recursion, we keep on going till we hit the base case which terminates the recursion. So let's imagine how we would process the above example. In the first pass, we would do the simplest inference from base fact to derived fact using the base rule of ancestor(X, Y) :- parent(X, Y) 
+Alright, let's dive into this. What is different from run_logical_operator? It's the hierarchy or recursion. If you see it as hierarchy(I'm visualizing this as a tree), one has to keep on going until we reach the top of the tree.
 
-```
+![](./img/ancestor-hierarchy.png)
+
+If we see it as a recursion, we keep on going till we hit the base case which terminates the recursion. So let's imagine how we would process the above example. In the first pass, we would do the simplest inference from base fact to derived fact using the base rule of `ancestor(X, Y) :- parent(X, Y)`. 
+
+Showing one hierarchy as an example(starting from `A`).
+
+![](./img/iterative-ancestry-depth1.png)
+
+```{raw-cell}
 Pass 1: Base Facts and Inferred facts i.e. KnowledgeBase1
 parent("A", "B"), 
 parent("B", "C"), 
@@ -569,10 +581,14 @@ ancestor("C", "D"),
 ancestor("AA", "BB"),
 ancestor("BB", "CC")
 ```
+aaa. Proof Read Below.
 
-Now that's done, we can focus on inference from a combination of inferred facts and base facts to new inferred facts using the recursive rule `ancestor(X, Z) :- parent(X, Y), ancestor(Y, Z)`. For e.g. in KnowledgeBase1, we have parent("C","D") and ancestor("B", "C") , so we can infer the fact ancestor("B", "D") i.e grandparents. We keep on doing this till we get:
+Now that's done, we can focus on inference from a combination of inferred facts and base facts to new inferred facts using the recursive rule `ancestor(X, Z) :- parent(X, Y), ancestor(Y, Z)`. For e.g. in KnowledgeBase1, we have `parent("C","D")` and `ancestor("B", "C")` , so we can infer the fact `ancestor("B", "D")` i.e grandparents. We keep on doing this till we get:
 
-```
+
+![](./img/iterative-ancestry-depth2.png)
+
+```{raw-cell}
 Pass 2: KnowledgeBase2
 parent("A", "B"), 
 parent("B", "C"), 
@@ -591,6 +607,8 @@ ancestor("AA", "CC")
 ```
 
 Do we stop? No, we have to keep on going till we find all the ancestors. Let's apply the rules to KnowledgeBase2 and get
+
+![](./img/iterative-ancestry-depth3.png)
 ```
 Pass 3: KnowledgeBase3
 parent("A", "B"), 
