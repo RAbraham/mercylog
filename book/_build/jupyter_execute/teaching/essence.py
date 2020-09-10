@@ -184,15 +184,15 @@ assert children_bob == {parent("Bob", "Carl"), parent("Bob", "Connor")}
 
 ## Simple Rule Query
 
-Next, consider a database.
+Let's add a rule to our program.
+
+human(X) :- man(X) # You are human if you are man.
+
+An example database:
 
 man("Bob")
 man("George")
 animal("Tiger")
-
-Let's add a rule to our program.
-
-human(X) :- man(X) # You are human if you are man.
 
 Query:
 

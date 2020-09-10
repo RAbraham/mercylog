@@ -235,18 +235,18 @@ assert children_bob == {parent("Bob", "Carl"), parent("Bob", "Connor")}
 
 +++
 
-Next, consider a database.
+Let's add a rule to our program.
+
+```{raw-cell}
+human(X) :- man(X) # You are human if you are man.
+```
+
+An example database:
 
 ```{raw-cell}
 man("Bob")
 man("George")
 animal("Tiger")
-```
-
-Let's add a rule to our program.
-
-```{raw-cell}
-human(X) :- man(X) # You are human if you are man.
 ```
 
 Query:
