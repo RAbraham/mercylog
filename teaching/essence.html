@@ -231,6 +231,10 @@
 <h2>Datalog Concepts<a class="headerlink" href="#datalog-concepts" title="Permalink to this headline">¶</a></h2>
 <p>Let’s start with a simple Datalog Program.</p>
 <p>We can have simple <code class="docutils literal notranslate"><span class="pre">facts</span></code> in our database. e.g. Bob is a man. Abe is a man. In Datalog, we write it as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">man</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">)</span>
+<span class="n">man</span><span class="p">(</span><span class="s2">&quot;Abe&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 <p><code class="docutils literal notranslate"><span class="pre">man</span></code> is like a table in a database. <code class="docutils literal notranslate"><span class="pre">man(&quot;Bob&quot;)</span></code> is a relation in that table. We’ll also call it a <code class="docutils literal notranslate"><span class="pre">base</span></code> relation.</p>
 <p>Next, we create the business logic i.e. <code class="docutils literal notranslate"><span class="pre">rules</span></code>.</p>
 <p>Someone is a person if he is a man
@@ -311,6 +315,11 @@
 </div>
 <p>The last element of Datalog is the query. The simplest query is no rules, just facts.</p>
 <p>Given:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">man</span><span class="p">(</span><span class="s2">&quot;Abe)</span>
+<span class="n">man</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">)</span>
+<span class="n">woman</span><span class="p">(</span><span class="s2">&quot;Abby&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>A query could be: <code class="docutils literal notranslate"><span class="pre">man(X)</span></code> # Find me all men</p>
 <p>The query should return: <code class="docutils literal notranslate"><span class="pre">{man(&quot;Bob&quot;),</span> <span class="pre">man(&quot;George&quot;)}</span></code></p>
 <p>This would be similar to a SQL query <code class="docutils literal notranslate"><span class="pre">select</span> <span class="pre">*</span> <span class="pre">from</span> <span class="pre">man</span></code></p>
@@ -351,6 +360,13 @@
 </div>
 </div>
 <p>Let’s add some facts of length two:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Abe&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">)</span> <span class="c1"># Abe is a parent of Bob</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Abby&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">)</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="p">)</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Connor&quot;</span><span class="p">)</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Beatrice&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>I may want to query who are the parents of Carl</p>
 <p><code class="docutils literal notranslate"><span class="pre">parent(X,</span> <span class="pre">&quot;Carl&quot;)</span></code> should return <code class="docutils literal notranslate"><span class="pre">{parent(&quot;Bob&quot;,</span> <span class="pre">&quot;Carl&quot;),</span> <span class="pre">parent(&quot;Beatrice&quot;,</span> <span class="pre">&quot;Carl&quot;)}</span></code></p>
 <p><code class="docutils literal notranslate"><span class="pre">parent(X,</span> <span class="pre">&quot;Carl&quot;)</span></code> is similar to <code class="docutils literal notranslate"><span class="pre">select</span> <span class="pre">*</span> <span class="pre">from</span> <span class="pre">parent</span> <span class="pre">where</span> <span class="pre">child</span> <span class="pre">=</span> <span class="pre">&quot;Carl&quot;</span></code> if there was a table <code class="docutils literal notranslate"><span class="pre">parent</span></code> with columns <code class="docutils literal notranslate"><span class="pre">parent</span></code> and <code class="docutils literal notranslate"><span class="pre">child</span></code>)</p>
@@ -413,6 +429,9 @@ For e.g
 <div class="section" id="simple-rule-query">
 <h2>Simple Rule Query<a class="headerlink" href="#simple-rule-query" title="Permalink to this headline">¶</a></h2>
 <p>Let’s add a rule to our program.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">human</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="p">:</span><span class="o">-</span> <span class="n">man</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="c1"># You are human if you are man.</span>
+</pre></div>
+</div>
 <p>An example database below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">man</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">)</span>
 <span class="n">man</span><span class="p">(</span><span class="s2">&quot;George&quot;</span><span class="p">)</span>
@@ -504,6 +523,17 @@ E.g., since we have <code class="docutils literal notranslate"><span class="pre"
 <div class="section" id="logical-and-query">
 <h2>Logical AND Query<a class="headerlink" href="#logical-and-query" title="Permalink to this headline">¶</a></h2>
 <p>Next, we introduce logical AND(conjunction). i.e. Given</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Abe&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">),</span> <span class="c1"># Abe is a parent of Bob</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Abby&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Connor&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;Beatrice&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="p">),</span>
+<span class="n">man</span><span class="p">(</span><span class="s2">&quot;Abe&quot;</span><span class="p">),</span>
+<span class="n">man</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">),</span>
+<span class="n">woman</span><span class="p">(</span><span class="s2">&quot;Abby&quot;</span><span class="p">),</span>
+<span class="n">woman</span><span class="p">(</span><span class="s2">&quot;Beatrice&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>We’d like to find all the fathers in the house. A person is a father if he is a parent and he is a man. i.e.
 <code class="docutils literal notranslate"><span class="pre">father(X,</span> <span class="pre">Y)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y),</span> <span class="pre">man(X)</span></code></p>
 <div class="cell docutils container">
@@ -551,7 +581,21 @@ e.g. for the body <code class="docutils literal notranslate"><span class="pre">p
 </div>
 </div>
 <p>Once we have that, we know that <code class="docutils literal notranslate"><span class="pre">match_relation_and_database</span></code> will return as before, a list of body attributes which each match a fact in the database. It’s time to conjunct. We may get some input like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[{</span><span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Bob&#39;</span><span class="p">,</span> <span class="n">Y</span><span class="p">:</span> <span class="s1">&#39;Carl&#39;</span><span class="p">},</span>    <span class="c1"># &lt;= All facts that match parent(X,Y)</span>
+  <span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Beatrice&#39;</span><span class="p">,</span> <span class="n">Y</span><span class="p">:</span> <span class="s1">&#39;Carl&#39;</span><span class="p">},</span>
+  <span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Abe&#39;</span><span class="p">,</span> <span class="n">Y</span><span class="p">:</span> <span class="s1">&#39;Bob&#39;</span><span class="p">},</span>
+  <span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Abby&#39;</span><span class="p">,</span> <span class="n">Y</span><span class="p">:</span> <span class="s1">&#39;Bob&#39;</span><span class="p">},</span>
+  <span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Bob&#39;</span><span class="p">,</span> <span class="n">Y</span><span class="p">:</span> <span class="s1">&#39;Connor&#39;</span><span class="p">}],</span>
+ <span class="p">[{</span><span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Bob&#39;</span><span class="p">},</span>               <span class="c1"># &lt;= All facts that match man(X)</span>
+  <span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Abe&#39;</span><span class="p">}]]</span>
+</pre></div>
+</div>
 <p>For the body <code class="docutils literal notranslate"><span class="pre">man(X),</span> <span class="pre">parent(X,</span> <span class="pre">Y)</span></code>, we expect back from a function <code class="docutils literal notranslate"><span class="pre">conjunct</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Bob&#39;</span><span class="p">,</span> <span class="n">Y</span><span class="p">:</span> <span class="s1">&#39;Carl&#39;</span><span class="p">},</span>
+ <span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Abe&#39;</span><span class="p">,</span> <span class="n">Y</span><span class="p">:</span> <span class="s1">&#39;Bob&#39;</span><span class="p">},</span>
+ <span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="s1">&#39;Bob&#39;</span><span class="p">,</span> <span class="n">Y</span><span class="p">:</span> <span class="s1">&#39;Connor&#39;</span><span class="p">}]</span>
+</pre></div>
+</div>
 <p>Just hacking it for now.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -625,6 +669,10 @@ e.g. for a rule <code class="docutils literal notranslate"><span class="pre">rel
 <div class="section" id="logical-or-query">
 <h2>Logical OR Query<a class="headerlink" href="#logical-or-query" title="Permalink to this headline">¶</a></h2>
 <p>Logical OR is just specifying two separate rules with the same head. E.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">human</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="p">:</span><span class="o">-</span> <span class="n">man</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">human</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="p">:</span><span class="o">-</span> <span class="n">woman</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>In Python, given:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -711,12 +759,80 @@ Given:</p>
 <p>So let’s imagine how we would process the above example. In the first pass, we would do the simplest inference from base fact to derived fact using the base rule of <code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Y)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y)</span></code>.</p>
 <p>Showing one hierarchy as an example(starting from <code class="docutils literal notranslate"><span class="pre">A</span></code>).</p>
 <p><img alt="" src="../_images/iterative-ancestry-depth1.png" /></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Pass</span> <span class="mi">1</span><span class="p">:</span> <span class="n">Base</span> <span class="n">Facts</span> <span class="ow">and</span> <span class="n">Inferred</span> <span class="n">facts</span> <span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span> <span class="n">KnowledgeBase1</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)]</span>
+<span class="c1"># ----------------- New inferred facts below --------------</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>Now that’s done, we can focus on inference from a combination of inferred facts and base facts to new inferred facts using the recursive rule <code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Z)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y),</span> <span class="pre">ancestor(Y,</span> <span class="pre">Z)</span></code>. For e.g. in <code class="docutils literal notranslate"><span class="pre">KnowledgeBase1</span></code>, we have <code class="docutils literal notranslate"><span class="pre">parent(&quot;C&quot;,&quot;D&quot;)</span></code> and <code class="docutils literal notranslate"><span class="pre">ancestor(&quot;B&quot;,</span> <span class="pre">&quot;C&quot;)</span></code> , so we can infer the fact <code class="docutils literal notranslate"><span class="pre">ancestor(&quot;B&quot;,</span> <span class="pre">&quot;D&quot;)</span></code> i.e grandparents. We keep on doing this till we get:</p>
 <p><img alt="" src="../_images/iterative-ancestry-depth2.png" /></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Pass</span> <span class="mi">2</span><span class="p">:</span> <span class="n">KnowledgeBase2</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+<span class="c1"># ----------------- New inferred facts below --------------</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>Do we stop? No, we have to keep on going till we find all the ancestors. Let’s apply the rules to <code class="docutils literal notranslate"><span class="pre">KnowledgeBase2</span></code> and get</p>
 <p><img alt="" src="../_images/iterative-ancestry-depth3.png" /></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Pass</span> <span class="mi">3</span><span class="p">:</span> <span class="n">KnowledgeBase3</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+<span class="c1"># ----------------- New inferred facts below --------------</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>i.e <code class="docutils literal notranslate"><span class="pre">A</span></code> is the great grand parent of <code class="docutils literal notranslate"><span class="pre">D</span></code></p>
 <p>Do we stop? Yes(if you look at the above example), but the computer does not know that. There could be new inferred facts, so let’s try again for <code class="docutils literal notranslate"><span class="pre">KnowledgeBase4</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Pass</span> <span class="mi">4</span><span class="p">:</span> <span class="n">KnowledgeBase4</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
+<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+<span class="c1"># ----------------- New inferred facts below --------------</span>
+<span class="n">No</span> <span class="n">New</span> <span class="n">Facts</span>
+</pre></div>
+</div>
 <p>Aha! There are no more new inferred facts. If we do another pass on <code class="docutils literal notranslate"><span class="pre">KnowledgeBase4</span></code>, it would come out the same. So we can stop!</p>
 <p>So the logic to stop would be:
 Take the output of each iteration. If it matches the input to that iteration, stop(as we did not learn any new inferred facts). If not a match, then run another iteration. Let’s call this method <code class="docutils literal notranslate"><span class="pre">iterate_until_no_change</span></code>.</p>
@@ -800,6 +916,9 @@ Is <code class="docutils literal notranslate"><span class="pre">AA</span></code>
 </div>
 <p>Finally, who are the intermediates between <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">D</span></code> i.e. <code class="docutils literal notranslate"><span class="pre">B</span></code> and <code class="docutils literal notranslate"><span class="pre">C</span></code>.</p>
 <p><code class="docutils literal notranslate"><span class="pre">Z</span></code> is an intermediate of <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code> if <code class="docutils literal notranslate"><span class="pre">X</span></code> is it’s ancestor and <code class="docutils literal notranslate"><span class="pre">Y</span></code> is its descendant.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">intermediate</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span> <span class="p">:</span><span class="o">-</span> <span class="n">ancestor</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Z</span><span class="p">),</span> <span class="n">ancestor</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>In Python,</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">

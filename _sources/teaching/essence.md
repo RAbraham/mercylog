@@ -27,7 +27,7 @@ Let's start with a simple Datalog Program.
 
 We can have simple `facts` in our database. e.g. Bob is a man. Abe is a man. In Datalog, we write it as:
 
-```{raw-cell}
+```
 man("Bob")
 man("Abe")
 ```
@@ -112,7 +112,7 @@ The last element of Datalog is the query. The simplest query is no rules, just f
 
 Given:
 
-```{raw-cell}
+```
 man("Abe)
 man("Bob")
 woman("Abby")
@@ -163,7 +163,7 @@ assert run_simplest(database, no_rules, query) == {abe, bob}
 
 Let's add some facts of length two:
 
-```{raw-cell}
+```
 parent("Abe", "Bob") # Abe is a parent of Bob
 parent("Abby", "Bob")
 parent("Bob", "Carl")
@@ -235,7 +235,7 @@ assert children_bob == {parent("Bob", "Carl"), parent("Bob", "Connor")}
 
 Let's add a rule to our program.
 
-```{raw-cell}
+```
 human(X) :- man(X) # You are human if you are man.
 ```
 
@@ -328,7 +328,7 @@ assert simplest_rule_result == {human("Abe"), human("Bob")}, f"result was {simpl
 
 Next, we introduce logical AND(conjunction). i.e. Given
 
-```{raw-cell}
+```
 parent("Abe", "Bob"), # Abe is a parent of Bob
 parent("Abby", "Bob"),
 parent("Bob", "Carl"),
@@ -385,7 +385,7 @@ def has_common_value(attrs1: Dict[Variable, Any], attrs2: Dict[Variable, Any]) -
 
 Once we have that, we know that `match_relation_and_database` will return as before, a list of body attributes which each match a fact in the database. It's time to conjunct. We may get some input like:
 
-```{raw-cell}
+```
 [[{X: 'Bob', Y: 'Carl'},    # <= All facts that match parent(X,Y)
   {X: 'Beatrice', Y: 'Carl'},
   {X: 'Abe', Y: 'Bob'},
@@ -397,7 +397,7 @@ Once we have that, we know that `match_relation_and_database` will return as bef
 
 For the body `man(X), parent(X, Y)`, we expect back from a function `conjunct`:
 
-```{raw-cell}
+```
 [{X: 'Bob', Y: 'Carl'},
  {X: 'Abe', Y: 'Bob'},
  {X: 'Bob', Y: 'Connor'}]
@@ -468,7 +468,7 @@ assert run_logical_operators(database, rules, query) == {father("Abe", "Bob"), f
 
 Logical OR is just specifying two separate rules with the same head. E.g.
 
-```{raw-cell}
+```
 human(X) :- man(X)
 human(X) :- woman(X)
 ```
@@ -566,7 +566,7 @@ Showing one hierarchy as an example(starting from `A`).
 
 ![](./img/iterative-ancestry-depth1.png)
 
-```{raw-cell}
+```
 Pass 1: Base Facts and Inferred facts i.e. KnowledgeBase1
 parent("A", "B"),
 parent("B", "C"),
@@ -585,7 +585,7 @@ Now that's done, we can focus on inference from a combination of inferred facts 
 
 ![](./img/iterative-ancestry-depth2.png)
 
-```{raw-cell}
+```
 Pass 2: KnowledgeBase2
 parent("A", "B"),
 parent("B", "C"),
@@ -607,7 +607,7 @@ Do we stop? No, we have to keep on going till we find all the ancestors. Let's a
 
 ![](./img/iterative-ancestry-depth3.png)
 
-```{raw-cell}
+```
 Pass 3: KnowledgeBase3
 parent("A", "B"),
 parent("B", "C"),
@@ -630,7 +630,7 @@ i.e `A` is the great grand parent of `D`
 
 Do we stop? Yes(if you look at the above example), but the computer does not know that. There could be new inferred facts, so let's try again for `KnowledgeBase4`.
 
-```{raw-cell}
+```
 Pass 4: KnowledgeBase4
 parent("A", "B"),
 parent("B", "C"),
@@ -724,7 +724,7 @@ Finally, who are the intermediates between `A` and `D` i.e. `B` and `C`.
 
 `Z` is an intermediate of `X` and `Y` if `X` is it's ancestor and `Y` is its descendant.
 
-```{raw-cell}
+```
 intermediate(Z, X, Y) :- ancestor(X, Z), ancestor(Z, Y)
 ```
 
