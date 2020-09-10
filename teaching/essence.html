@@ -754,7 +754,7 @@ Given:</p>
 </div>
 </div>
 </div>
-<p>Alright, let’s dive into this. What is different from run_logical_operator? It’s the hierarchy or recursion. If you see it as hierarchy(I’m visualizing this as a tree), one has to keep on going until we reach the top of the tree.</p>
+<p>Alright, let’s dive into this. What is different from <code class="docutils literal notranslate"><span class="pre">run_logical_operator</span></code>? It’s the hierarchy or recursion. If you see it as hierarchy(I’m visualizing this as a tree), one has to keep on going until we reach the top of the tree.</p>
 <p><img alt="" src="../_images/ancestor-hierarchy.png" /></p>
 <p>So let’s imagine how we would process the above example. In the first pass, we would do the simplest inference from base fact to derived fact using the base rule of <code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Y)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y)</span></code>.</p>
 <p>Showing one hierarchy as an example(starting from <code class="docutils literal notranslate"><span class="pre">A</span></code>).</p>
@@ -850,7 +850,7 @@ Take the output of each iteration. If it matches the input to that iteration, st
 </div>
 </div>
 </div>
-<p>Now, we already have <code class="docutils literal notranslate"><span class="pre">run_logical_operator</span></code>. That will be our <code class="docutils literal notranslate"><span class="pre">transform</span></code> function above. So putting this all together below.</p>
+<p>Now, we already have <code class="docutils literal notranslate"><span class="pre">evaluate_logical_operators_in_rule</span></code>. That will be our <code class="docutils literal notranslate"><span class="pre">transform</span></code> function above. So putting this all together below.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_recursive</span><span class="p">(</span><span class="n">database</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Relation</span><span class="p">],</span> <span class="n">rules</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Rule</span><span class="p">],</span> <span class="n">query</span><span class="p">:</span> <span class="n">Relation</span><span class="p">):</span>
@@ -935,6 +935,7 @@ Is <code class="docutils literal notranslate"><span class="pre">AA</span></code>
 </div>
 </div>
 </div>
+<p>That’s it! If you found it interesting, check out <a class="reference external" href="https://github.com/RAbraham/mercylog">Mercylog</a>, a Datalog inspired library in Python.</p>
 </div>
 <div class="section" id="extra-extra-read-all-about-it">
 <h2>Extra Extra. Read All About It<a class="headerlink" href="#extra-extra-read-all-about-it" title="Permalink to this headline">¶</a></h2>
