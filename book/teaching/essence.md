@@ -87,7 +87,7 @@ class Relation:
 
 A rule could be:
 - `person(X) :- man(X)` i.e. `X` is a person if he is man.
-- `father(X, Y) :- man(X), parent(X, Y)` i.e. X is a father of Y if X is a man and X is the parent of Y
+- `father(X, Y) :- man(X), parent(X, Y)` i.e. `X` is a father of `Y` if `X` is a man and `X` is the parent of `Y`
 
 A rule has:
 - a head relation which is on the left of the `:-` symbol e.g. `person(X)` and `father(X, Y)` above
@@ -209,7 +209,7 @@ def query_variable_match(fact: Relation, query: Relation) -> bool:
 
     # TODO: zip is duplicated?
     for query_attribute, fact_attribute in zip(query.attributes, fact.attributes):
-        if not isinstance(query_attribute, Variable) and query_attribute != fact_attribute :
+        if not isinstance(query_attribute, Variable) and query_attribute != fact_attribute:
                 return False
     return True  
 
@@ -388,7 +388,6 @@ def has_common_value(attrs1: Dict[Variable, Any], attrs2: Dict[Variable, Any]) -
 Once we have that, we know that `match_relation_and_database` will return as before, a list of body attributes which each match a fact in the database. It's time to conjunct. We may get some input like:
 
 ```{raw-cell}
-
 [[{X: 'Bob', Y: 'Carl'},    # <= All facts that match parent(X,Y)
   {X: 'Beatrice', Y: 'Carl'},
   {X: 'Abe', Y: 'Bob'},
@@ -404,7 +403,6 @@ For the body `man(X), parent(X, Y)`, we expect back from a function `conjunct`:
 [{X: 'Bob', Y: 'Carl'},
  {X: 'Abe', Y: 'Bob'},
  {X: 'Bob', Y: 'Connor'}]
-
 ```
 
 Just hacking it for now.
@@ -428,7 +426,6 @@ def conjunct(body_attributes: List[List[Dict]]) -> List:
 
 I also realized that though the body can return many attributes which have 'conjuncted', we only need those which are in the head.
 e.g. for a rule `relation1(X) :- relation2(X,Y), relation3(X)`, `relation1` just needs `X` so I'll just pull that.
-
 
 ```{code-cell} ipython3
 def rule_attributes(relation: Relation, attr: Dict[Variable, Any]) -> Tuple:
@@ -472,11 +469,14 @@ assert run_logical_operators(database, rules, query) == {father("Abe", "Bob"), f
 +++
 
 Logical OR is just specifying two separate rules with the same head. E.g.
+
 ```{raw-cell}
 human(X) :- man(X)
 human(X) :- woman(X)
 ```
+
 In Python, given:
+
 ```{code-cell} ipython3
 database = {
     animal("Tiger"),
@@ -534,6 +534,7 @@ ancestor("AA", "CC") # AA -> BB -> CC
 ancestor("BB", "CC")
 ```
 In Python,
+
 ```{code-cell} ipython3
 ancestor = lambda ancestor, descendant: Relation('ancestor', (ancestor, descendant))
 
@@ -670,7 +671,6 @@ def iterate_until_no_change(transform: Callable, initial_value: Set) -> Set:
 Now, we already have `run_logical_operator`. That will be our `transform` function above. So putting this all together below.
 
 ```{code-cell} ipython3
-
 def run_recursive(database: Set[Relation], rules: List[Rule], query: Relation):
     transformer = lambda a_knowledgebase: generate_knowledgebase(evaluate_logical_operators_in_rule, a_knowledgebase, rules)
     knowledgebase = iterate_until_no_change(transformer, database)
@@ -730,7 +730,8 @@ Finally, who are the intermediates between `A` and `D` i.e. `B` and `C`.
 intermediate(Z, X, Y) :- ancestor(X, Z), ancestor(Z, Y)
 ```
 
-In Python, 
+In Python,
+
 ```{code-cell} ipython3
 intermediate = lambda intermediate, start, end: Relation("intermediate", (intermediate, start, end))
 intermediate_head = intermediate(Z, X, Y)

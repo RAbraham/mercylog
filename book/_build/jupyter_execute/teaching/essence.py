@@ -58,7 +58,7 @@ class Relation:
 
 A rule could be:
 - `person(X) :- man(X)` i.e. `X` is a person if he is man.
-- `father(X, Y) :- man(X), parent(X, Y)` i.e. X is a father of Y if X is a man and X is the parent of Y
+- `father(X, Y) :- man(X), parent(X, Y)` i.e. `X` is a father of `Y` if `X` is a man and `X` is the parent of `Y`
 
 A rule has:
 - a head relation which is on the left of the `:-` symbol e.g. `person(X)` and `father(X, Y)` above
@@ -163,7 +163,7 @@ def query_variable_match(fact: Relation, query: Relation) -> bool:
 
     # TODO: zip is duplicated?
     for query_attribute, fact_attribute in zip(query.attributes, fact.attributes):
-        if not isinstance(query_attribute, Variable) and query_attribute != fact_attribute :
+        if not isinstance(query_attribute, Variable) and query_attribute != fact_attribute:
                 return False
     return True  
 
@@ -329,7 +329,6 @@ For the body `man(X), parent(X, Y)`, we expect back from a function `conjunct`:
 [{X: 'Bob', Y: 'Carl'},
  {X: 'Abe', Y: 'Bob'},
  {X: 'Bob', Y: 'Connor'}]
-
 
 Just hacking it for now.
 

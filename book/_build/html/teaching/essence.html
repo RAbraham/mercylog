@@ -288,7 +288,7 @@
 <p>A rule could be:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">person(X)</span> <span class="pre">:-</span> <span class="pre">man(X)</span></code> i.e. <code class="docutils literal notranslate"><span class="pre">X</span></code> is a person if he is man.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">father(X,</span> <span class="pre">Y)</span> <span class="pre">:-</span> <span class="pre">man(X),</span> <span class="pre">parent(X,</span> <span class="pre">Y)</span></code> i.e. X is a father of Y if X is a man and X is the parent of Y</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">father(X,</span> <span class="pre">Y)</span> <span class="pre">:-</span> <span class="pre">man(X),</span> <span class="pre">parent(X,</span> <span class="pre">Y)</span></code> i.e. <code class="docutils literal notranslate"><span class="pre">X</span></code> is a father of <code class="docutils literal notranslate"><span class="pre">Y</span></code> if <code class="docutils literal notranslate"><span class="pre">X</span></code> is a man and <code class="docutils literal notranslate"><span class="pre">X</span></code> is the parent of <code class="docutils literal notranslate"><span class="pre">Y</span></code></p></li>
 </ul>
 <p>A rule has:</p>
 <ul class="simple">
@@ -383,7 +383,7 @@ For e.g
 
     <span class="c1"># TODO: zip is duplicated?</span>
     <span class="k">for</span> <span class="n">query_attribute</span><span class="p">,</span> <span class="n">fact_attribute</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">attributes</span><span class="p">,</span> <span class="n">fact</span><span class="o">.</span><span class="n">attributes</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query_attribute</span><span class="p">,</span> <span class="n">Variable</span><span class="p">)</span> <span class="ow">and</span> <span class="n">query_attribute</span> <span class="o">!=</span> <span class="n">fact_attribute</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query_attribute</span><span class="p">,</span> <span class="n">Variable</span><span class="p">)</span> <span class="ow">and</span> <span class="n">query_attribute</span> <span class="o">!=</span> <span class="n">fact_attribute</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="kc">True</span>  
 
