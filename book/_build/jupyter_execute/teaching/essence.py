@@ -188,7 +188,7 @@ Let's add a rule to our program.
 
 human(X) :- man(X) # You are human if you are man.
 
-An example database:
+An example database below:
 
 man("Bob")
 man("George")
