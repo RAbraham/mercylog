@@ -8,8 +8,10 @@ Let's start with a simple Datalog Program.
 
 We can have simple `facts` in our database. e.g. Bob is a man. Abe is a man. In Datalog, we write it as:
 
+```
 man("Bob")
 man("Abe")
+```
 
 `man` is like a table in a database. `man("Bob")` is a relation in that table. We'll also call it a `base` relation.
 
@@ -81,9 +83,11 @@ The last element of Datalog is the query. The simplest query is no rules, just f
 
 Given:
 
+```
 man("Abe)
 man("Bob")
 woman("Abby")
+```
 
 A query could be: `man(X)` # Find me all men
 
@@ -122,11 +126,13 @@ assert run_simplest(database, no_rules, query) == {abe, bob}
 
 Let's add some facts of length two:
 
+```
 parent("Abe", "Bob") # Abe is a parent of Bob
 parent("Abby", "Bob")
 parent("Bob", "Carl")
 parent("Bob", "Connor")
 parent("Beatrice", "Carl")
+```
 
 I may want to query who are the parents of Carl
 
@@ -186,7 +192,9 @@ assert children_bob == {parent("Bob", "Carl"), parent("Bob", "Connor")}
 
 Let's add a rule to our program.
 
+```
 human(X) :- man(X) # You are human if you are man.
+```
 
 An example database below:
 
@@ -267,6 +275,7 @@ assert simplest_rule_result == {human("Abe"), human("Bob")}, f"result was {simpl
 
 Next, we introduce logical AND(conjunction). i.e. Given
 
+```
 parent("Abe", "Bob"), # Abe is a parent of Bob
 parent("Abby", "Bob"),
 parent("Bob", "Carl"),
@@ -276,6 +285,7 @@ man("Abe"),
 man("Bob"),
 woman("Abby"),
 woman("Beatrice")
+```
 
 We'd like to find all the fathers in the house. A person is a father if he is a parent and he is a man. i.e.
 `father(X, Y) :- parent(X, Y), man(X)`
@@ -318,6 +328,7 @@ def has_common_value(attrs1: Dict[Variable, Any], attrs2: Dict[Variable, Any]) -
 
 Once we have that, we know that `match_relation_and_database` will return as before, a list of body attributes which each match a fact in the database. It's time to conjunct. We may get some input like:
 
+```
 [[{X: 'Bob', Y: 'Carl'},    # <= All facts that match parent(X,Y)
   {X: 'Beatrice', Y: 'Carl'},
   {X: 'Abe', Y: 'Bob'},
@@ -325,12 +336,15 @@ Once we have that, we know that `match_relation_and_database` will return as bef
   {X: 'Bob', Y: 'Connor'}],
  [{X: 'Bob'},               # <= All facts that match man(X)
   {X: 'Abe'}]]
+```
 
 For the body `man(X), parent(X, Y)`, we expect back from a function `conjunct`:
 
+```
 [{X: 'Bob', Y: 'Carl'},
  {X: 'Abe', Y: 'Bob'},
  {X: 'Bob', Y: 'Connor'}]
+```
 
 Just hacking it for now.
 
@@ -385,8 +399,10 @@ assert run_logical_operators(database, rules, query) == {father("Abe", "Bob"), f
 
 Logical OR is just specifying two separate rules with the same head. E.g.
 
+```
 human(X) :- man(X)
 human(X) :- woman(X)
+```
 
 In Python, given:
 
@@ -475,6 +491,7 @@ Showing one hierarchy as an example(starting from `A`).
 
 ![](./img/iterative-ancestry-depth1.png)
 
+```
 Pass 1: Base Facts and Inferred facts i.e. KnowledgeBase1
 parent("A", "B"),
 parent("B", "C"),
@@ -487,11 +504,13 @@ ancestor("B", "C"),
 ancestor("C", "D"),
 ancestor("AA", "BB"),
 ancestor("BB", "CC")
+```
 
 Now that's done, we can focus on inference from a combination of inferred facts and base facts to new inferred facts using the recursive rule `ancestor(X, Z) :- parent(X, Y), ancestor(Y, Z)`. For e.g. in `KnowledgeBase1`, we have `parent("C","D")` and `ancestor("B", "C")` , so we can infer the fact `ancestor("B", "D")` i.e grandparents. We keep on doing this till we get:
 
 ![](./img/iterative-ancestry-depth2.png)
 
+```
 Pass 2: KnowledgeBase2
 parent("A", "B"),
 parent("B", "C"),
@@ -507,11 +526,13 @@ ancestor("BB", "CC")
 ancestor("A", "C")
 ancestor("B", "D")
 ancestor("AA", "CC")
+```
 
 Do we stop? No, we have to keep on going till we find all the ancestors. Let's apply the rules to `KnowledgeBase2` and get
 
 ![](./img/iterative-ancestry-depth3.png)
 
+```
 Pass 3: KnowledgeBase3
 parent("A", "B"),
 parent("B", "C"),
@@ -528,11 +549,13 @@ ancestor("B", "D")
 ancestor("AA", "CC")
 # ----------------- New inferred facts below --------------
 ancestor("A", "D")
+```
 
 i.e `A` is the great grand parent of `D`
 
 Do we stop? Yes(if you look at the above example), but the computer does not know that. There could be new inferred facts, so let's try again for `KnowledgeBase4`.
 
+```
 Pass 4: KnowledgeBase4
 parent("A", "B"),
 parent("B", "C"),
@@ -550,6 +573,7 @@ ancestor("AA", "CC")
 ancestor("A", "D")
 # ----------------- New inferred facts below --------------
 No New Facts
+```
 
 Aha! There are no more new inferred facts. If we do another pass on `KnowledgeBase4`, it would come out the same. So we can stop!
 
@@ -613,7 +637,9 @@ Finally, who are the intermediates between `A` and `D` i.e. `B` and `C`.
 
 `Z` is an intermediate of `X` and `Y` if `X` is it's ancestor and `Y` is its descendant.
 
+```
 intermediate(Z, X, Y) :- ancestor(X, Z), ancestor(Z, Y)
+```
 
 In Python,
 
