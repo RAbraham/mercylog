@@ -1,6 +1,6 @@
 # An Unnecessarily Long-Winded Introduction to the Essence of Datalog
 
-In this post, I'll gradually build up a naive implementation of the Datalog engine. An updated version of this post can be found [here](https://rabraham.github.io/mercylog/teaching/essence.html)
+In this post, I'll gradually build up to a naive implementation of the Datalog engine. An updated version of this post can be found [here](https://rabraham.github.io/mercylog/teaching/essence.html)
 
 ## Datalog Concepts
 
@@ -367,7 +367,7 @@ def evaluate_logical_operators_in_rule(rule: Rule, database: List[Relation]) -> 
     
     return {Relation(rule.head.name, rule_attributes(rule.head, attr)) for attr in attributes}
 
-def run_logical_operators(database, rules, query):
+def run_logical_operators(database: Set[Relation], rules: List[Rule], query: Relation):
     knowledge_base = generate_knowledgebase(evaluate_logical_operators_in_rule, database, rules)
     return filter_facts(knowledge_base, query, query_variable_match)
 
@@ -468,41 +468,38 @@ Alright, let's dive into this. What is different from run_logical_operator? It's
 
 ![](./img/ancestor-hierarchy.png)
 
-If we see it as a recursion, we keep on going till we hit the base case which terminates the recursion. So let's imagine how we would process the above example. In the first pass, we would do the simplest inference from base fact to derived fact using the base rule of `ancestor(X, Y) :- parent(X, Y)`. 
+So let's imagine how we would process the above example. In the first pass, we would do the simplest inference from base fact to derived fact using the base rule of `ancestor(X, Y) :- parent(X, Y)`.
 
 Showing one hierarchy as an example(starting from `A`).
 
 ![](./img/iterative-ancestry-depth1.png)
 
 Pass 1: Base Facts and Inferred facts i.e. KnowledgeBase1
-parent("A", "B"), 
-parent("B", "C"), 
-parent("C", "D"), 
+parent("A", "B"),
+parent("B", "C"),
+parent("C", "D"),
 parent("AA", "BB"),
 parent("BB", "CC")]
 # ----------------- New inferred facts below --------------
-ancestor("A", "B"), 
-ancestor("B", "C"), 
-ancestor("C", "D"), 
+ancestor("A", "B"),
+ancestor("B", "C"),
+ancestor("C", "D"),
 ancestor("AA", "BB"),
 ancestor("BB", "CC")
 
-aaa. Proof Read Below.
-
-Now that's done, we can focus on inference from a combination of inferred facts and base facts to new inferred facts using the recursive rule `ancestor(X, Z) :- parent(X, Y), ancestor(Y, Z)`. For e.g. in KnowledgeBase1, we have `parent("C","D")` and `ancestor("B", "C")` , so we can infer the fact `ancestor("B", "D")` i.e grandparents. We keep on doing this till we get:
-
+Now that's done, we can focus on inference from a combination of inferred facts and base facts to new inferred facts using the recursive rule `ancestor(X, Z) :- parent(X, Y), ancestor(Y, Z)`. For e.g. in `KnowledgeBase1`, we have `parent("C","D")` and `ancestor("B", "C")` , so we can infer the fact `ancestor("B", "D")` i.e grandparents. We keep on doing this till we get:
 
 ![](./img/iterative-ancestry-depth2.png)
 
 Pass 2: KnowledgeBase2
-parent("A", "B"), 
-parent("B", "C"), 
-parent("C", "D"), 
+parent("A", "B"),
+parent("B", "C"),
+parent("C", "D"),
 parent("AA", "BB"),
 parent("BB", "CC")
-ancestor("A", "B"), 
-ancestor("B", "C"), 
-ancestor("C", "D"), 
+ancestor("A", "B"),
+ancestor("B", "C"),
+ancestor("C", "D"),
 ancestor("AA", "BB"),
 ancestor("BB", "CC")
 # ----------------- New inferred facts below --------------
@@ -510,19 +507,19 @@ ancestor("A", "C")
 ancestor("B", "D")
 ancestor("AA", "CC")
 
-Do we stop? No, we have to keep on going till we find all the ancestors. Let's apply the rules to KnowledgeBase2 and get
+Do we stop? No, we have to keep on going till we find all the ancestors. Let's apply the rules to `KnowledgeBase2` and get
 
 ![](./img/iterative-ancestry-depth3.png)
-```
+
 Pass 3: KnowledgeBase3
-parent("A", "B"), 
-parent("B", "C"), 
-parent("C", "D"), 
+parent("A", "B"),
+parent("B", "C"),
+parent("C", "D"),
 parent("AA", "BB"),
 parent("BB", "CC")
-ancestor("A", "B"), 
-ancestor("B", "C"), 
-ancestor("C", "D"), 
+ancestor("A", "B"),
+ancestor("B", "C"),
+ancestor("C", "D"),
 ancestor("AA", "BB"),
 ancestor("BB", "CC")
 ancestor("A", "C")
@@ -530,22 +527,20 @@ ancestor("B", "D")
 ancestor("AA", "CC")
 # ----------------- New inferred facts below --------------
 ancestor("A", "D")
-```
 
-i.e A is the great grand parent of D
+i.e `A` is the great grand parent of `D`
 
-Do we stop? Yes(if you look at the above example), but the computer does not know that. There could be new inferred facts, so let's try again for KnowledgeBase4
+Do we stop? Yes(if you look at the above example), but the computer does not know that. There could be new inferred facts, so let's try again for `KnowledgeBase4`.
 
-```
 Pass 4: KnowledgeBase4
-parent("A", "B"), 
-parent("B", "C"), 
-parent("C", "D"), 
+parent("A", "B"),
+parent("B", "C"),
+parent("C", "D"),
 parent("AA", "BB"),
 parent("BB", "CC"),
-ancestor("A", "B"), 
-ancestor("B", "C"), 
-ancestor("C", "D"), 
+ancestor("A", "B"),
+ancestor("B", "C"),
+ancestor("C", "D"),
 ancestor("AA", "BB"),
 ancestor("BB", "CC")
 ancestor("A", "C")
@@ -553,16 +548,14 @@ ancestor("B", "D")
 ancestor("AA", "CC")
 ancestor("A", "D")
 # ----------------- New inferred facts below --------------
-
 No New Facts
-```
 
-Aha! There are no more new inferred facts. If we do another pass on KnowledgeBase4, it would come out the same. So we can stop!
+Aha! There are no more new inferred facts. If we do another pass on `KnowledgeBase4`, it would come out the same. So we can stop!
 
 So the logic to stop would be:
-Take the output of each iteration. If it matches the input to that iteration, stop(as we did not learn any new inferred facts). If not a match, then run another iteration. Let's call this method iterate_until_no_change
+Take the output of each iteration. If it matches the input to that iteration, stop(as we did not learn any new inferred facts). If not a match, then run another iteration. Let's call this method `iterate_until_no_change`.
 
-def iterate_until_no_change(transform, initial_value):
+def iterate_until_no_change(transform: Callable, initial_value: Set) -> Set:
     a_input = initial_value
 
     while True:
@@ -571,11 +564,11 @@ def iterate_until_no_change(transform, initial_value):
             return a_output
         a_input = a_output
 
-Now, we already have run_logical_operator. That will be our `transform` function above.
+Now, we already have `run_logical_operator`. That will be our `transform` function above. So putting this all together below.
 
-def run_recursive(database, rules, query):
-    tranformer = lambda a_knowledgebase: generate_knowledgebase(evaluate_logical_operators_in_rule, a_knowledgebase, rules)
-    knowledgebase = iterate_until_no_change(tranformer, database)
+def run_recursive(database: Set[Relation], rules: List[Rule], query: Relation):
+    transformer = lambda a_knowledgebase: generate_knowledgebase(evaluate_logical_operators_in_rule, a_knowledgebase, rules)
+    knowledgebase = iterate_until_no_change(transformer, database)
     return filter_facts(knowledgebase, query, query_variable_match)
 
 Let's define the query
@@ -599,25 +592,29 @@ expected_result = {
 assert recursive_result == expected_result, f"{recursive_result} not equal to {expected_result}"
 
 Let's explore other queries we can ask.
-Is AA the ancestor of C(No! Such an impolite question)
+Is `AA` the ancestor of `C`?(No! Such an impolite question)
 
 query = ancestor("AA", "C")
 
 assert run_recursive(database, rules, query) == set()
 
-What if I want to find all ancestors of C
+What if I want to find all ancestors of `C`?
 
 query = ancestor(X, "C")
 assert run_recursive(database, rules, query) == {ancestor("A", "C"), ancestor("B", "C")}
 
-What if I want to find who all are the descendants of AA. Again, use the same query but just reverse the order!
+What if I want to find who all are the descendants of `AA`. Again, use the same query but just reverse the order!
 
 query = ancestor("AA", X)
 assert run_recursive(database, rules, query) == {ancestor("AA", "BB"), ancestor("AA", "CC")}
 
-Finally, who are the intermediates between A and D i.e. B and C
-Z is an intermediate of X and Y if X is it's ancestor and Y is its descendant
+Finally, who are the intermediates between `A` and `D` i.e. `B` and `C`.
+
+`Z` is an intermediate of `X` and `Y` if `X` is it's ancestor and `Y` is its descendant.
+
 intermediate(Z, X, Y) :- ancestor(X, Z), ancestor(Z, Y)
+
+In Python,
 
 intermediate = lambda intermediate, start, end: Relation("intermediate", (intermediate, start, end))
 intermediate_head = intermediate(Z, X, Y)
@@ -629,8 +626,8 @@ query = intermediate(Z, "A", "D")
 
 assert run_recursive(database, rules, query) == {intermediate("B", "A", "D"), intermediate("C", "A", "D")}
 
-## For the lovers and haters
-* This post was inspired by https://dodisturb.me/posts/2018-12-25-The-Essence-of-Datalog.html. 
-* SQL does support recursion(https://dba.stackexchange.com/a/94944/146211). I just find Datalog has a cleaner syntax.
+## Extra Extra. Read All About It
+* This post was inspired by this [post](https://dodisturb.me/posts/2018-12-25-The-Essence-of-Datalog.html). 
+* SQL does support [recursion](https://dba.stackexchange.com/a/94944/146211). I just find Datalog has a cleaner syntax.
 
 * One aspect of Datalog being declarative is that the order of rules does not matter either. So technically, instead of `rules = [rule1, rule2]`, we could have used `rules = frozenset([rule1, rule2])`. The latter is a bit more clutter so I used simple lists.

@@ -210,8 +210,8 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#for-the-lovers-and-haters">
-   For the lovers and haters
+  <a class="reference internal nav-link" href="#extra-extra-read-all-about-it">
+   Extra Extra. Read All About It
   </a>
  </li>
 </ul>
@@ -226,7 +226,7 @@
                 
   <div class="section" id="an-unnecessarily-long-winded-introduction-to-the-essence-of-datalog">
 <h1>An Unnecessarily Long-Winded Introduction to the Essence of Datalog<a class="headerlink" href="#an-unnecessarily-long-winded-introduction-to-the-essence-of-datalog" title="Permalink to this headline">¶</a></h1>
-<p>In this post, I’ll gradually build up a naive implementation of the Datalog engine. An updated version of this post can be found <a class="reference external" href="https://rabraham.github.io/mercylog/teaching/essence.html">here</a></p>
+<p>In this post, I’ll gradually build up to a naive implementation of the Datalog engine. An updated version of this post can be found <a class="reference external" href="https://rabraham.github.io/mercylog/teaching/essence.html">here</a></p>
 <div class="section" id="datalog-concepts">
 <h2>Datalog Concepts<a class="headerlink" href="#datalog-concepts" title="Permalink to this headline">¶</a></h2>
 <p>Let’s start with a simple Datalog Program.</p>
@@ -592,7 +592,7 @@ e.g. for a rule <code class="docutils literal notranslate"><span class="pre">rel
     
     <span class="k">return</span> <span class="p">{</span><span class="n">Relation</span><span class="p">(</span><span class="n">rule</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">rule_attributes</span><span class="p">(</span><span class="n">rule</span><span class="o">.</span><span class="n">head</span><span class="p">,</span> <span class="n">attr</span><span class="p">))</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">}</span>
 
-<span class="k">def</span> <span class="nf">run_logical_operators</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">run_logical_operators</span><span class="p">(</span><span class="n">database</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Relation</span><span class="p">],</span> <span class="n">rules</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Rule</span><span class="p">],</span> <span class="n">query</span><span class="p">:</span> <span class="n">Relation</span><span class="p">):</span>
     <span class="n">knowledge_base</span> <span class="o">=</span> <span class="n">generate_knowledgebase</span><span class="p">(</span><span class="n">evaluate_logical_operators_in_rule</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">filter_facts</span><span class="p">(</span><span class="n">knowledge_base</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">query_variable_match</span><span class="p">)</span>
 </pre></div>
@@ -703,60 +703,21 @@ Given:</p>
 </div>
 <p>Alright, let’s dive into this. What is different from run_logical_operator? It’s the hierarchy or recursion. If you see it as hierarchy(I’m visualizing this as a tree), one has to keep on going until we reach the top of the tree.</p>
 <p><img alt="" src="../_images/ancestor-hierarchy.png" /></p>
-<p>If we see it as a recursion, we keep on going till we hit the base case which terminates the recursion. So let’s imagine how we would process the above example. In the first pass, we would do the simplest inference from base fact to derived fact using the base rule of <code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Y)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y)</span></code>.</p>
+<p>So let’s imagine how we would process the above example. In the first pass, we would do the simplest inference from base fact to derived fact using the base rule of <code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Y)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y)</span></code>.</p>
 <p>Showing one hierarchy as an example(starting from <code class="docutils literal notranslate"><span class="pre">A</span></code>).</p>
 <p><img alt="" src="../_images/iterative-ancestry-depth1.png" /></p>
-<p>aaa. Proof Read Below.</p>
-<p>Now that’s done, we can focus on inference from a combination of inferred facts and base facts to new inferred facts using the recursive rule <code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Z)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y),</span> <span class="pre">ancestor(Y,</span> <span class="pre">Z)</span></code>. For e.g. in KnowledgeBase1, we have <code class="docutils literal notranslate"><span class="pre">parent(&quot;C&quot;,&quot;D&quot;)</span></code> and <code class="docutils literal notranslate"><span class="pre">ancestor(&quot;B&quot;,</span> <span class="pre">&quot;C&quot;)</span></code> , so we can infer the fact <code class="docutils literal notranslate"><span class="pre">ancestor(&quot;B&quot;,</span> <span class="pre">&quot;D&quot;)</span></code> i.e grandparents. We keep on doing this till we get:</p>
+<p>Now that’s done, we can focus on inference from a combination of inferred facts and base facts to new inferred facts using the recursive rule <code class="docutils literal notranslate"><span class="pre">ancestor(X,</span> <span class="pre">Z)</span> <span class="pre">:-</span> <span class="pre">parent(X,</span> <span class="pre">Y),</span> <span class="pre">ancestor(Y,</span> <span class="pre">Z)</span></code>. For e.g. in <code class="docutils literal notranslate"><span class="pre">KnowledgeBase1</span></code>, we have <code class="docutils literal notranslate"><span class="pre">parent(&quot;C&quot;,&quot;D&quot;)</span></code> and <code class="docutils literal notranslate"><span class="pre">ancestor(&quot;B&quot;,</span> <span class="pre">&quot;C&quot;)</span></code> , so we can infer the fact <code class="docutils literal notranslate"><span class="pre">ancestor(&quot;B&quot;,</span> <span class="pre">&quot;D&quot;)</span></code> i.e grandparents. We keep on doing this till we get:</p>
 <p><img alt="" src="../_images/iterative-ancestry-depth2.png" /></p>
-<p>Do we stop? No, we have to keep on going till we find all the ancestors. Let’s apply the rules to KnowledgeBase2 and get</p>
+<p>Do we stop? No, we have to keep on going till we find all the ancestors. Let’s apply the rules to <code class="docutils literal notranslate"><span class="pre">KnowledgeBase2</span></code> and get</p>
 <p><img alt="" src="../_images/iterative-ancestry-depth3.png" /></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Pass</span> <span class="mi">3</span><span class="p">:</span> <span class="n">KnowledgeBase3</span>
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
-<span class="c1"># ----------------- New inferred facts below --------------</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>i.e A is the great grand parent of D</p>
-<p>Do we stop? Yes(if you look at the above example), but the computer does not know that. There could be new inferred facts, so let’s try again for KnowledgeBase4</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Pass</span> <span class="mi">4</span><span class="p">:</span> <span class="n">KnowledgeBase4</span>
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
-<span class="n">parent</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">),</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span> 
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span> 
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span> 
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">),</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;BB&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">)</span>
-<span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
-<span class="c1"># ----------------- New inferred facts below --------------</span>
-
-<span class="n">No</span> <span class="n">New</span> <span class="n">Facts</span>
-</pre></div>
-</div>
-<p>Aha! There are no more new inferred facts. If we do another pass on KnowledgeBase4, it would come out the same. So we can stop!</p>
+<p>i.e <code class="docutils literal notranslate"><span class="pre">A</span></code> is the great grand parent of <code class="docutils literal notranslate"><span class="pre">D</span></code></p>
+<p>Do we stop? Yes(if you look at the above example), but the computer does not know that. There could be new inferred facts, so let’s try again for <code class="docutils literal notranslate"><span class="pre">KnowledgeBase4</span></code>.</p>
+<p>Aha! There are no more new inferred facts. If we do another pass on <code class="docutils literal notranslate"><span class="pre">KnowledgeBase4</span></code>, it would come out the same. So we can stop!</p>
 <p>So the logic to stop would be:
-Take the output of each iteration. If it matches the input to that iteration, stop(as we did not learn any new inferred facts). If not a match, then run another iteration. Let’s call this method iterate_until_no_change</p>
+Take the output of each iteration. If it matches the input to that iteration, stop(as we did not learn any new inferred facts). If not a match, then run another iteration. Let’s call this method <code class="docutils literal notranslate"><span class="pre">iterate_until_no_change</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">iterate_until_no_change</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">initial_value</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">iterate_until_no_change</span><span class="p">(</span><span class="n">transform</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">initial_value</span><span class="p">:</span> <span class="n">Set</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">:</span>
     <span class="n">a_input</span> <span class="o">=</span> <span class="n">initial_value</span>
 
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
@@ -768,12 +729,12 @@ Take the output of each iteration. If it matches the input to that iteration, st
 </div>
 </div>
 </div>
-<p>Now, we already have run_logical_operator. That will be our <code class="docutils literal notranslate"><span class="pre">transform</span></code> function above.</p>
+<p>Now, we already have <code class="docutils literal notranslate"><span class="pre">run_logical_operator</span></code>. That will be our <code class="docutils literal notranslate"><span class="pre">transform</span></code> function above. So putting this all together below.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_recursive</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
-    <span class="n">tranformer</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a_knowledgebase</span><span class="p">:</span> <span class="n">generate_knowledgebase</span><span class="p">(</span><span class="n">evaluate_logical_operators_in_rule</span><span class="p">,</span> <span class="n">a_knowledgebase</span><span class="p">,</span> <span class="n">rules</span><span class="p">)</span>
-    <span class="n">knowledgebase</span> <span class="o">=</span> <span class="n">iterate_until_no_change</span><span class="p">(</span><span class="n">tranformer</span><span class="p">,</span> <span class="n">database</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_recursive</span><span class="p">(</span><span class="n">database</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Relation</span><span class="p">],</span> <span class="n">rules</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Rule</span><span class="p">],</span> <span class="n">query</span><span class="p">:</span> <span class="n">Relation</span><span class="p">):</span>
+    <span class="n">transformer</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a_knowledgebase</span><span class="p">:</span> <span class="n">generate_knowledgebase</span><span class="p">(</span><span class="n">evaluate_logical_operators_in_rule</span><span class="p">,</span> <span class="n">a_knowledgebase</span><span class="p">,</span> <span class="n">rules</span><span class="p">)</span>
+    <span class="n">knowledgebase</span> <span class="o">=</span> <span class="n">iterate_until_no_change</span><span class="p">(</span><span class="n">transformer</span><span class="p">,</span> <span class="n">database</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">filter_facts</span><span class="p">(</span><span class="n">knowledgebase</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">query_variable_match</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -804,7 +765,7 @@ Take the output of each iteration. If it matches the input to that iteration, st
 </div>
 </div>
 <p>Let’s explore other queries we can ask.
-Is AA the ancestor of C(No! Such an impolite question)</p>
+Is <code class="docutils literal notranslate"><span class="pre">AA</span></code> the ancestor of <code class="docutils literal notranslate"><span class="pre">C</span></code>?(No! Such an impolite question)</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span>
@@ -814,7 +775,7 @@ Is AA the ancestor of C(No! Such an impolite question)</p>
 </div>
 </div>
 </div>
-<p>What if I want to find all ancestors of C</p>
+<p>What if I want to find all ancestors of <code class="docutils literal notranslate"><span class="pre">C</span></code>?</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="n">ancestor</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span>
@@ -823,7 +784,7 @@ Is AA the ancestor of C(No! Such an impolite question)</p>
 </div>
 </div>
 </div>
-<p>What if I want to find who all are the descendants of AA. Again, use the same query but just reverse the order!</p>
+<p>What if I want to find who all are the descendants of <code class="docutils literal notranslate"><span class="pre">AA</span></code>. Again, use the same query but just reverse the order!</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="n">ancestor</span><span class="p">(</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
@@ -832,9 +793,9 @@ Is AA the ancestor of C(No! Such an impolite question)</p>
 </div>
 </div>
 </div>
-<p>Finally, who are the intermediates between A and D i.e. B and C
-Z is an intermediate of X and Y if X is it’s ancestor and Y is its descendant
-intermediate(Z, X, Y) :- ancestor(X, Z), ancestor(Z, Y)</p>
+<p>Finally, who are the intermediates between <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">D</span></code> i.e. <code class="docutils literal notranslate"><span class="pre">B</span></code> and <code class="docutils literal notranslate"><span class="pre">C</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Z</span></code> is an intermediate of <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code> if <code class="docutils literal notranslate"><span class="pre">X</span></code> is it’s ancestor and <code class="docutils literal notranslate"><span class="pre">Y</span></code> is its descendant.</p>
+<p>In Python,</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">intermediate</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">intermediate</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="n">Relation</span><span class="p">(</span><span class="s2">&quot;intermediate&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">intermediate</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
@@ -851,11 +812,11 @@ intermediate(Z, X, Y) :- ancestor(X, Z), ancestor(Z, Y)</p>
 </div>
 </div>
 </div>
-<div class="section" id="for-the-lovers-and-haters">
-<h2>For the lovers and haters<a class="headerlink" href="#for-the-lovers-and-haters" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="extra-extra-read-all-about-it">
+<h2>Extra Extra. Read All About It<a class="headerlink" href="#extra-extra-read-all-about-it" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>This post was inspired by https://dodisturb.me/posts/2018-12-25-The-Essence-of-Datalog.html.</p></li>
-<li><p>SQL does support recursion(https://dba.stackexchange.com/a/94944/146211). I just find Datalog has a cleaner syntax.</p></li>
+<li><p>This post was inspired by this <a class="reference external" href="https://dodisturb.me/posts/2018-12-25-The-Essence-of-Datalog.html">post</a>.</p></li>
+<li><p>SQL does support <a class="reference external" href="https://dba.stackexchange.com/a/94944/146211">recursion</a>. I just find Datalog has a cleaner syntax.</p></li>
 <li><p>One aspect of Datalog being declarative is that the order of rules does not matter either. So technically, instead of <code class="docutils literal notranslate"><span class="pre">rules</span> <span class="pre">=</span> <span class="pre">[rule1,</span> <span class="pre">rule2]</span></code>, we could have used <code class="docutils literal notranslate"><span class="pre">rules</span> <span class="pre">=</span> <span class="pre">frozenset([rule1,</span> <span class="pre">rule2])</span></code>. The latter is a bit more clutter so I used simple lists.</p></li>
 </ul>
 </div>
