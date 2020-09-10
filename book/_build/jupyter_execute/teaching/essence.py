@@ -190,9 +190,11 @@ human(X) :- man(X) # You are human if you are man.
 
 An example database below:
 
+```
 man("Bob")
 man("George")
 animal("Tiger")
+```
 
 Query:
 
