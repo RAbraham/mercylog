@@ -556,7 +556,7 @@ ancestor_rule_recursive = Rule(ancestor(X, Z), {parent(X, Y), ancestor(Y, Z)})
 rules = [ancestor_rule_base, ancestor_rule_recursive]
 ```
 
-Alright, let's dive into this. What is different from run_logical_operator? It's the hierarchy or recursion. If you see it as hierarchy(I'm visualizing this as a tree), one has to keep on going until we reach the top of the tree.
+Alright, let's dive into this. What is different from `run_logical_operator`? It's the hierarchy or recursion. If you see it as hierarchy(I'm visualizing this as a tree), one has to keep on going until we reach the top of the tree.
 
 ![](./img/ancestor-hierarchy.png)
 
@@ -666,7 +666,7 @@ def iterate_until_no_change(transform: Callable, initial_value: Set) -> Set:
         a_input = a_output
 ```
 
-Now, we already have `run_logical_operator`. That will be our `transform` function above. So putting this all together below.
+Now, we already have `evaluate_logical_operators_in_rule`. That will be our `transform` function above. So putting this all together below.
 
 ```{code-cell} ipython3
 def run_recursive(database: Set[Relation], rules: List[Rule], query: Relation):
@@ -741,6 +741,10 @@ query = intermediate(Z, "A", "D")
 
 assert run_recursive(database, rules, query) == {intermediate("B", "A", "D"), intermediate("C", "A", "D")}
 ```
+
++++
+
+That's it! If you found it interesting, check out [Mercylog](https://github.com/RAbraham/mercylog), a Datalog inspired library in Python.
 
 ## Extra Extra. Read All About It
 * This post was inspired by this [post](https://dodisturb.me/posts/2018-12-25-The-Essence-of-Datalog.html). 
