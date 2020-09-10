@@ -233,8 +233,6 @@ assert children_bob == {parent("Bob", "Carl"), parent("Bob", "Connor")}
 
 ## Simple Rule Query
 
-+++
-
 Let's add a rule to our program.
 
 ```{raw-cell}
@@ -243,7 +241,7 @@ human(X) :- man(X) # You are human if you are man.
 
 An example database below:
 
-```{raw-cell}
+```
 man("Bob")
 man("George")
 animal("Tiger")
