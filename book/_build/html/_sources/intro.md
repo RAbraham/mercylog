@@ -1,7 +1,7 @@
 Welcome to Mercylog 
 ============================
 
-Mercylog is a library in Python for relational programming.
+Mercylog is a library in Python for relational programming. It is currently a work in progress and not meant to be used in production or staging or development or anywhere.
 
 It is inspired by Datalog and its inspirations.
 
