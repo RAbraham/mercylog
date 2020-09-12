@@ -750,4 +750,4 @@ That's it! If you found it interesting, check out [Mercylog](https://github.com/
 * This post was inspired by this [post](https://dodisturb.me/posts/2018-12-25-The-Essence-of-Datalog.html). 
 * SQL does support [recursion](https://dba.stackexchange.com/a/94944/146211). I just find Datalog has a cleaner syntax.
 
-* One aspect of Datalog being declarative is that the order of rules does not matter either. So technically, instead of `rules = [rule1, rule2]`, we could have used `rules = frozenset([rule1, rule2])`. The latter is a bit more clutter so I used simple lists.
+* One aspect of Datalog being declarative is that the order of rules does not matter either. So technically, instead of `rules = [rule1, rule3]`, we could have used `rules = frozenset([rule1, rule2])`. The latter is a bit more clutter so I used simple lists.
