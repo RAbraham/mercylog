@@ -149,7 +149,7 @@ class Relation:
     
     
     name: str
-    terms: PVector[Term]
+    terms: Tuple[Term]
     def __le__(self, body: Union[List, "Relation"]):
         if isinstance(body, List):
             _b = body
@@ -158,7 +158,7 @@ class Relation:
             _b = [body]
         
         head_relation = Relation(self.name, self.terms)
-        return Rule(head_relation, _b)
+        return Rule(head_relation, set(_b))
 
 
     pass
@@ -179,7 +179,7 @@ class RelationCreator:
     name: str
 
     def __call__(self, *terms, **kwargs) -> Relation:
-        _terms = pvector([t for t in terms])
+        _terms = tuple([t for t in terms])
         return Relation(self.name, _terms)
     
 
@@ -198,12 +198,7 @@ class Rule:
 
     '''
     head: Relation
-    body: Sequence[Relation]
-
-    def __init__(self, head: Relation, body: Sequence[Relation]):
-        # results = [require(safety(head, body))]
-
-        pass
+    body: Set[Relation]
 
 
 def is_safe(head: Relation, body: Sequence[Relation]) -> bool:

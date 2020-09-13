@@ -1,5 +1,6 @@
 import pytest
 from mercylog.data_sources.in_memory import Variable, Relation, run, query_variable_match, Rule
+from mercylog.types import relation
 
 
 X = Variable('X')
@@ -12,9 +13,8 @@ def test_relation_filter():
         abe,
         bob,
         woman("Abby")}
-    no_rules = [] 
 
-    assert run(database, no_rules, man(X)) == {abe, bob}
+    assert run(database, [], man(X)) == {abe, bob}
 
 def test_query_variable_match():
     assert query_variable_match(parent("A", "Bob"), parent(X, "Bob") ) == True
@@ -33,30 +33,22 @@ def test_filter():
     assert parents_carl == {parent("Bob", "Carl"), parent("Beatrice", "Carl")}
 
     children_bob =  run(database, [], parent("Bob", X)) 
-
     assert children_bob == {parent("Bob", "Carl"), parent("Bob", "Connor")}
 
 
 def test_single_body_rule():
-
-    head = human(X) 
-    body = [man(X)]
-    human_rule = Rule(head, body) # No pun was intended
+    human_rule = human(X) <= man(X) 
     database = {
         man("Abe"),
         man("Bob"),
         animal("Tiger")
     }
-    rules = [human_rule]
-    query = human(X)
 
-    simplest_rule_result = run(database, rules, query)
+    simplest_rule_result = run(database, [human_rule], human(X))
     assert simplest_rule_result == {human("Abe"), human("Bob")}
 
 
 def test_conjunction():
-    woman = lambda x: Relation("woman", (x,))
-    father = lambda x, y: Relation("father", (x, y))
 
     database = {
         parent("Abe", "Bob"), # Abe is a parent of Bob
@@ -70,10 +62,10 @@ def test_conjunction():
         woman("Beatrice")
     }
 
-    father_rule = Rule(father(X, Y), {parent(X, Y), man(X)})
+    father_rule = father(X, Y) <= [man(X), parent(X, Y)]
     rules = [father_rule]
     query = father(X, Y)
-    simple_conjunct_rules = [Rule(human(X), {man(X)})]
+    simple_conjunct_rules = [human(X) <= man(X)]
     assert run(database, simple_conjunct_rules, human(X)) == {human("Abe"), human("Bob")}
     assert run(database, rules, query) == {father("Abe", "Bob"), father("Bob", "Carl"), father("Bob", "Connor")}
 
@@ -87,8 +79,9 @@ def test_disjunction():
         woman("Beatrice")
     }
 
-    man_rule = Rule(human(X), {man(X)})
-    woman_rule = Rule(human(X), {woman(X)})
+    man_rule = human(X) <= man(X)
+    woman_rule = human(X) <= woman(X)
+    
     rules = [man_rule, woman_rule]
     query = human(X)
 
@@ -114,10 +107,8 @@ def test_recursion():
     X = Variable("X")
     Y = Variable("Y")
     Z = Variable("Z")
-    # ancestor(X, Y) :- parent(X, Y)
-    ancestor_rule_base = Rule(ancestor(X, Y), [parent(X, Y)])
-    # ancestor(X, Z) :- parent(X, Y), ancestor(Y, Z)
-    ancestor_rule_recursive = Rule(ancestor(X, Z), {parent(X, Y), ancestor(Y, Z)})
+    ancestor_rule_base = ancestor(X, Y) <= parent(X, Y)
+    ancestor_rule_recursive = ancestor(X, Z) <= [parent(X, Y), ancestor(Y, Z)] 
 
     rules = [ancestor_rule_base, ancestor_rule_recursive]
 
@@ -149,10 +140,8 @@ def test_recursion():
 
     assert run(database, rules, query) == {ancestor("AA", "BB"), ancestor("AA", "CC")}
 
-    intermediate = lambda intermediate, start, end: Relation("intermediate", (intermediate, start, end))
-    intermediate_head = intermediate(Z, X, Y)
-    intermediate_body = {ancestor(X, Z), ancestor(Z, Y)} 
-    intermediate_rule = Rule(intermediate_head, intermediate_body)
+    # intermediate 
+    intermediate_rule = intermediate(Z, X, Y) <= [ancestor(X, Z), ancestor(Z, Y)]
 
     rules = [ancestor_rule_base, ancestor_rule_recursive, intermediate_rule]
     query = intermediate(Z, "A", "D")
@@ -160,17 +149,17 @@ def test_recursion():
     assert run(database, rules, query) == {intermediate("B", "A", "D"), intermediate("C", "A", "D")}
 
 
-parent = lambda parent, child: Relation("parent", (parent, child))
+parent = relation("parent")
 
-man = lambda x: Relation("man", (x,))
+man = relation("man")
 
-human = lambda x: Relation("human", (x,))
+human = relation("human")
 
-animal = lambda x: Relation("animal", (x,))
+animal = relation("animal")
 
-woman = lambda x: Relation("woman", (x,))
+woman = relation("woman")
 
-animal = lambda x: Relation("animal", (x,))
+father = relation('father')
+ancestor = relation("ancestor")
 
-
-ancestor = lambda ancestor, descendant: Relation('ancestor', (ancestor, descendant))
+intermediate = relation("intermediate")

@@ -1,26 +1,7 @@
 from typing import *
 from dataclasses import dataclass
-from pprint import pprint
+from mercylog.types import Variable, Relation, Rule
 
-@dataclass(frozen=True)
-class Variable:
-    name: str
-
-@dataclass(frozen=True, eq=True)
-class Relation:
-    """
-    man("Bob) is Relation("man", ("Bob",)) # ("Bob",) is a single valued tuple
-    parent("John", "Chester") is Relation("parent", ("John", "Chester"))
-    man(X) is Relation("man", (Variable("X"),))
-
-    """
-    name: str
-    attributes: Tuple
-
-@dataclass(frozen=True, eq=True)
-class Rule:
-    head: Relation
-    body: Set[Relation]
 
 def filter_facts(database: Set[Relation], query: Relation, match: Callable) -> Set[Relation]:
     return {fact for fact in database if match(fact, query)}
@@ -30,22 +11,22 @@ def query_variable_match(fact: Relation, query: Relation) -> bool:
         return False
 
     # TODO: zip is duplicated?
-    for query_attribute, fact_attribute in zip(query.attributes, fact.attributes):
-        if not isinstance(query_attribute, Variable) and query_attribute != fact_attribute:
+    for query_term, fact_term in zip(query.terms, fact.terms):
+        if not isinstance(query_term, Variable) and query_term != fact_term:
                 return False
     return True  
 
 def match_relation_and_fact(relation: Relation, fact: Relation) -> Optional[Dict]:
     if relation.name == fact.name:
-        return dict(zip(relation.attributes, fact.attributes))
+        return dict(zip(relation.terms, fact.terms))
 
 def match_relation_and_database(database: Set[Relation], relation: Relation) -> List[Dict]:
-    inferred_attributes = []
+    inferred_terms = []
     for fact in database:
-        attributes = match_relation_and_fact(relation, fact)
-        if attributes:
-            inferred_attributes.append(attributes)
-    return inferred_attributes
+        terms = match_relation_and_fact(relation, fact)
+        if terms:
+            inferred_terms.append(terms)
+    return inferred_terms
 
 
 def generate_knowledgebase(evaluate: Callable, database: Set[Relation], rules: List[Rule]):
@@ -60,14 +41,14 @@ def has_common_value(attrs1: Dict[Variable, Any], attrs2: Dict[Variable, Any]) -
     return all([attrs1[c] == attrs2[c] for c in common_vars])
 
 
-def conjunct(body_attributes: List[List[Dict]]) -> List:
+def conjunct(body_terms: List[List[Dict]]) -> List:
     # TODO: Does not cover body lengths greater than 2
     result = []
-    if len(body_attributes) == 1:
-        return body_attributes[0]
+    if len(body_terms) == 1:
+        return body_terms[0]
     
-    attr1 = body_attributes[0]
-    attr2 = body_attributes[1]
+    attr1 = body_terms[0]
+    attr2 = body_terms[1]
     for a1 in attr1:
         for a2 in attr2:
             _c = has_common_value(a1, a2)
@@ -75,20 +56,20 @@ def conjunct(body_attributes: List[List[Dict]]) -> List:
                 result.append({**a1, **a2})
     return result
 
-def rule_attributes(relation: Relation, attr: Dict[Variable, Any]) -> Tuple:
-    return tuple([attr[a] for a in relation.attributes])
+def rule_terms(relation: Relation, attr: Dict[Variable, Any]) -> Tuple:
+    return tuple([attr[a] for a in relation.terms])
 
 
 def evaluate_logical_operators_in_rule(rule: Rule, database: List[Relation]) -> Set[Relation]:
-    body_attributes = []
+    body_terms = []
 
     for relation in rule.body:
-        _attributes = match_relation_and_database(database, relation)
-        body_attributes.append(_attributes)
+        _terms = match_relation_and_database(database, relation)
+        body_terms.append(_terms)
 
-    attributes = conjunct(body_attributes)
+    terms = conjunct(body_terms)
     
-    return {Relation(rule.head.name, rule_attributes(rule.head, attr)) for attr in attributes}
+    return {Relation(rule.head.name, rule_terms(rule.head, attr)) for attr in terms}
 
 def run_logical_operators(database: Set[Relation], rules: List[Rule], query: Relation):
     knowledge_base = generate_knowledgebase(evaluate_logical_operators_in_rule, database, rules)
@@ -108,3 +89,4 @@ def run(database: Set[Relation], rules: List[Rule], query: Relation):
     transformer = lambda a_knowledgebase: generate_knowledgebase(evaluate_logical_operators_in_rule, a_knowledgebase, rules)
     knowledgebase = iterate_until_no_change(transformer, database)
     return filter_facts(knowledgebase, query, query_variable_match)
+
