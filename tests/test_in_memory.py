@@ -5,6 +5,7 @@ from mercylog.types import relation
 
 X = Variable('X')
 Y = Variable("Y")
+Z = Variable("Z")
 
 def test_relation_filter():
     abe = man("Abe")
@@ -69,6 +70,23 @@ def test_conjunction():
     assert run(database, simple_conjunct_rules, human(X)) == {human("Abe"), human("Bob")}
     assert run(database, rules, query) == {father("Abe", "Bob"), father("Bob", "Carl"), father("Bob", "Connor")}
 
+def test_n_body_rules():
+    database = {
+        parent("Abe", "Bob"), # Abe is a parent of Bob
+        parent("Abby", "Bob"),
+        parent("Bob", "Carl"),
+        parent("Bob", "Connor"),
+        parent("Beatrice", "Carl"),
+        man("Abe"),
+        man("Bob"),
+        woman("Abby"),
+        woman("Beatrice")
+    }
+    grandfather = relation("grandfather")
+    grandfather_rule = grandfather(X, Y) <= [man(X), parent(X, Z), parent(Z, Y)]
+    assert run(database, [grandfather_rule], grandfather(X, Y)) == {grandfather("Abe", "Carl"), grandfather("Abe", "Connor")}
+
+    
 
 def test_disjunction():
     database = {
@@ -153,11 +171,12 @@ parent = relation("parent")
 
 man = relation("man")
 
+woman = relation("woman")
+
 human = relation("human")
 
 animal = relation("animal")
 
-woman = relation("woman")
 
 father = relation('father')
 ancestor = relation("ancestor")

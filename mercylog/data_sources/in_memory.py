@@ -1,6 +1,7 @@
 from typing import *
 from dataclasses import dataclass
 from mercylog.types import Variable, Relation, Rule
+from pprint import pprint
 
 
 def filter_facts(database: Set[Relation], query: Relation, match: Callable) -> Set[Relation]:
@@ -40,21 +41,23 @@ def has_common_value(attrs1: Dict[Variable, Any], attrs2: Dict[Variable, Any]) -
     common_vars = set(attrs1.keys()).intersection(set(attrs2.keys()))
     return all([attrs1[c] == attrs2[c] for c in common_vars])
 
-
-def conjunct(body_terms: List[List[Dict]]) -> List:
-    # TODO: Does not cover body lengths greater than 2
+def _conjunct(a, b):
     result = []
-    if len(body_terms) == 1:
-        return body_terms[0]
-    
-    attr1 = body_terms[0]
-    attr2 = body_terms[1]
-    for a1 in attr1:
-        for a2 in attr2:
+    for a1 in a:
+        for a2 in b:
             _c = has_common_value(a1, a2)
             if _c:
                 result.append({**a1, **a2})
     return result
+    
+def conjunct(body_terms: List[List[Dict]]) -> List:
+    if not body_terms:
+        return []
+    r = body_terms[0]
+    for _b in body_terms[1:]:
+        r = _conjunct(r, _b)
+        
+    return r
 
 def rule_terms(relation: Relation, attr: Dict[Variable, Any]) -> Tuple:
     return tuple([attr[a] for a in relation.terms])

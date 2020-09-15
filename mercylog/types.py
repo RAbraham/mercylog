@@ -93,11 +93,10 @@ class Term(ABC):
 
 @dataclass(frozen=True)
 class Variable(Term):
-
     # Also called term
     name: str
-
-    pass
+    def __repr__(self):
+        return self.name
 
 v = Variable
 
@@ -160,6 +159,9 @@ class Relation:
         head_relation = Relation(self.name, self.terms)
         return Rule(head_relation, set(_b))
 
+    def __repr__(self):
+        term_str = ", ".join([str(t) for t in self.terms])
+        return f"{self.name}({term_str})"
 
     pass
 
@@ -200,6 +202,9 @@ class Rule:
     head: Relation
     body: Set[Relation]
 
+    def __repr__(self):
+        body = ",".join([str(b) for b in self.body])
+        return f"{self.head} <= {body}"
 
 def is_safe(head: Relation, body: Sequence[Relation]) -> bool:
     '''
