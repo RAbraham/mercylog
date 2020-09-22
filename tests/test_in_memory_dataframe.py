@@ -1,11 +1,28 @@
 import pytest
-from mercylog.data_sources.in_memory import Variable, Relation, run, query_variable_match, Rule
+from mercylog.data_sources.in_memory import Variable, Relation, run, run_df, query_variable_match, Rule, query_variables
 from mercylog.types import relation
 
 
 X = Variable('X')
 Y = Variable("Y")
 Z = Variable("Z")
+
+def a_df(a_dict):
+    return a_dict
+
+def test_query_variables():
+    query = [man(X)]
+    assert query_variables(query) == {X}
+    query = [parent(X, "Carl")]
+    assert query_variables(query) == {X}
+    query = [man(X),
+            parent(X, Z),
+            parent(Z, Y)]
+    assert query_variables(query) == {X, Y, Z}
+    # TODO: we have to check if vars is passed, it is a valid subset of the query?
+    # TODO: What about don't care variable i.e. m._
+
+
 
 def test_relation_filter():
     abe = man("Abe")
@@ -14,13 +31,29 @@ def test_relation_filter():
         abe,
         bob,
         woman("Abby")}
-
-    assert run(database, [], man(X)) == {abe, bob}
+    
+    from pprint import pprint
+    assert run_df(database, [], [man(X)]) == a_df({X: {'Abe', 'Bob'}}) 
 
 def test_query_variable_match():
     assert query_variable_match(parent("A", "Bob"), parent(X, "Bob") ) == True
     assert query_variable_match(parent("A", "Bob"), parent("A", X)) == True
     assert query_variable_match(parent("A", "NoMatch"), parent(X, "Bob") ) == False 
+
+# def test_filter():
+#     database = {
+#         parent("Abe", "Bob"), # Abe is a parent of Bob
+#         parent("Abby", "Bob"),
+#         parent("Bob", "Carl"),
+#         parent("Bob", "Connor"),
+#         parent("Beatrice", "Carl")
+#     }
+#     parents_carl =  run(database, [], parent(X, "Carl")) 
+#     assert parents_carl == {parent("Bob", "Carl"), parent("Beatrice", "Carl")}
+
+#     children_bob =  run(database, [], parent("Bob", X)) 
+#     assert children_bob == {parent("Bob", "Carl"), parent("Bob", "Connor")}
+
 
 def test_filter():
     database = {
@@ -30,11 +63,12 @@ def test_filter():
         parent("Bob", "Connor"),
         parent("Beatrice", "Carl")
     }
-    parents_carl =  run(database, [], parent(X, "Carl")) 
-    assert parents_carl == {parent("Bob", "Carl"), parent("Beatrice", "Carl")}
+    parents_carl =  run_df(database, [], [parent(X, "Carl")]) 
+    # assert parents_carl == {parent("Bob", "Carl"), parent("Beatrice", "Carl")}
+    assert parents_carl == a_df({X: {"Bob", "Beatrice"}})
 
-    children_bob =  run(database, [], parent("Bob", X)) 
-    assert children_bob == {parent("Bob", "Carl"), parent("Bob", "Connor")}
+    # children_bob =  run(database, [], parent("Bob", X)) 
+    # assert children_bob == {parent("Bob", "Carl"), parent("Bob", "Connor")}
 
 
 def test_single_body_rule():

@@ -1,6 +1,6 @@
 from typing import *
 from dataclasses import dataclass
-from mercylog.types import Variable, Relation, Rule
+from mercylog.types import Variable, Relation, Rule, relation
 from pprint import pprint
 
 
@@ -92,4 +92,34 @@ def run(database: Set[Relation], rules: List[Rule], query: Relation):
     transformer = lambda a_knowledgebase: generate_knowledgebase(evaluate_logical_operators_in_rule, a_knowledgebase, rules)
     knowledgebase = iterate_until_no_change(transformer, database)
     return filter_facts(knowledgebase, query, query_variable_match)
+
+
+def run_df(database: Set[Relation], rules: List[Rule], query: List[Relation], vars: List[Variable]=None):
+    assert isinstance(query, List)
+    query_vars = vars or list(query_variables(query))
+    main_query_rule = relation("main_query_rule")
+    head = main_query_rule(*query_vars)
+    m =  head <= query
+    
+    _rules = rules + [m]
+    transformer = lambda a_knowledgebase: generate_knowledgebase(evaluate_logical_operators_in_rule, a_knowledgebase, _rules)
+    knowledgebase = iterate_until_no_change(transformer, database)
+    facts = filter_facts(knowledgebase, head, query_variable_match)
+    result = {}
+    for ix, variable in enumerate(query_vars):
+        result[variable] = [] 
+        for f in facts:
+            result[variable].append(f.terms[ix])
+        result[variable] = set(result[variable]) 
+    return result 
+            
+    
+
+
+def query_variables(query: List[Relation]) -> Set[Variable]:
+    q = query
+    vn = [v for ri in q for v in ri.variables() if str(v) != '_' and isinstance(v, Variable)]
+    return set(vn)
+
+
 
