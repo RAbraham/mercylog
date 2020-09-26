@@ -1,11 +1,13 @@
 from typing import *
-from dataclasses import dataclass
 from mercylog.types import Variable, Relation, Rule, relation
-from pprint import pprint
+import pandas as pd
 
 
-def filter_facts(database: Set[Relation], query: Relation, match: Callable) -> Set[Relation]:
-    return {fact for fact in database if match(fact, query)}
+def filter_facts(
+    database: List[Relation], query: Relation, match: Callable
+) -> List[Relation]:
+    return [fact for fact in database if match(fact, query)]
+
 
 def query_variable_match(fact: Relation, query: Relation) -> bool:
     if fact.name != query.name:
@@ -14,14 +16,22 @@ def query_variable_match(fact: Relation, query: Relation) -> bool:
     # TODO: zip is duplicated?
     for query_term, fact_term in zip(query.terms, fact.terms):
         if not isinstance(query_term, Variable) and query_term != fact_term:
-                return False
-    return True  
+            return False
+    return True
+
 
 def match_relation_and_fact(relation: Relation, fact: Relation) -> Optional[Dict]:
     if relation.name == fact.name:
+        zipped = zip(relation.terms, fact.terms)
+        for rt, ft in zipped:
+            if not isinstance(rt, Variable) and rt != ft:
+                return None
         return dict(zip(relation.terms, fact.terms))
 
-def match_relation_and_database(database: Set[Relation], relation: Relation) -> List[Dict]:
+
+def match_relation_and_database(
+    database: List[Relation], relation: Relation
+) -> List[Dict]:
     inferred_terms = []
     for fact in database:
         terms = match_relation_and_fact(relation, fact)
@@ -30,16 +40,20 @@ def match_relation_and_database(database: Set[Relation], relation: Relation) -> 
     return inferred_terms
 
 
-def generate_knowledgebase(evaluate: Callable, database: Set[Relation], rules: List[Rule]):
-    knowledge_base = database 
+def generate_knowledgebase(
+    evaluate: Callable, database: Set[Relation], rules: List[Rule]
+):
+    knowledge_base = database
     for rule in rules:
         evaluation = evaluate(rule, database)
-        knowledge_base = knowledge_base.union(evaluation)
-    return knowledge_base 
+        knowledge_base = set(knowledge_base).union(set(evaluation))
+    return knowledge_base
+
 
 def has_common_value(attrs1: Dict[Variable, Any], attrs2: Dict[Variable, Any]) -> bool:
     common_vars = set(attrs1.keys()).intersection(set(attrs2.keys()))
     return all([attrs1[c] == attrs2[c] for c in common_vars])
+
 
 def _conjunct(a, b):
     result = []
@@ -49,21 +63,25 @@ def _conjunct(a, b):
             if _c:
                 result.append({**a1, **a2})
     return result
-    
+
+
 def conjunct(body_terms: List[List[Dict]]) -> List:
     if not body_terms:
         return []
     r = body_terms[0]
     for _b in body_terms[1:]:
         r = _conjunct(r, _b)
-        
+
     return r
+
 
 def rule_terms(relation: Relation, attr: Dict[Variable, Any]) -> Tuple:
     return tuple([attr[a] for a in relation.terms])
 
 
-def evaluate_logical_operators_in_rule(rule: Rule, database: List[Relation]) -> Set[Relation]:
+def evaluate_logical_operators_in_rule(
+    rule: Rule, database: List[Relation]
+) -> List[Relation]:
     body_terms = []
 
     for relation in rule.body:
@@ -71,15 +89,13 @@ def evaluate_logical_operators_in_rule(rule: Rule, database: List[Relation]) -> 
         body_terms.append(_terms)
 
     terms = conjunct(body_terms)
-    
-    return {Relation(rule.head.name, rule_terms(rule.head, attr)) for attr in terms}
 
-def run_logical_operators(database: Set[Relation], rules: List[Rule], query: Relation):
-    knowledge_base = generate_knowledgebase(evaluate_logical_operators_in_rule, database, rules)
-    return filter_facts(knowledge_base, query, query_variable_match)
+    return list(
+        {Relation(rule.head.name, rule_terms(rule.head, attr)) for attr in terms}
+    )
 
 
-def iterate_until_no_change(transform: Callable, initial_value: Set) -> Set:
+def iterate_until_no_change(transform: Callable, initial_value: List) -> List:
     a_input = initial_value
 
     while True:
@@ -88,38 +104,43 @@ def iterate_until_no_change(transform: Callable, initial_value: Set) -> Set:
             return a_output
         a_input = a_output
 
-def run(database: Set[Relation], rules: List[Rule], query: Relation):
-    transformer = lambda a_knowledgebase: generate_knowledgebase(evaluate_logical_operators_in_rule, a_knowledgebase, rules)
-    knowledgebase = iterate_until_no_change(transformer, database)
-    return filter_facts(knowledgebase, query, query_variable_match)
 
+def run(
+    database: List[Relation],
+    rules: List[Rule],
+    query: List[Relation],
+    vars: List[Variable] = None,
+) -> pd.DataFrame:
 
-def run_df(database: Set[Relation], rules: List[Rule], query: List[Relation], vars: List[Variable]=None):
+    assert isinstance(database, List)
     assert isinstance(query, List)
     query_vars = vars or list(query_variables(query))
     main_query_rule = relation("main_query_rule")
     head = main_query_rule(*query_vars)
-    m =  head <= query
-    
+    m = head <= query
+
     _rules = rules + [m]
-    transformer = lambda a_knowledgebase: generate_knowledgebase(evaluate_logical_operators_in_rule, a_knowledgebase, _rules)
+    transformer = lambda a_knowledgebase: generate_knowledgebase(
+        evaluate_logical_operators_in_rule, a_knowledgebase, _rules
+    )
     knowledgebase = iterate_until_no_change(transformer, database)
     facts = filter_facts(knowledgebase, head, query_variable_match)
     result = {}
     for ix, variable in enumerate(query_vars):
-        result[variable] = [] 
+        result[variable] = []
         for f in facts:
             result[variable].append(f.terms[ix])
-        result[variable] = set(result[variable]) 
-    return result 
-            
-    
+        result[variable] = result[variable]
+
+    return pd.DataFrame(result)
 
 
 def query_variables(query: List[Relation]) -> Set[Variable]:
     q = query
-    vn = [v for ri in q for v in ri.variables() if str(v) != '_' and isinstance(v, Variable)]
+    vn = [
+        v
+        for ri in q
+        for v in ri.variables()
+        if str(v) != "_" and isinstance(v, Variable)
+    ]
     return set(vn)
-
-
-
