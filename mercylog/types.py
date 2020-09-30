@@ -83,59 +83,64 @@ A language in which the program can be specified in a high level manner as a spe
 
 Error = str
 
+
 class Term(ABC):
     """
     Also called attribute in relational programming
     The set from which it can take values is called it's domain
     E.g. A term can be the value 4 from the domain of integers
     """
+
     pass
+
 
 @dataclass(frozen=True)
 class Variable(Term):
     # Also called term
     name: str
+
     def __repr__(self):
         return self.name
 
+
 v = Variable
+# def __init__(self, name, *variables):
+#     self.name = name
+#     self._variables = variables
 
-    # def __init__(self, name, *variables):
-    #     self.name = name
-    #     self._variables = variables
+# def __le__(self, body: Union[List, Any]):
+#     if isinstance(body, List):
+#         b = Facts(*body)
+#     else:
+#         b = body
+#     return Rule(self, b)
 
-    # def __le__(self, body: Union[List, Any]):
-    #     if isinstance(body, List):
-    #         b = Facts(*body)
-    #     else:
-    #         b = body
-    #     return Rule(self, b)
+# def variables(self):
+#     return self._variables
 
-    # def variables(self):
-    #     return self._variables
+# def get_clause(self):
+#     return self.relation_x()
 
-    # def get_clause(self):
-    #     return self.relation_x()
+# def relation_x(self):
+#     var_strs = []
+#     # TODO: Duplicate isinstance check
+#     for v in self.variables():
+#         if isinstance(v, str):
+#             x = f'"{v}"'
+#         else:
+#             x = str(v)
 
-    # def relation_x(self):
-    #     var_strs = []
-    #     # TODO: Duplicate isinstance check
-    #     for v in self.variables():
-    #         if isinstance(v, str):
-    #             x = f'"{v}"'
-    #         else:
-    #             x = str(v)
+#         var_strs.append(x)
+#     a_str = ','.join(var_strs)
+#     return self.name + '(' + a_str + ')'
 
-    #         var_strs.append(x)
-    #     a_str = ','.join(var_strs)
-    #     return self.name + '(' + a_str + ')'
+# def relation(self):
+#     return self.relation_x()
 
-    # def relation(self):
-    #     return self.relation_x()
+# def __invert__(self):
+#     return InvertedRelationInstance(self)
+#     pass
 
-    # def __invert__(self):
-    #     return InvertedRelationInstance(self)
-    #     pass
 
 @dataclass(frozen=True)
 class Relation:
@@ -145,17 +150,17 @@ class Relation:
     Also called Atom in Datalog terminology
     Note also that in the context of logic-based languages, a relation's name is also called it's _predicate_
     """
-    
-    
+
     name: str
     terms: Tuple[Term]
+
     def __le__(self, body: Union[List, "Relation"]):
         if isinstance(body, List):
             _b = body
             pass
         else:
             _b = [body]
-        
+
         head_relation = Relation(self.name, self.terms)
         return Rule(head_relation, set(_b))
 
@@ -168,6 +173,7 @@ class Relation:
     def variables(self) -> Sequence[Variable]:
         return [v for v in self.terms if isinstance(v, Variable)]
 
+
 @dataclass(frozen=True)
 class RelationCreator:
     """
@@ -176,20 +182,18 @@ class RelationCreator:
     person = relation('person')
     person(X) # <----- This
     """
-    
+
     # Also called predicate
     name: str
 
     def __call__(self, *terms, **kwargs) -> Relation:
         _terms = tuple([t for t in terms])
         return Relation(self.name, _terms)
-    
-
 
 
 @dataclass(frozen=True)
 class Rule:
-    '''
+    """
     A Datalog rule r is a logic program rule of the form:
     R0 <- R1, R2, ... Rn. where n >= 0
     Ri are relations where no function symbols appears
@@ -198,7 +202,8 @@ class Rule:
 
     The meaning of the above rule is if R1,R2...Rn is true, then R0 is true.
 
-    '''
+    """
+
     head: Relation
     body: Set[Relation]
 
@@ -206,13 +211,14 @@ class Rule:
         body = ",".join([str(b) for b in self.body])
         return f"{self.head} <= {body}"
 
+
 def is_safe(head: Relation, body: Sequence[Relation]) -> bool:
-    '''
+    """
       Every variable appearing in the head should also appear in at least one of the atoms in the body.
         This requirement is called the safety requirement and is used to avoid rules yielding infinite relations from
         finite ones.
 
-    '''
+    """
     head_vars = head.variables()
     body_vars = util.flatten(relation.variables() for relation in body)
 
@@ -220,23 +226,26 @@ def is_safe(head: Relation, body: Sequence[Relation]) -> bool:
 
 
 class Fact:
-    '''
+    """
     A fact is a ground rule with an empty body. We call it a p-fact if p is the predicate symbol in the head.
     For simplicity, we just write a fact as A0 instead of A <-. i.e. dropping the <- symbol.
-    '''
+    """
+
 
 def relation(predicate: str) -> RelationCreator:
     return RelationCreator(predicate)
 
 
-
 # def run(data_source: DataSource, program: Program, query: Query):
+
 
 class DataSource:
     pass
 
+
 class Program:
     pass
+
 
 class Query:
     pass
@@ -251,6 +260,7 @@ class KnowledgeBase:
     - Base predicate symbols can appear in the body of rules in P but not in the head. 
     - Derived predicate symbols cannot appear in D and their definition is in P .
     """
+
     pass
 
 
@@ -259,4 +269,3 @@ class KnowledgeBase:
 #         return error_message
 #     else:
 #         return False
-

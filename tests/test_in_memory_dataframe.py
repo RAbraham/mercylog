@@ -187,6 +187,45 @@ def test_recursion():
     assert_df(run(database, rules, [query]), a_df({Z: ["B", "C"]}))
 
 
+def test_variables():
+    database = [
+        parent("A", "B"),
+        parent("B", "C"),
+        parent("C", "D"),
+        parent("AA", "BB"),
+        parent("BB", "CC"),
+    ]
+
+    ancestor_rule_base = ancestor(X, Y) <= parent(X, Y)
+    ancestor_rule_recursive = ancestor(X, Z) <= [parent(X, Y), ancestor(Y, Z)]
+
+    intermediate_rule = intermediate(Z, X, Y) <= [ancestor(X, Z), ancestor(Z, Y)]
+
+    rules = [ancestor_rule_base, ancestor_rule_recursive, intermediate_rule]
+    query = [intermediate(Z, X, Y)]
+    print(">>Test Var")
+    """
+    Y   Z   X
+0   D   B   A
+1   C   B   A
+2   D   C   B
+3   D   C   A
+4  CC  BB  AA
+    """
+    from functools import partial
+
+    run_var = partial(run, database, rules, query)
+
+    xs = ["A", "A", "B", "A", "AA"]
+    ys = ["D", "C", "D", "D", "CC"]
+    zs = ["B", "B", "C", "C", "BB"]
+    assert_df(run_var(), a_df({X: xs, Y: ys, Z: zs}))
+    assert_df(run_var([X]), a_df({X: xs}))
+    assert_df(run_var([X, Y]), a_df({X: xs, Y: ys}))
+    assert_df(run_var([X, Y, Z]), a_df({X: xs, Y: ys, Z: zs}))
+
+
+
 parent = relation("parent")
 
 man = relation("man")

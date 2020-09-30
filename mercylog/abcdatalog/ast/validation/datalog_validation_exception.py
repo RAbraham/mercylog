@@ -1,0 +1,2 @@
+class DatalogValidationException(Exception):
+    pass

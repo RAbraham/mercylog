@@ -109,12 +109,12 @@ def run(
     database: List[Relation],
     rules: List[Rule],
     query: List[Relation],
-    vars: List[Variable] = None,
+    variables: List[Variable] = None,
 ) -> pd.DataFrame:
 
     assert isinstance(database, List)
     assert isinstance(query, List)
-    query_vars = vars or list(query_variables(query))
+    query_vars = variables or list(query_variables(query))
     main_query_rule = relation("main_query_rule")
     head = main_query_rule(*query_vars)
     m = head <= query
