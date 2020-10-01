@@ -14,16 +14,14 @@ class BinaryUnifier(Premise):
         self.left = left
         self.right = right
 
-    def get_left(self) -> Term:
+    def getLeft(self) -> Term:
         return self.left
 
-    def get_right(self) -> Term:
+    def getRight(self) -> Term:
         return self.right
 
-    def get_args_iterable(self) -> Sequence:
+    def getArgsIterable(self) -> Sequence:
         return [self.left, self.right]
-
-    pass
 
     def accept(self, visitor: PremiseVisitor, state):
         return visitor.visit(self, state)
