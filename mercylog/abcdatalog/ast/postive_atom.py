@@ -72,7 +72,7 @@ class PositiveAtom(Premise, Head):
     def __init__(self, pred: PredicateSym, args: List[Term]):
         self.pred = pred
         self.args = deepcopy(args)
-        self.isGround = False
+        self.isGround = None
         if pred.getArity() != len(args):
             raise ValueError(f"Arity of predicate symbol {pred} is {pred.getArity()} but given {len(args)} arguments(s).")
 
@@ -107,9 +107,12 @@ class PositiveAtom(Premise, Head):
 # 	}
 #
     def isGround(self) -> bool:
-        is_ground =  all([isinstance(t, Constant) for t in self.args])
-        self.isGround = is_ground
-        return is_ground
+        if not self.isGround:
+            is_ground =  all([isinstance(t, Constant) for t in self.args])
+            self.isGround = is_ground
+            return is_ground
+        else:
+            return self.isGround
 
 aaa
 # 	/**
