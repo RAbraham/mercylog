@@ -1,4 +1,4 @@
-from mercylog.abcdatalog.ast.postive_atom import PositiveAtom
+from mercylog.abcdatalog.ast.positive_atom import PositiveAtom
 from abc import ABC, abstractmethod
 from typing import *
 

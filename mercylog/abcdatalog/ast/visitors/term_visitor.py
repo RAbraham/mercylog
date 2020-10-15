@@ -1,26 +1,23 @@
-from abc import ABC, abstractmethod
-
-# import abcdatalog.ast.visitors.PremiseVisitor;
-from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
 from typing import *
+from mercylog.abcdatalog.ast.constant import Constant
+from mercylog.abcdatalog.ast.variable import Variable
 
 I = TypeVar("I")
 O = TypeVar("O")
 
-
-# /**
-#  * A premise in the body of a clause. This interface is under-specified to allow
-#  * the addition of new language features.
-#  *
-#  */
+from abc import ABC, abstractmethod
 
 
-class Premise(ABC):
+class TermVisitor(ABC, Generic[I, O]):
     def __init__(self):
         super().__init__()
 
     @abstractmethod
-    def accept_premise_visitor(self, premise_visitor: PremiseVisitor[I, O], state: I) -> O:
+    def visit_variable(self, t: Variable, state: I) -> O:
+        pass
+
+    @abstractmethod
+    def visit_constant(self, t: Constant, state: I) -> O:
         pass
 
 
@@ -38,15 +35,13 @@ class Premise(ABC):
 #  *
 #  * See README for contributors.
 #  ******************************************************************************/
-# package abcdatalog.ast;
+# package abcdatalog.ast.visitors;
 #
-# import abcdatalog.ast.visitors.PremiseVisitor;
+# import abcdatalog.ast.Constant;
+# import abcdatalog.ast.Variable;
 #
-# /**
-#  * A premise in the body of a clause. This interface is under-specified to allow
-#  * the addition of new language features.
-#  *
-#  */
-# public interface Premise {
-# 	public <I, O> O accept(PremiseVisitor<I, O> visitor, I state);
+# public interface TermVisitor<I, O> {
+# 	public O visit(Variable t, I state);
+#
+# 	public O visit(Constant t, I state);
 # }

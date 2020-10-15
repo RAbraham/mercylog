@@ -8,14 +8,19 @@ from mercylog.abcdatalog.ast.head import Head
 from mercylog.abcdatalog.ast.predicate_sym import PredicateSym
 from mercylog.abcdatalog.ast.term import Term
 from mercylog.abcdatalog.ast.constant import Constant
-# import abcdatalog.util.substitution.Substitution;
 from mercylog.abcdatalog.util.substitution.substitution import Substitution
+from dataclasses import dataclass
+
+I = TypeVar("I")
+O = TypeVar("O")
+
+
 
 # /**
 #  * A non-negated atom; i.e., a predicate symbol, and a sequence of terms.
 #  *
 #  */
-# public class PositiveAtom implements Premise, Head {
+@dataclass(frozen=True)
 class PositiveAtom(Premise, Head):
 # 	/**
 # 	 * Predicate symbol of this atom.
@@ -30,7 +35,7 @@ class PositiveAtom(Premise, Head):
 # 	 * Is the atom ground (i.e., all arguments are constants)?
 # 	 */
 # 	protected volatile Boolean isGround;
-    isGround: bool
+#     isGround: bool
 #
 # 	/**
 # 	 * A static factory method for the creation of atoms. Returns an atom with
@@ -49,7 +54,7 @@ class PositiveAtom(Premise, Head):
 
     @classmethod
     def create(cls, pred: PredicateSym, args: List[Term]):
-        return PositiveAtom(pred, args)
+        return PositiveAtom(pred, deepcopy(args))
 
 #
 # 	/**
@@ -70,11 +75,9 @@ class PositiveAtom(Premise, Head):
 # 		}
 # 	}
     def __init__(self, pred: PredicateSym, args: List[Term]):
-        self.pred = pred
-        self.args = deepcopy(args)
-        self.isGround = None
         if pred.getArity() != len(args):
             raise ValueError(f"Arity of predicate symbol {pred} is {pred.getArity()} but given {len(args)} arguments(s).")
+        super().__init__()
 
 #
 # 	public Term[] getArgs() {
@@ -90,31 +93,10 @@ class PositiveAtom(Premise, Head):
 
     def getPred(self) -> PredicateSym:
         return self.pred
-#
-# 	public boolean isGround() {
-# 		Boolean isGround;
-# 		if ((isGround = this.isGround) == null) {
-# 			// This might do redundant work since we do not synchronize, but
-# 			// it's still sound, and it's probably cheap enough that
-# 			// synchronizing might be more expensive.
-# 			boolean b = true;
-# 			for (Term t : args) {
-# 				b &= t instanceof Constant;
-# 			}
-# 			this.isGround = isGround = Boolean.valueOf(b);
-# 		}
-# 		return isGround;
-# 	}
-#
-    def isGround(self) -> bool:
-        if not self.isGround:
-            is_ground =  all([isinstance(t, Constant) for t in self.args])
-            self.isGround = is_ground
-            return is_ground
-        else:
-            return self.isGround
 
-aaa
+    def isGround(self) -> bool:
+        return all([isinstance(t, Constant) for t in self.args])
+
 # 	/**
 # 	 * Attempts to unify this atom with a fact (i.e., a ground atom).
 # 	 *
@@ -122,14 +104,13 @@ aaa
 # 	 *            the fact
 # 	 * @return a substitution, or null if the atoms do not unify
 # 	 */
-# 	public Substitution unify(PositiveAtom fact) {
-# 		assert fact.isGround();
-# 		if (!this.getPred().equals(fact.getPred())) {
-# 			return null;
-# 		}
-# 		return SimpleConstSubstitution.unify(this.args, fact.args);
-# 	}
-#
+    def unify(self, fact: "PositiveAtom") -> Optional[Substitution]:
+        assert fact.isGround()
+        if self.getPred() != fact.getPred():
+            return None
+
+        return SimpleConstSubstitution.unify(self.args, fact.args)
+
 # 	/**
 # 	 * Apply a substitution to the terms in this atom.
 # 	 *
@@ -137,68 +118,24 @@ aaa
 # 	 *            the substitution
 # 	 * @return a new atom with the substitution applied
 # 	 */
-# 	public PositiveAtom applySubst(Substitution subst) {
-# 		return create(this.pred, subst.apply(this.args));
-# 	}
-#
-# 	@Override
-# 	public String toString() {
-# 		StringBuilder sb = new StringBuilder();
-# 		sb.append(this.pred);
-# 		if (this.args.length != 0) {
-# 			sb.append('(');
-# 			for (int i = 0; i < this.args.length; ++i) {
-# 				sb.append(this.args[i]);
-# 				if (i < this.args.length - 1) {
-# 					sb.append(", ");
-# 				}
-# 			}
-# 			sb.append(')');
-# 		}
-# 		return sb.toString();
-# 	}
-#
-# 	@Override
-# 	public int hashCode() {
-# 		final int prime = 31;
-# 		int result = 1;
-# 		result = prime * result + Arrays.hashCode(args);
-# 		result = prime * result + pred.hashCode();
-# 		return result;
-# 	}
-#
-# 	@Override
-# 	public boolean equals(Object obj) {
-# 		if (this == obj)
-# 			return true;
-# 		if (obj == null)
-# 			return false;
-# 		if (getClass() != obj.getClass())
-# 			return false;
-# 		PositiveAtom other = (PositiveAtom) obj;
-# 		// This check relies on isGround being set to one of the static
-# 		// attributes Boolean.TRUE or Boolean.FALSE.
-# 		if (isGround != null && other.isGround != null && isGround != other.isGround)
-# 				return false;
-# 		if (!pred.equals(other.pred))
-# 			return false;
-# 		if (!Arrays.equals(args, other.args))
-# 			return false;
-# 		return true;
-# 	}
-#
-# 	@Override
-# 	public <I, O> O accept(PremiseVisitor<I, O> visitor, I state) {
-# 		return visitor.visit(this, state);
-# 	}
-#
-# 	@Override
-# 	public <I, O> O accept(HeadVisitor<I, O> visitor, I state) {
-# 		return visitor.visit(this, state);
-# 	}
-# }
 
-    pass
+    def applySubst(self, subst: Substitution) -> "PositiveAtom":
+        return PositiveAtom.create(self.pred, subst.apply(self.args))
+
+
+    def __str__(self):
+        if not self.args:
+            return f"{self.pred}"
+        else:
+            return f"{self.pred}({', '.join([str(a) for a in self.args])})"
+
+    def accept_premise_visitor(self, visitor: PremiseVisitor[I, O] , state: I  ) -> O:
+        return visitor.visit(self, state)
+
+    def accept_head_visitor(self, visitor: HeadVisitor[I, O] , state: I ) -> O:
+        return visitor.visit(self, state)
+
+
 # ===================================================================================================================
 # public class PositiveAtom implements Premise, Head {
 # 	/**
