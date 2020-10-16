@@ -78,6 +78,11 @@ class TrueAtom:
 #  * rules in a program are guaranteed to be valid.
 #  *
 #  */
+def add_to_edb(atom, nothing, edbPredicateSymbols):
+    edbPredicateSymbols.add(atom.getPred())
+    return None
+
+
 # public class DatalogValidator {
 class DatalogValidator:
 # 	private boolean allowBinaryUnification;
@@ -137,9 +142,6 @@ class DatalogValidator:
 # 		Set<PredicateSym> idbPredicateSymbols = new HashSet<>();
         idbPredicateSymbols: Set[PredicateSym] = set()
 #
-# 		HeadVisitor<Void, PositiveAtom> getHeadAsAtom = (new HeadVisitorBuilder<Void, PositiveAtom>())
-# 				.onPositiveAtom((atom, nothing) -> atom).orCrash();
-        aaa
         getHeadAsAtom: HeadVisitor = HeadVisitorBuilder().onPositiveAtom(lambda atom, nothing: atom).orCrash()
 # 		PremiseVisitor<Void, Void> getBodyPred = (new PremiseVisitorBuilder<Void, Void>())
 # 				.onPositiveAtom((atom, nothing) -> {
@@ -149,6 +151,10 @@ class DatalogValidator:
 # 					edbPredicateSymbols.add(atom.getPred());
 # 					return null;
 # 				}).orNull();
+
+        add_atom = lambda atom, nothing: add_to_edb(atom, nothing, edbPredicateSymbols)
+        getBodyPred: PremiseVisitor = PremiseVisitorBuilder().onPositiveAtom(add_atom).onNegatedAtom(add_atom).orNull()
+        aaa
 # 		for (ValidClause cl : rewrittenClauses) {
 # 			PositiveAtom head = cl.getHead().accept(getHeadAsAtom, null);
 # 			List<Premise> body = cl.getBody();
