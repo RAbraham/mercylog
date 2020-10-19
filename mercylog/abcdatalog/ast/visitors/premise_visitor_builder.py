@@ -5,12 +5,12 @@ from mercylog.abcdatalog.ast.negated_atom import NegatedAtom
 from mercylog.abcdatalog.ast.positive_atom import PositiveAtom
 from mercylog.abcdatalog.ast.premise import Premise
 from mercylog.abcdatalog.engine.bottomup.annotated_atom import AnnotatedAtom
-
+from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
 I = TypeVar("I")
 O = TypeVar("O")
 
 # 	private class Visitor implements PremiseVisitor<I,O> {
-class Visitor("PremiseVisitor"):
+class Visitor(PremiseVisitor):
 
     def __init__(self, otherwise: Callable[[Premise, I], O], onPositiveAtom, onNegatedAtom, onBinaryUnifier, onBinaryDisunifier, onAnnotatedAtom):
         self.otherwise = otherwise
@@ -135,29 +135,43 @@ class PremiseVisitorBuilder(Generic[I, O]):
 # 		this.onBinaryDisunifier = onBinaryDisunifier;
 # 		return this;
 # 	}
-aaa
+    def onBinaryDisnifier(self, onBinaryDisunifier) -> "PremiseVisitorBuilder":
+        self._onBinaryDisunifier = onBinaryDisunifier
+        return self
+
 #
 # 	public PremiseVisitorBuilder<I, O> onAnnotatedAtom(BiFunction<AnnotatedAtom, I, O> onAnnotatedAtom) {
 # 		this.onAnnotatedAtom = onAnnotatedAtom;
 # 		return this;
 # 	}
+    def onAnnotatedAtom(self, onAnnotatedAtom) -> "PremiseVisitorBuilder":
+        self._onAnnotatedAtom = onAnnotatedAtom
+        return self
+
 #
 # 	public PremiseVisitor<I, O> or(BiFunction<Premise, I, O> f) {
 # 		return new Visitor(f);
 # 	}
+    def or_(self, f: Callable[[Premise, I], O]) -> PremiseVisitor[I, O]:
+        return Visitor(f, self._onPositiveAtom, self._onNegatedAtom, self._onBinaryUnifier, self._onBinaryDisunifier, self._onAnnotatedAtom)
 #
 # 	public PremiseVisitor<I, O> orCrash() {
 # 		return this.or((conj, state) -> { throw new UnsupportedOperationException(); });
 # 	}
+    def orCrash(self) -> PremiseVisitor[I, O]:
+        def raise_error():
+            raise NotImplementedError()
+        return self.or_(lambda conj, state: raise_error())
+
 #
 # 	public PremiseVisitor<I, O> orNull() {
 # 		return this.or((conj, state) -> null);
 # 	}
 #
-
+    def orNull(self) -> PremiseVisitor[I, O]:
+        return self.or_(lambda conj, state: None)
 # }
 
-    pass
 # /*******************************************************************************
 #  * This file is part of the AbcDatalog project.
 #  *
