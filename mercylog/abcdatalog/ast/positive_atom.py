@@ -74,10 +74,9 @@ class PositiveAtom(Premise, Head):
 # 					+ args.length + " argument(s).");
 # 		}
 # 	}
-    def __init__(self, pred: PredicateSym, args: List[Term]):
-        if pred.getArity() != len(args):
-            raise ValueError(f"Arity of predicate symbol {pred} is {pred.getArity()} but given {len(args)} arguments(s).")
-        super().__init__()
+    def __post_init__(self):
+        if self.pred.getArity() != len(self.args):
+            raise ValueError(f"Arity of predicate symbol {self.pred} is {self.pred.getArity()} but given {len(self.args)} arguments(s).")
 
 #
 # 	public Term[] getArgs() {
@@ -130,7 +129,7 @@ class PositiveAtom(Premise, Head):
             return f"{self.pred}({', '.join([str(a) for a in self.args])})"
 
     def accept_premise_visitor(self, visitor: PremiseVisitor[I, O] , state: I  ) -> O:
-        return visitor.visit(self, state)
+        return visitor.visit_positive_atom(self, state)
 
     def accept_head_visitor(self, visitor: HeadVisitor[I, O] , state: I ) -> O:
         return visitor.visit(self, state)
