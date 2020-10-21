@@ -117,6 +117,7 @@ class DatalogValidator:
 # 	public UnstratifiedProgram validate(Set<Clause> program) throws DatalogValidationException {
 # 		return validate(program, false);
 # 	}
+    aaa two validates?
     def validate(self, program: Set[Clause]) -> UnStratifiedProgram:
         return self.validate(program, False)
 #
@@ -154,7 +155,6 @@ class DatalogValidator:
 
         add_atom = lambda atom, nothing: add_to_edb(atom, nothing, edbPredicateSymbols)
         getBodyPred: PremiseVisitor = PremiseVisitorBuilder().onPositiveAtom(add_atom).onNegatedAtom(add_atom).orNull()
-        aaa
 # 		for (ValidClause cl : rewrittenClauses) {
 # 			PositiveAtom head = cl.getHead().accept(getHeadAsAtom, null);
 # 			List<Premise> body = cl.getBody();
@@ -169,6 +169,10 @@ class DatalogValidator:
 # 				}
 # 			}
 # 		}
+        cl: ValidClause
+        for cl in rewrittenClauses:
+            head: PositiveAtom = cl.getHead().accept(getHeadAsAtom, None)
+
 #
 # 		Set<PositiveAtom> initialFacts = new HashSet<>();
 # 		edbPredicateSymbols.removeAll(idbPredicateSymbols);

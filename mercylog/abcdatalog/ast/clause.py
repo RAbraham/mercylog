@@ -1,3 +1,6 @@
+from typing import *
+from mercylog.abcdatalog.ast.head import Head
+from mercylog.abcdatalog.ast.premise import Premise
 """
  * A clause consisting of a head and a body, the latter of which is a list of
  * premises. The standard interpretation is that the head of a clause is
@@ -7,10 +10,45 @@
 from dataclasses import dataclass
 from typing import *
 @dataclass(frozen=True)
+
+# public class Clause {
+#  	private final Head head;
+#
+# 	protected final List<Premise> body;
 class Clause:
 	head: Head
 	body: List[Premise]
 
+# 	/**
+# 	 * Returns the head of this clause.
+# 	 *
+# 	 * @return the head
+# 	 */
+# 	public Head getHead() {
+# 		return this.head;
+# 	}
+	def getHead(self) -> Head:
+		return self.head
+
+#
+# 	/**
+# 	 * Returns the body of this clause.
+# 	 *
+# 	 * @return the body
+# 	 */
+# 	public List<Premise> getBody() {
+# 		return this.body;
+# 	}
+#
+	def getBody(self) -> List[Premise]:
+		return self.body
+
+	def __str__(self):
+		body_texts = [str(b) for b in self.getBody()]
+		result = str(self.getHead()) + ' :- ' + ','.join(body_texts)
+		return result
+
+# ----------------------------------------------------------------------------------
 # public class Clause {
 #  	private final Head head;
 #
@@ -29,6 +67,7 @@ class Clause:
 # 	public Head getHead() {
 # 		return this.head;
 # 	}
+
 #
 # 	/**
 # 	 * Returns the body of this clause.
