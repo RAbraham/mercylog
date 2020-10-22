@@ -24,6 +24,8 @@ from mercylog.abcdatalog.util.substitution.term_unifier import TermUnifier
 from mercylog.abcdatalog.util.substitution.union_find_based_unifier import UnionFindBasedUnifier
 from mercylog.abcdatalog.ast.validation.unstratified_program import UnStratifiedProgram
 
+# 	private static final class Program implements UnstratifiedProgram {
+
 # 	public static final class ValidClause extends Clause {
 #
 # 		private ValidClause(Head head, List<Premise> body) {
@@ -37,6 +39,40 @@ class ValidClause(Clause):
     def __init__(self, head: Head, body: List[Premise]):
         super().__init__(head, body)
 
+class Program(UnStratifiedProgram):
+    def __init__(self, rules: Set[ValidClause], initialFacts: Set[PositiveAtom], edbPredicateSymbols: Set[PredicateSym], idbPredicateSymbols: Set[PredicateSym]):
+        self.rules = rules
+        self.initialFacts = initialFacts
+        self.edbPredicateSymbols = edbPredicateSymbols
+        self.idbPredicateSymbols = idbPredicateSymbols
+        super(Program, self).__init__()
+# 		public Set<ValidClause> getRules() {
+# 			return this.rules;
+# 		}
+    def getRules(self) -> Set[ValidClause]:
+        return self.rules
+#
+# 		public Set<PositiveAtom> getInitialFacts() {
+# 			return this.initialFacts;
+# 		}
+    def getInitialFacts(self) -> Set[PositiveAtom]:
+        return self.initialFacts
+#
+# 		public Set<PredicateSym> getEdbPredicateSyms() {
+# 			return this.edbPredicateSymbols;
+# 		}
+#
+    def getEdbPredicateSyms(self) -> Set[PredicateSym]:
+        return self.edbPredicateSymbols
+
+# 		public Set<PredicateSym> getIdbPredicateSyms() {
+# 			return this.idbPredicateSymbols;
+# 		}
+#
+    def getIdbPredicateSyms(self) -> Set[PredicateSym]:
+        return self.idbPredicateSymbols
+# 	}
+#
 # 	private final static class True {
 #
 # 		private True() {
@@ -117,12 +153,11 @@ class DatalogValidator:
 # 	public UnstratifiedProgram validate(Set<Clause> program) throws DatalogValidationException {
 # 		return validate(program, false);
 # 	}
-    aaa two validates?
-    def validate(self, program: Set[Clause]) -> UnStratifiedProgram:
-        return self.validate(program, False)
-#
+#     def validate(self, program: Set[Clause]) -> UnStratifiedProgram:
+#         return self.validate(program, False)
+# #
 # 	public UnstratifiedProgram validate(Set<Clause> program, boolean treatIdbFactsAsClauses) throws DatalogValidationException {
-    def validate(self, program: Set[Clause], treatIdbFactsAsClauses: bool) -> UnStratifiedProgram:
+    def validate(self, program: Set[Clause], treatIdbFactsAsClauses: bool = False) -> UnStratifiedProgram:
 # 		Set<ValidClause> rewrittenClauses = new HashSet<>();
         rewrittenClauses: Set[ValidClause] = set()
 # 		for (Clause clause : program) {
@@ -131,7 +166,7 @@ class DatalogValidator:
             rewrittenClauses.add(self.checkRule(clause))
 # 		}
 # 		rewrittenClauses.add(new ValidClause(True.getTrueAtom(), Collections.emptyList()));
-        rewrittenClauses.add(ValidClause(TrueAtom.getTrueATom(), []))
+        rewrittenClauses.add(ValidClause(TrueAtom.getTrueAtom(), []))
 #
 # 		Set<ValidClause> rules = new HashSet<>();
         rules: Set[ValidClause] = set()
@@ -171,11 +206,23 @@ class DatalogValidator:
 # 		}
         cl: ValidClause
         for cl in rewrittenClauses:
-            head: PositiveAtom = cl.getHead().accept(getHeadAsAtom, None)
-
+            head: PositiveAtom = cl.getHead().accept_head_visitor(getHeadAsAtom, None)
+            body: List[Premise] = cl.getBody()
+            if not body:
+                bodilessClauses.add(cl)
+                edbPredicateSymbols.add(head.getPred())
+            else:
+                idbPredicateSymbols.add(head.getPred())
+                rules.add(cl)
+                c: Premise
+                for c in body:
+                    c.accept_premise_visitor(getBodyPred, None)
 #
 # 		Set<PositiveAtom> initialFacts = new HashSet<>();
+        initialFacts: Set[PositiveAtom] = set()
 # 		edbPredicateSymbols.removeAll(idbPredicateSymbols);
+        for i in idbPredicateSymbols:
+            edbPredicateSymbols.remove(i)
 # 		for (ValidClause cl : bodilessClauses) {
 # 			PositiveAtom head = HeadHelpers.forcePositiveAtom(cl.getHead());
 # 			if (treatIdbFactsAsClauses && idbPredicateSymbols.contains(head.getPred())) {
@@ -184,11 +231,19 @@ class DatalogValidator:
 # 				initialFacts.add(head);
 # 			}
 # 		}
+        cl: ValidClause
+        for cl in bodilessClauses:
+            head: PositiveAtom = HeadHelpers.forcePositiveAtom(cl.getHead())
+            if treatIdbFactsAsClauses and (head.getPred() in idbPredicateSymbols):
+                rules.add(cl)
+            else:
+                initialFacts.add(head)
 #
 # 		return new Program(rules, initialFacts, edbPredicateSymbols, idbPredicateSymbols);
+        return Program(rules, initialFacts, edbPredicateSymbols, idbPredicateSymbols)
 # 	}
-    pass
 #
+    aaa
 # 	private ValidClause checkRule(Clause clause) throws DatalogValidationException {
 # 		Set<Variable> boundVars = new HashSet<>();
 # 		Set<Variable> possiblyUnboundVars = new HashSet<>();
@@ -265,38 +320,7 @@ class DatalogValidator:
 # 		return new ValidClause(clause.getHead(), newBody);
 # 	}
 #
-# 	private static final class Program implements UnstratifiedProgram {
-# 		private final Set<ValidClause> rules;
-# 		private final Set<PositiveAtom> initialFacts;
-# 		private final Set<PredicateSym> edbPredicateSymbols;
-# 		private final Set<PredicateSym> idbPredicateSymbols;
-#
-# 		public Program(Set<ValidClause> rules, Set<PositiveAtom> initialFacts, Set<PredicateSym> edbPredicateSymbols,
-# 				Set<PredicateSym> idbPredicateSymbols) {
-# 			this.rules = rules;
-# 			this.initialFacts = initialFacts;
-# 			this.edbPredicateSymbols = edbPredicateSymbols;
-# 			this.idbPredicateSymbols = idbPredicateSymbols;
-# 		}
-#
-# 		public Set<ValidClause> getRules() {
-# 			return this.rules;
-# 		}
-#
-# 		public Set<PositiveAtom> getInitialFacts() {
-# 			return this.initialFacts;
-# 		}
-#
-# 		public Set<PredicateSym> getEdbPredicateSyms() {
-# 			return this.edbPredicateSymbols;
-# 		}
-#
-# 		public Set<PredicateSym> getIdbPredicateSyms() {
-# 			return this.idbPredicateSymbols;
-# 		}
-#
-# 	}
-#
+
 # 	private final static class True {
 #
 # 		private True() {
