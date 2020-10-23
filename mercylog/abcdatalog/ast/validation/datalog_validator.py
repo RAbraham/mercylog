@@ -243,12 +243,15 @@ class DatalogValidator:
         return Program(rules, initialFacts, edbPredicateSymbols, idbPredicateSymbols)
 # 	}
 #
-    aaa
 # 	private ValidClause checkRule(Clause clause) throws DatalogValidationException {
+    def checkRule(self, clause: Clause) -> ValidClause:
 # 		Set<Variable> boundVars = new HashSet<>();
+        boundVars: Set[Variable] = set()
 # 		Set<Variable> possiblyUnboundVars = new HashSet<>();
+        possiblyUnboundVars: Set[Variable] = set()
 # 		TermUnifier subst = new UnionFindBasedUnifier();
-#
+        subst: TermUnifier = UnionFindBasedUnifier()
+        aaa
 # 		TermVisitor<Set<Variable>, Set<Variable>> tv = (new TermVisitorBuilder<Set<Variable>, Set<Variable>>())
 # 				.onVariable((x, set) -> {
 # 					set.add(x);
