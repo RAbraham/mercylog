@@ -251,16 +251,22 @@ class DatalogValidator:
         possiblyUnboundVars: Set[Variable] = set()
 # 		TermUnifier subst = new UnionFindBasedUnifier();
         subst: TermUnifier = UnionFindBasedUnifier()
-        aaa
 # 		TermVisitor<Set<Variable>, Set<Variable>> tv = (new TermVisitorBuilder<Set<Variable>, Set<Variable>>())
 # 				.onVariable((x, set) -> {
 # 					set.add(x);
 # 					return set;
 # 				}).or((x, set) -> set);
 #
+        def add_set(x, a_set: Set):
+            a_set.add(x)
+            return a_set
+        tv : TermVisitor = TermVisitorBuilder().onVariable(add_set).or_(lambda x, a_set: a_set)
 # 		TermHelpers.fold(HeadHelpers.forcePositiveAtom(clause.getHead()).getArgs(), tv, possiblyUnboundVars);
+        TermHelpers.fold(HeadHelpers.forcePositiveAtom(clause.getHead()).getArgs(), tv, possiblyUnboundVars)
 #
 # 		Box<Boolean> hasPositiveAtom = new Box<>(false);
+        hasPositiveAtom: Box[bool] = Box(False)
+        aaa
 # 		PremiseVisitor<DatalogValidationException, DatalogValidationException> cv = new CrashPremiseVisitor<DatalogValidationException, DatalogValidationException>() {
 #
 # 			@Override
