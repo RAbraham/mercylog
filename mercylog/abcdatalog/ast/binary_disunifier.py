@@ -12,6 +12,7 @@ class BinaryDisunifier(Premise):
     def __init__(self, left: Term, right: Term):
         self.left = left
         self.right = right
+        super(BinaryDisunifier, self).__init__()
 
     def get_left(self) -> Term:
         return self.left
@@ -24,8 +25,8 @@ class BinaryDisunifier(Premise):
     pass
 
     def accept(self, visitor: PremiseVisitor, state):
-        return visitor.visit(self, state)
+        return visitor.visit_binary_disunifier(self, state)
 
     def __str__(self):
-        return self.left + "!= " + self.right
+        return str(self.left) + "!= " + str(self.right)
 

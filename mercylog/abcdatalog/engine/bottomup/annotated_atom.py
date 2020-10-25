@@ -69,8 +69,7 @@ class AnnotatedAtom(Premise):
 # 	}
 #
     def accept_premise_visitor(self, premise_visitor: PremiseVisitor[I, O], state: I) -> O:
-        premise_visitor.visit_annotated_atom(self, state)
-        pass
+        return premise_visitor.visit_annotated_atom(self, state)
 
     def __str__(self):
         return str(self.atom) + '<' + self.anno.value + '>'

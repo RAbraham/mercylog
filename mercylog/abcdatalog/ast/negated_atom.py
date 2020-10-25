@@ -49,7 +49,7 @@ class NegatedAtom(Premise):
 # 		return visitor.visit(this, state);
 # 	}
     def accept_premise_visitor(self, premise_visitor: PremiseVisitor[I, O], state: I) -> O:
-        premise_visitor.visit_negated_atom(self, state)
+        return premise_visitor.visit_negated_atom(self, state)
 
 #
 # 	public Term[] getArgs() {

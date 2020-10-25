@@ -13,6 +13,7 @@ class BinaryUnifier(Premise):
     def __init__(self, left: Term, right: Term):
         self.left = left
         self.right = right
+        super(BinaryUnifier, self).__init__()
 
     def getLeft(self) -> Term:
         return self.left
@@ -24,7 +25,7 @@ class BinaryUnifier(Premise):
         return [self.left, self.right]
 
     def accept(self, visitor: PremiseVisitor, state):
-        return visitor.visit(self, state)
+        return visitor.visit_binary_unifier(self, state)
 
     def __str__(self):
-        return self.left + " = " + self.right
+        return str(self.left) + " = " + str(self.right)

@@ -1,3 +1,4 @@
+import copy
 from typing import *
 from mercylog.abcdatalog.ast.binary_disunifier import BinaryDisunifier
 from mercylog.abcdatalog.ast.binary_unifier import BinaryUnifier
@@ -23,8 +24,88 @@ from mercylog.abcdatalog.util.box import Box
 from mercylog.abcdatalog.util.substitution.term_unifier import TermUnifier
 from mercylog.abcdatalog.util.substitution.union_find_based_unifier import UnionFindBasedUnifier
 from mercylog.abcdatalog.ast.validation.unstratified_program import UnStratifiedProgram
+from mercylog.abcdatalog.ast.validation.datalog_validation_exception import DatalogValidationException
 
-# 	private static final class Program implements UnstratifiedProgram {
+I = TypeVar("I")
+O = TypeVar("O")
+
+
+# 		PremiseVisitor<DatalogValidationException, DatalogValidationException> cv = new CrashPremiseVisitor<DatalogValidationException, DatalogValidationException>() {
+class LocalCrashPremiseVisitor(CrashPremiseVisitor):
+    def __init__(self, tv, subst, hasPositiveAtom, boundVars,  possiblyUnboundVars, allowBinaryUnification, allowBinaryDisunification, allowNegatedBodyAtom):
+        self.tv = tv
+        self.boundVars = boundVars
+        self.subst = subst
+        self.possiblyUnboundVars = possiblyUnboundVars
+        self.hasPositiveAtom = hasPositiveAtom
+        self.allowBinaryUnification = allowBinaryUnification
+        self.allowBinaryDisunification = allowBinaryDisunification
+        self.allowNegatedBodyAtom = allowNegatedBodyAtom
+
+        super(LocalCrashPremiseVisitor, self).__init__()
+
+#
+# 			@Override
+# 			public DatalogValidationException visit(PositiveAtom atom, DatalogValidationException e) {
+# 				TermHelpers.fold(atom.getArgs(), tv, boundVars);
+# 				hasPositiveAtom.value = true;
+# 				return e;
+# 			}
+
+    def visit_positive_atom(self, atom: PositiveAtom, state: I) -> O:
+        TermHelpers.fold(atom.getArgs(), self.tv, self.boundVars)
+        self.hasPositiveAtom.value = True
+        return state
+# 			@Override
+# 			public DatalogValidationException visit(BinaryUnifier u, DatalogValidationException e) {
+# 				if (!allowBinaryUnification) {
+# 					return new DatalogValidationException("Binary unification is not allowed: ");
+# 				}
+# 				TermHelpers.fold(u.getArgsIterable(), tv, possiblyUnboundVars);
+# 				TermHelpers.unify(u.getLeft(), u.getRight(), subst);
+# 				return e;
+# 			}
+#
+
+    def visit_binary_unifier(self, u: BinaryUnifier, state: I) -> O:
+        if not self.allowBinaryUnification:
+            return DatalogValidationException("Binary unification is not allowed")
+        TermHelpers.fold(u.getArgsIterable(), self.tv, self.possiblyUnboundVars)
+        TermHelpers.unify_term_unifier(u.getLeft(), u.getRight(), self.subst)
+        return state
+    # 			@Override
+# 			public DatalogValidationException visit(BinaryDisunifier u, DatalogValidationException e) {
+# 				if (!allowBinaryDisunification) {
+# 					return new DatalogValidationException("Binary disunification is not allowed: ");
+# 				}
+# 				TermHelpers.fold(u.getArgsIterable(), tv, possiblyUnboundVars);
+# 				return e;
+# 			}
+#
+
+    def visit_binary_disunifier(self, u: BinaryDisunifier, state: I) -> O:
+        if not self.allowBinaryDisunification:
+            return DatalogValidationException("Binary disunification is not allowed")
+        TermHelpers.fold(u.get_args_iterable(), self.tv, self.possiblyUnboundVars)
+        return state
+    # 			@Override
+# 			public DatalogValidationException visit(NegatedAtom atom, DatalogValidationException e) {
+# 				if (!allowNegatedBodyAtom) {
+# 					return new DatalogValidationException("Negated body atoms are not allowed: ");
+# 				}
+# 				TermHelpers.fold(atom.getArgs(), tv, possiblyUnboundVars);
+# 				return e;
+# 			}
+#
+
+    def visit_negated_atom(self, atom: NegatedAtom, state: I) -> O:
+        if not self.allowNegatedBodyAtom:
+            return DatalogValidationException("Negated body atoms are not allowed:")
+        TermHelpers.fold(atom.getArgs(), self.tv, self.possiblyUnboundVars)
+        return state
+    # 		};
+#
+    pass
 
 # 	public static final class ValidClause extends Clause {
 #
@@ -266,7 +347,7 @@ class DatalogValidator:
 #
 # 		Box<Boolean> hasPositiveAtom = new Box<>(false);
         hasPositiveAtom: Box[bool] = Box(False)
-        aaa
+
 # 		PremiseVisitor<DatalogValidationException, DatalogValidationException> cv = new CrashPremiseVisitor<DatalogValidationException, DatalogValidationException>() {
 #
 # 			@Override
@@ -306,6 +387,8 @@ class DatalogValidator:
 #
 # 		};
 #
+        cv:PremiseVisitor = LocalCrashPremiseVisitor(tv, subst, hasPositiveAtom, boundVars, possiblyUnboundVars, self.allowBinaryUnification, self.allowBinaryDisunification, self.allowNegatedBodyAtom)
+
 # 		for (Premise c : clause.getBody()) {
 # 			DatalogValidationException e = c.accept(cv, null);
 # 			if (e != null) {
@@ -313,6 +396,11 @@ class DatalogValidator:
 # 			}
 # 		}
 #
+        c: Premise
+        for c in clause.getBody():
+            e: DatalogValidationException = c.accept_premise_visitor(cv, None)
+            if e:
+                raise e
 # 		for (Variable x : possiblyUnboundVars) {
 # 			if (!boundVars.contains(x) && !(subst.get(x) instanceof Constant)) {
 # 				throw new DatalogValidationException("Every variable in a rule must be bound, but " + x
@@ -321,43 +409,29 @@ class DatalogValidator:
 # 			}
 # 		}
 #
+        x: Variable
+        for x in possiblyUnboundVars:
+            if x not in boundVars and not isinstance(subst.get(x), Constant):
+                raise DatalogValidationException(f"Every variable in a rule must be bound, but {x} is not bound in "
+                                                 f"the rule {clause}. A variable X is bound if 1) it appears in a "
+                                                 f"positive(non-negated) body atom or 2) it is explicitly unified "
+                                                 f"with a constant(e.g. X=a) or with a variable that is bound "
+                                                 f"(e.g. X=Y where Y is bound). ")
 # 		List<Premise> newBody = new ArrayList<>(clause.getBody());
 # 		if (!hasPositiveAtom.value && !newBody.isEmpty()) {
 # 			newBody.add(0, True.getTrueAtom());
 # 		}
+        newBody: List[Premise] = copy.deepcopy(clause.getBody())
+        if not hasPositiveAtom.value and newBody:
+            newBody.insert(0, TrueAtom.getTrueAtom())
 #
 # 		return new ValidClause(clause.getHead(), newBody);
+        return ValidClause(clause.getHead(), newBody)
 # 	}
 #
 
-# 	private final static class True {
-#
-# 		private True() {
-# 			// Cannot be instantiated.
-# 		}
-#
-# 		private static class TruePred extends PredicateSym {
-#
-# 			protected TruePred() {
-# 				super("true", 0);
-# 			}
-#
-# 		};
-#
-# 		private final static PositiveAtom trueAtom = PositiveAtom.create(new TruePred(), new Term[] {});
-#
-# 		public static PositiveAtom getTrueAtom() {
-# 			return trueAtom;
-# 		}
-# 	}
-#
-# 	public static final class ValidClause extends Clause {
-#
-# 		private ValidClause(Head head, List<Premise> body) {
-# 			super(head, body);
-# 		}
-#
-# 	}
+
+
 #
 # }
 
