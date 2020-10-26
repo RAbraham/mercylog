@@ -1,11 +1,17 @@
-aaa
 # import abcdatalog.ast.Clause;
+from mercylog.abcdatalog.ast.clause import Clause
 # import abcdatalog.ast.PositiveAtom;
+from mercylog.abcdatalog.ast.positive_atom import PositiveAtom
 # import abcdatalog.ast.PredicateSym;
+from mercylog.abcdatalog.ast.predicate_sym import PredicateSym
 # import abcdatalog.ast.Premise;
+from mercylog.abcdatalog.ast.premise import Premise
 # import abcdatalog.ast.validation.DatalogValidationException;
+from mercylog.abcdatalog.ast.validation.datalog_validation_exception import DatalogValidationException
 # import abcdatalog.ast.validation.DatalogValidator;
+from mercylog.abcdatalog.ast.validation.datalog_validator import  DatalogValidator
 # import abcdatalog.ast.validation.StratifiedNegationValidator;
+from mercylog.abcdatalog.ast.validation.stratified_negation_validator import aaa
 # import abcdatalog.ast.validation.StratifiedProgram;
 # import abcdatalog.ast.validation.DatalogValidator.ValidClause;
 # import abcdatalog.ast.validation.UnstratifiedProgram;
