@@ -23,7 +23,7 @@ from mercylog.abcdatalog.ast.visitors.term_visitor_builder import TermVisitorBui
 from mercylog.abcdatalog.util.box import Box
 from mercylog.abcdatalog.util.substitution.term_unifier import TermUnifier
 from mercylog.abcdatalog.util.substitution.union_find_based_unifier import UnionFindBasedUnifier
-from mercylog.abcdatalog.ast.validation.unstratified_program import UnStratifiedProgram
+from mercylog.abcdatalog.ast.validation.unstratified_program import UnstratifiedProgram
 from mercylog.abcdatalog.ast.validation.datalog_validation_exception import DatalogValidationException
 
 I = TypeVar("I")
@@ -120,7 +120,7 @@ class ValidClause(Clause):
     def __init__(self, head: Head, body: List[Premise]):
         super().__init__(head, body)
 
-class Program(UnStratifiedProgram):
+class Program(UnstratifiedProgram):
     def __init__(self, rules: Set[ValidClause], initialFacts: Set[PositiveAtom], edbPredicateSymbols: Set[PredicateSym], idbPredicateSymbols: Set[PredicateSym]):
         self.rules = rules
         self.initialFacts = initialFacts
@@ -238,7 +238,7 @@ class DatalogValidator:
 #         return self.validate(program, False)
 # #
 # 	public UnstratifiedProgram validate(Set<Clause> program, boolean treatIdbFactsAsClauses) throws DatalogValidationException {
-    def validate(self, program: Set[Clause], treatIdbFactsAsClauses: bool = False) -> UnStratifiedProgram:
+    def validate(self, program: Set[Clause], treatIdbFactsAsClauses: bool = False) -> UnstratifiedProgram:
 # 		Set<ValidClause> rewrittenClauses = new HashSet<>();
         rewrittenClauses: Set[ValidClause] = set()
 # 		for (Clause clause : program) {

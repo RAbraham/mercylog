@@ -14,12 +14,12 @@ from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
 
 # import abcdatalog.util.graph.Digraph;
 # import abcdatalog.util.graph.DirectedEdge;
+from mercylog.abcdatalog.util.graph.digraph import Digraph
+from mercylog.abcdatalog.util.graph.directed_edge import DirectedEdge
+from mercylog.abcdatalog.ast.validation.unstratified_program import UnstratifiedProgram
 
-#
-# class StratifiedNegationGraph {
-class StratifiedNegationGraph:
-    aaa
 # 	private static class AnnotatedEdge implements DirectedEdge<PredicateSym> {
+class AnnotatedEdge(DirectedEdge[PredicateSym]):
 # 		private final PredicateSym source;
 # 		private final PredicateSym dest;
 # 		private final boolean isNegated;
@@ -29,27 +29,54 @@ class StratifiedNegationGraph:
 # 			this.dest = dest;
 # 			this.isNegated = isNegated;
 # 		}
+    def __init__(self, source: PredicateSym, dest: PredicateSym, isNegated: bool):
+        self.source = source
+        self.dest = dest
+        self._isNegated = isNegated
+        super(AnnotatedEdge, self).__init__()
 #
 # 		@Override
 # 		public PredicateSym getSource() {
 # 			return this.source;
 # 		}
+    def getSource(self) -> PredicateSym:
+        return self.source
 #
 # 		@Override
 # 		public PredicateSym getDest() {
 # 			return this.dest;
 # 		}
+    def getDest(self) -> PredicateSym:
+        return self.dest
 #
 # 		public boolean isNegated() {
 # 			return this.isNegated;
 # 		}
 #
+    def isNegated(self) -> bool:
+        return self._isNegated
 # 		public AnnotatedEdge reverse() {
 # 			return new AnnotatedEdge(this.dest, this.source, this.isNegated);
 # 		}
+    def reverse(self) -> "AnnotatedEdge":
+        return AnnotatedEdge(self.dest, self.source, self._isNegated)
+
 # 	}
 #
+#
+    pass
+# class StratifiedNegationGraph {
+class StratifiedNegationGraph:
 # 	public static StratifiedNegationGraph create(UnstratifiedProgram program) throws DatalogValidationException {
+    @staticmethod
+    def create(program: UnstratifiedProgram)-> "StratifiedNegationGraph":
+        # 		Digraph<PredicateSym, AnnotatedEdge> graph = new Digraph<>();
+        aaa
+        graph: DiGraph[PredicateSym, AnnotatedEdge] = Digraph()
+        # 		HeadVisitor<Void, PredicateSym> getHeadPred = (new HeadVisitorBuilder<Void, PredicateSym>())
+        # 				.onPositiveAtom((atom, nothing) -> atom.getPred()).orCrash();
+        # 		PremiseVisitor<PredicateSym, Void> addEdge = new DefaultConjunctVisitor<PredicateSym, Void>() {
+        pass
 # 		// Build dependency graph...
 # 		Digraph<PredicateSym, AnnotatedEdge> graph = new Digraph<>();
 # 		HeadVisitor<Void, PredicateSym> getHeadPred = (new HeadVisitorBuilder<Void, PredicateSym>())

@@ -5,7 +5,7 @@ from mercylog.abcdatalog.ast.positive_atom import PositiveAtom
 from mercylog.abcdatalog.ast.predicate_sym import PredicateSym
 # import abcdatalog.ast.validation.DatalogValidator.ValidClause;
 from mercylog.abcdatalog.ast.validation.datalog_validator import ValidClause
-from mercylog.abcdatalog.ast.validation.datalog_validator import UnStratifiedProgram
+from mercylog.abcdatalog.ast.validation.datalog_validator import UnstratifiedProgram
 from mercylog.abcdatalog.ast.validation.stratified_negation_graph import StratifiedNegationGraph
 
 
@@ -16,7 +16,7 @@ class StratifiedProgram:
 # 			public Set<ValidClause> getRules() {
 # 				return prog.getRules();
 # 			}
-    def __init__(self, prog: UnStratifiedProgram, g: StratifiedNegationGraph ):
+    def __init__(self, prog: UnstratifiedProgram, g: StratifiedNegationGraph):
         self.prog = prog
         self.g = g
 

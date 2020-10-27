@@ -14,7 +14,7 @@ from mercylog.abcdatalog.ast.validation.datalog_validator import ValidClause
 #  *
 #  */
 
-class UnStratifiedProgram(ABC):
+class UnstratifiedProgram(ABC):
 
     def __init__(self):
         super().__init__()
