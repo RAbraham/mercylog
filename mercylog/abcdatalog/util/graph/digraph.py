@@ -1,17 +1,34 @@
-# import abcdatalog.util.Box;
+from mercylog.abcdatalog.util.box import Box
 
-#
+from typing import *
+
+V = TypeVar("V")
+E = TypeVar("E")
+
+
 # public class Digraph<V, E extends DirectedEdge<V>> {
-# 	private Map<V, List<E>> graph = new HashMap<>();
+class Digraph(Generic[V, E]):
+    def __init__(self):
+        # 	private Map<V, List<E>> graph = new HashMap<>();
+        self.graph: Dict[V, List[E]] = dict()
+    pass
 #
 # 	public void addEdge(E edge) {
-# 		List<E> neighbors = this.graph.get(edge.getSource());
-# 		if (neighbors == null) {
-# 			neighbors = new LinkedList<>();
-# 			this.graph.put(edge.getSource(), neighbors);
-# 		}
-# 		neighbors.add(edge);
-# 	}
+    def addEdge(self, edge: E) -> None:
+        # 		List<E> neighbors = this.graph.get(edge.getSource());
+        # 		if (neighbors == null) {
+        # 			neighbors = new LinkedList<>();
+        # 			this.graph.put(edge.getSource(), neighbors);
+        # 		}
+        # 		neighbors.add(edge);
+        # 	}
+        neighbors: List[E] = self.graph.get(edge.getSource())
+        if not neighbors:
+            neighbors = []
+            self.graph[edge.getSource()] = neighbors
+
+        neighbors.append(edge)
+
 #
 # 	public void addVertex(V vertex) {
 # 		List<E> neighbors = this.graph.get(vertex);
@@ -20,6 +37,11 @@
 # 			this.graph.put(vertex, neighbors);
 # 		}
 # 	}
+    def addVertex(self, vertex: V) -> None:
+        neighbors: List[E] = self.graph.get(vertex)
+        if not neighbors:
+            neighbors = []
+            self.graph[vertex] = neighbors
 #
 # 	public Iterable<E> getOutgoingEdges(V source) {
 # 		List<E> outgoing = this.graph.get(source);
@@ -29,6 +51,13 @@
 # 		return outgoing;
 # 	}
 #
+    def getOutgoingEdges(self, source: V) -> Iterable[E]:
+        outgoing: List[E] = self.graph.get(source)
+        if not outgoing:
+            return []
+        else:
+            return outgoing
+
 # 	public Set<V> getVertices() {
 # 		return this.graph.keySet();
 # 	}
