@@ -61,6 +61,8 @@ class Digraph(Generic[V, E]):
 # 	public Set<V> getVertices() {
 # 		return this.graph.keySet();
 # 	}
+    def getVertices(self) -> Set[V]:
+        return set(self.graph.keys())
 #
 # 	public Digraph<V, E> getTranspose(Function<E, E> reverseEdge) {
 # 		Digraph<V, E> t = new Digraph<>();
@@ -72,6 +74,15 @@ class Digraph(Generic[V, E]):
 # 		}
 # 		return t;
 # 	}
+    def getTranspose(self, reverseEdge: Callable[[E], E] ) -> "Digraph":
+        t: Digraph[V, E] = Digraph()
+        for k, v in self.graph.items():
+            t.addVertex(k)
+            edge: E
+            for edge in v:
+                t.addEdge(reverseEdge(edge))
+        return t
+
 #
 # 	public List<Set<V>> getStronglyConnectedComponents(Function<E, E> reverseEdge) {
 # 		Box<Integer> time = new Box<>();
@@ -96,6 +107,14 @@ class Digraph(Generic[V, E]):
 # 				dfs.value.accept(vertex);
 # 			}
 # 		}
+    def getStronglyConnectedComponents(self, reverseEdge: Callable[[E], E]) -> List[Set[V]]:
+        time: Box[int] = Box()
+        visited: Set[V] = set()
+        finishingTimes = dict()
+        dfs: Box[Callable[[Any]]] = Box()
+        aaa
+
+        pass
 #
 # 		Digraph<V, E> transpose = this.getTranspose(reverseEdge);
 # 		Box<BiConsumer<V, Set<V>>> dfs2 = new Box<>();
