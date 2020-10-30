@@ -5,6 +5,15 @@ from typing import *
 V = TypeVar("V")
 E = TypeVar("E")
 
+def dfs_func(v, time: Box, visited: Set, outGoingEdges: Callable, vertices, finishingTimes: Dict[Any, int]):
+    time.value = time.value + 1
+    visited.add(v)
+    for edge in outGoingEdges(v):
+        dest = edge.getDest()
+        if dest not in visited:
+            dfs_func(dest,  time, visited, outGoingEdges, vertices, finishingTimes)
+    time.value = time.value + 1
+    finishingTimes[v] = time.value
 
 # public class Digraph<V, E extends DirectedEdge<V>> {
 class Digraph(Generic[V, E]):
@@ -107,14 +116,7 @@ class Digraph(Generic[V, E]):
 # 				dfs.value.accept(vertex);
 # 			}
 # 		}
-    def getStronglyConnectedComponents(self, reverseEdge: Callable[[E], E]) -> List[Set[V]]:
-        time: Box[int] = Box()
-        visited: Set[V] = set()
-        finishingTimes = dict()
-        dfs: Box[Callable[[Any]]] = Box()
-        aaa
 
-        pass
 #
 # 		Digraph<V, E> transpose = this.getTranspose(reverseEdge);
 # 		Box<BiConsumer<V, Set<V>>> dfs2 = new Box<>();
@@ -146,6 +148,23 @@ class Digraph(Generic[V, E]):
 # 		return components;
 # 	}
 #
+    def getStronglyConnectedComponents(self, reverseEdge: Callable[[E], E]) -> List[Set[V]]:
+        time: Box[int] = Box()
+        visited: Set[V] = set()
+        finishingTimes = dict()
+        dfs: Box[Callable[[Any]]] = Box()
+        dfs.value = dfs_func
+        time.value = 0
+        vertices = self.getVertices()
+        for vertex in vertices:
+            if vertex not in visited:
+                dfs_func(vertex, time, visited, self.getOutgoingEdges, vertices, finishingTimes)
+
+        transpose: Digraph[V, E] = self.getTranspose(reverseEdge)
+        aaa
+
+
+        pass
 # 	public static void main(String[] args) {
 # 		class CharEdge implements DirectedEdge<Character> {
 # 			private final char source;
