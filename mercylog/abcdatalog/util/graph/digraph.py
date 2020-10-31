@@ -1,4 +1,5 @@
 from mercylog.abcdatalog.util.box import Box
+from mercylog.abcdatalog.util.graph.directed_edge import DirectedEdge
 
 from typing import *
 
@@ -14,6 +15,15 @@ def dfs_func(v, time: Box, visited: Set, outGoingEdges: Callable, vertices, fini
             dfs_func(dest,  time, visited, outGoingEdges, vertices, finishingTimes)
     time.value = time.value + 1
     finishingTimes[v] = time.value
+
+def dfs2_func(v, curComponent, visited: Set, transpose: "Digraph"):
+    visited.add(v)
+    curComponent.add(v)
+    edge: E
+    for edge in transpose.getOutgoingEdges(v):
+        dest: V = edge.getDest()
+        if dest not in visited:
+            dfs2_func(dest, curComponent, visited, transpose)
 
 # public class Digraph<V, E extends DirectedEdge<V>> {
 class Digraph(Generic[V, E]):
@@ -161,63 +171,79 @@ class Digraph(Generic[V, E]):
                 dfs_func(vertex, time, visited, self.getOutgoingEdges, vertices, finishingTimes)
 
         transpose: Digraph[V, E] = self.getTranspose(reverseEdge)
-        aaa
+        dfs2: Box[Callable[[V, Set[V]]]] = Box()
+        dfs2.value = dfs2_func
+
+        orderedVertices: List[V] = []
+        items = finishingTimes.items()
+        sorted_items = sorted(items, key=lambda i: i[1], reverse=True)
+        for e in sorted_items:
+            orderedVertices.append(e[0])
+
+        components: List[Set[V]] = []
+        visited.clear()
+        vertex: V
+        for vertex in orderedVertices:
+            if vertex not in visited:
+                curComponent: Set[V] = set()
+                dfs2_func(vertex, curComponent, visited, transpose)
+                components.append(curComponent)
+            pass
 
 
+        return components
+
+if __name__ == '__main__':
+    class CharEdge(DirectedEdge[str]):
+        def __init__(self, source: str, dest: str):
+            self.source = source
+            self.dest = dest
+            super(CharEdge, self).__init__()
+
+        def getSource(self):
+            return self.source
+
+        def getDest(self):
+            return self.dest
+
+        def reverse(self) -> "CharEdge":
+            return CharEdge(self.dest, self.source)
         pass
-# 	public static void main(String[] args) {
-# 		class CharEdge implements DirectedEdge<Character> {
-# 			private final char source;
-# 			private final char dest;
-#
-# 			public CharEdge(char source, char dest) {
-# 				this.source = source;
-# 				this.dest = dest;
-# 			}
-#
-# 			@Override
-# 			public Character getSource() {
-# 				return this.source;
-# 			}
-#
-# 			@Override
-# 			public Character getDest() {
-# 				return this.dest;
-# 			}
-#
-# 			public CharEdge reverse() {
-# 				return new CharEdge(this.dest, this.source);
-# 			}
-#
-# 		}
-#
 # 		Digraph<Character, CharEdge> graph = new Digraph<>();
-# 		graph.addEdge(new CharEdge('a', 'b'));
-# 		graph.addEdge(new CharEdge('b', 'c'));
-# 		graph.addEdge(new CharEdge('b', 'e'));
-# 		graph.addEdge(new CharEdge('b', 'f'));
-# 		graph.addEdge(new CharEdge('c', 'd'));
-# 		graph.addEdge(new CharEdge('c', 'g'));
-# 		graph.addEdge(new CharEdge('d', 'c'));
-# 		graph.addEdge(new CharEdge('d', 'h'));
-# 		graph.addEdge(new CharEdge('e', 'a'));
-# 		graph.addEdge(new CharEdge('e', 'f'));
-# 		graph.addEdge(new CharEdge('f', 'g'));
-# 		graph.addEdge(new CharEdge('g', 'f'));
-# 		graph.addEdge(new CharEdge('g', 'h'));
-# 		graph.addEdge(new CharEdge('h', 'h'));
-#
+    graph: Digraph[str, CharEdge] = Digraph()
+
+    graph.addEdge(CharEdge('a', 'b'))
+    graph.addEdge(CharEdge('b', 'c'))
+    graph.addEdge(CharEdge('b', 'e'))
+    graph.addEdge(CharEdge('b', 'f'))
+    graph.addEdge(CharEdge('c', 'd'))
+    graph.addEdge(CharEdge('c', 'g'))
+    graph.addEdge(CharEdge('d', 'c'))
+    graph.addEdge(CharEdge('d', 'h'))
+    graph.addEdge(CharEdge('e', 'a'))
+    graph.addEdge(CharEdge('e', 'f'))
+    graph.addEdge(CharEdge('f', 'g'))
+    graph.addEdge(CharEdge('g', 'f'))
+    graph.addEdge(CharEdge('g', 'h'))
+    graph.addEdge(CharEdge('h', 'h'))
+
 # 		// Components (in topological order) should be:
 # 		// [a, b, e]
 # 		// [c, d]
 # 		// [f, g]
 # 		// [h]
 # 		List<Set<Character>> components = graph.getStronglyConnectedComponents(e -> e.reverse());
+    components: List[Set[str]] = graph.getStronglyConnectedComponents(lambda e: e.reverse())
 # 		for (Set<Character> component : components) {
 # 			System.out.println(component);
 # 		}
+    component: Set[str]
+    for component in components:
+        print(component)
 # 	}
 # }
+
+    pass
 # /*******************************************************************************
 #  * This file is part of the AbcDatalog project.
 #  *
