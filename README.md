@@ -2,7 +2,7 @@ NOTE: EXPERIMENTAL. PROTOTYPE FOR DESIGN PURPOSES. Do not use !!
 
 # Vision
 
-Merycylog will be a Datalog based library which allows developers to build
+Mercylog will be a Datalog based library which investigates the benefits of Datalog to build:
 - Applications: 
   - Datalog's expressiveness can allow us to reduce the code required to build applications([Overlog](https://dl.acm.org/citation.cfm?id=1755913.1755937), [Yedalog](https://storage.googleapis.com/pub-tools-public-publication-data/pdf/43462.pdf)) 
   - Query data sources with higher expressivity of Datalog([Datomic](https://docs.datomic.com/on-prem/tutorial.html), [DataScript](https://github.com/tonsky/datascript)).
