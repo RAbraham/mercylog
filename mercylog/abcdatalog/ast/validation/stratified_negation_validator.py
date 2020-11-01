@@ -52,7 +52,6 @@ class StratifiedProgram:
     def getStrata(self) -> List[Set[PredicateSym]]:
         return self.g.getStrata()
 
-aaa
 #
 # 			@Override
 # 			public Map<PredicateSym, Integer> getPredToStratumMap() {
@@ -61,7 +60,8 @@ aaa
 #
 # 		};
 
-    pass
+    def getPredToStratumMap(self) -> Dict[PredicateSym, int]:
+        return self.g.getPredToStratumMap()
 #
 # /**
 #  * A class for validating that an unstratified program can be successfully
@@ -70,11 +70,7 @@ aaa
 #  */
 # public final class StratifiedNegationValidator {
 class StratifiedNegationValidator:
-#
-# 	private StratifiedNegationValidator() {
-# 		// Cannot be instantiated.
-# 	}
-#
+    aaa
 # 	/**
 # 	 * Validates that the given unstratified program can be stratified for
 # 	 * negation and returns a witness stratified program.

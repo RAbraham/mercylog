@@ -1,3 +1,4 @@
+from typing import *
 from mercylog.abcdatalog.ast.clause import Clause
 from mercylog.abcdatalog.ast.negated_atom import NegatedAtom
 from mercylog.abcdatalog.ast.positive_atom import PositiveAtom
@@ -17,7 +18,7 @@ from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
 from mercylog.abcdatalog.util.graph.digraph import Digraph
 from mercylog.abcdatalog.util.graph.directed_edge import DirectedEdge
 from mercylog.abcdatalog.ast.validation.unstratified_program import UnstratifiedProgram
-
+from mercylog.abcdatalog.ast.validation.datalog_validation_exception import DatalogValidationException
 # 	private static class AnnotatedEdge implements DirectedEdge<PredicateSym> {
 class AnnotatedEdge(DirectedEdge[PredicateSym]):
 # 		private final PredicateSym source;
@@ -65,22 +66,6 @@ class AnnotatedEdge(DirectedEdge[PredicateSym]):
 #
 #
     pass
-# class StratifiedNegationGraph {
-class StratifiedNegationGraph:
-# 	public static StratifiedNegationGraph create(UnstratifiedProgram program) throws DatalogValidationException {
-    @staticmethod
-    def create(program: UnstratifiedProgram)-> "StratifiedNegationGraph":
-        # 		Digraph<PredicateSym, AnnotatedEdge> graph = new Digraph<>();
-        aaa
-        graph: DiGraph[PredicateSym, AnnotatedEdge] = Digraph()
-        # 		HeadVisitor<Void, PredicateSym> getHeadPred = (new HeadVisitorBuilder<Void, PredicateSym>())
-        # 				.onPositiveAtom((atom, nothing) -> atom.getPred()).orCrash();
-        # 		PremiseVisitor<PredicateSym, Void> addEdge = new DefaultConjunctVisitor<PredicateSym, Void>() {
-        pass
-# 		// Build dependency graph...
-# 		Digraph<PredicateSym, AnnotatedEdge> graph = new Digraph<>();
-# 		HeadVisitor<Void, PredicateSym> getHeadPred = (new HeadVisitorBuilder<Void, PredicateSym>())
-# 				.onPositiveAtom((atom, nothing) -> atom.getPred()).orCrash();
 # 		PremiseVisitor<PredicateSym, Void> addEdge = new DefaultConjunctVisitor<PredicateSym, Void>() {
 # 			@Override
 # 			public Void visit(PositiveAtom atom, PredicateSym headPred) {
@@ -98,22 +83,56 @@ class StratifiedNegationGraph:
 # 				return null;
 # 			}
 # 		};
-# 		for (ValidClause cl : program.getRules()) {
-# 			PredicateSym pred = cl.getHead().accept(getHeadPred, null);
-# 			graph.addVertex(pred);
-# 			for (Premise c : cl.getBody()) {
-# 				c.accept(addEdge, pred);
-# 			}
-# 		}
-#
+class LocalDefaultConjunctVisitor(DefaultConjunctVisitor):
+    def __init__(self, program, graph):
+        self.program = program
+        self.graph = graph
+
+    def visit_positive_atom(self, atom: PositiveAtom, headPred: PredicateSym):
+        if atom.getPred() not in self.program.getEdbPredicateSyms():
+                self.graph.addEdge(AnnotatedEdge(atom.getPred(), headPred, False))
+        pass
+
+    def visit_negated_atom(self, atom: NegatedAtom, headPred: PredicateSym):
+        # TODO: duplicate if condition
+
+        if atom.getPred() not in self.program.getEdbPredicateSyms():
+            self.graph.addEdge(AnnotatedEdge(atom.getPred(), headPred, True))
+
+    pass
+# class StratifiedNegationGraph {
+
+class StratifiedNegationGraph:
+# 	public static StratifiedNegationGraph create(UnstratifiedProgram program) throws DatalogValidationException {
+    @staticmethod
+    def create(program: UnstratifiedProgram)-> "StratifiedNegationGraph":
+        graph: Digraph[PredicateSym, AnnotatedEdge] = Digraph()
+        getHeadPred: HeadVisitor = HeadVisitorBuilder().onPositiveAtom(lambda atom, nothing: atom.getPred()).orCrash()
+        addEdge: PremiseVisitor = LocalDefaultConjunctVisitor(program, graph)
+
+        cl: ValidClause
+        for cl in program.getRules():
+            pred: PredicateSym = cl.getHead().accept_head_visitor(getHeadPred, None)
+            graph.addVertex(pred)
+            c: Premise
+            for c in cl.getBody():
+                c.accept_premise_visitor(addEdge, pred)
+
 # 		List<Set<PredicateSym>> strata = graph.getStronglyConnectedComponents(e -> e.reverse());
+        strata: List[Set[PredicateSym]] = graph.getStronglyConnectedComponents(lambda e: e.reverse())
 # 		Map<PredicateSym, Integer> predToStratumMap = new HashMap<>();
+        predToStratumMap: Dict[PredicateSym, int] = dict()
 # 		Iterator<Set<PredicateSym>> iter = strata.iterator();
 # 		for (int i = 0; iter.hasNext(); ++i) {
 # 			for (PredicateSym pred : iter.next()) {
 # 				predToStratumMap.put(pred, i);
 # 			}
 # 		}
+        for i, preds in enumerate(strata):
+            pred: PredicateSym
+            for pred in preds:
+                predToStratumMap[pred] = i
+            pass
 #
 # 		iter = strata.iterator();
 # 		for (int i = 0; iter.hasNext(); ++i) {
@@ -126,9 +145,18 @@ class StratifiedNegationGraph:
 # 			}
 # 		}
 #
+        for i, preds in enumerate(strata):
+            pred: PredicateSym
+            for pred in preds:
+                edge: AnnotatedEdge
+                for edge in graph.getOutgoingEdges(pred):
+                    if edge.isNegated() and predToStratumMap.get(edge.getDest()) == i:
+                        raise DatalogValidationException("Program cannot be stratified")
 # 		return new StratifiedNegationGraph(strata, predToStratumMap);
+        return StratifiedNegationGraph(strata, predToStratumMap)
 # 	}
 #
+
 # 	private final List<Set<PredicateSym>> strata;
 # 	private final Map<PredicateSym, Integer> predToStratumMap;
 #
@@ -137,13 +165,22 @@ class StratifiedNegationGraph:
 # 		this.predToStratumMap = predToStratumMap;
 # 	}
 #
+    def __init__(self, strata: List[Set[PredicateSym]], predToStratumMap: Dict[PredicateSym, int]):
+        self.strata = strata
+        self.predToStratumMap = predToStratumMap
+
 # 	public List<Set<PredicateSym>> getStrata() {
 # 		return strata;
 # 	}
 #
+    def getStrata(self) -> List[Set[PredicateSym]]:
+        return self.strata
 # 	public Map<PredicateSym, Integer> getPredToStratumMap() {
 # 		return predToStratumMap;
 # 	}
+    def getPredToStratumMap(self) -> Dict[PredicateSym, int]:
+        return self.predToStratumMap
+aaa
 #
 # 	public static void main(String[] args) throws DatalogParseException {
 # 		Consumer<String> test = program -> {
