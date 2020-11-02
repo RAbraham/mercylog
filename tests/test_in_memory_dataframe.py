@@ -1,11 +1,10 @@
 import pytest
 from mercylog.data_sources.in_memory import (
-    Variable,
     run,
     query_variable_match,
     query_variables,
 )
-from mercylog.types import relation
+from mercylog.types import relation, Variable
 import pandas as pd
 
 X = Variable("X")

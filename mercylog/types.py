@@ -103,7 +103,9 @@ class Variable(Term):
         return self.name
 
 
-v = Variable
+# v = Variable
+
+_ = Variable("_")
 # def __init__(self, name, *variables):
 #     self.name = name
 #     self._variables = variables
@@ -173,6 +175,24 @@ class Relation:
     def variables(self) -> Sequence[Variable]:
         return [v for v in self.terms if isinstance(v, Variable)]
 
+    def __invert__(self):
+        return InvertedRelationInstance(self)
+        pass
+
+
+class InvertedRelationInstance(object):
+    def __init__(self, relation_instance):
+        self.relation_instance = relation_instance
+        pass
+
+    def get_clause(self):
+        return "not " + self.relation_instance.get_clause()
+
+    def relation(self):
+        return self.get_clause()
+
+    def variables(self):
+        return self.relation_instance.variables()
 
 @dataclass(frozen=True)
 class RelationCreator:

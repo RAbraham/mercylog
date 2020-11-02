@@ -180,7 +180,30 @@ class StratifiedNegationGraph:
 # 	}
     def getPredToStratumMap(self) -> Dict[PredicateSym, int]:
         return self.predToStratumMap
-aaa
+# 	@Override
+# 	public String toString() {
+# 		StringBuilder sb = new StringBuilder();
+# 		for (int i = 0; i < this.strata.size(); ++i) {
+# 			sb.append("[ " + i + ": ");
+# 			for (PredicateSym pred : this.strata.get(i)) {
+# 				sb.append(pred + " ");
+# 			}
+# 			sb.append("] ");
+# 		}
+# 		return sb.toString();
+# 	}
+    def __str__(self):
+        result = ""
+        for i, s in enumerate(self.strata):
+            indexed_str = f'[{i}:'
+            preds = ' '.join([str(_s) for _s in self.strata[i]])
+            end_str = "] "
+            result = result + indexed_str + preds + end_str
+        return result
+
+
+
+        pass
 #
 # 	public static void main(String[] args) throws DatalogParseException {
 # 		Consumer<String> test = program -> {
@@ -219,18 +242,7 @@ aaa
 # 		test.accept("p :- not q.");
 # 	}
 #
-# 	@Override
-# 	public String toString() {
-# 		StringBuilder sb = new StringBuilder();
-# 		for (int i = 0; i < this.strata.size(); ++i) {
-# 			sb.append("[ " + i + ": ");
-# 			for (PredicateSym pred : this.strata.get(i)) {
-# 				sb.append(pred + " ");
-# 			}
-# 			sb.append("] ");
-# 		}
-# 		return sb.toString();
-# 	}
+
 # }
     pass
 # /*******************************************************************************
