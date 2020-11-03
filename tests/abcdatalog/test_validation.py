@@ -4,7 +4,6 @@ from mercylog.types import relation, Variable, _
 
 from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import convert
 
-
 def test_reachable():
     # 		String program = "reachable(X,Y) :- edge(X,Y).
     # 	            	" + "reachable(X,Y) :- edge(X,Z), reachable(Z,Y)."
@@ -27,8 +26,12 @@ def test_reachable():
         node(X) <= edge(_, X)
 
     ]
-    # aaa. Check DatalogParser to parse mercylog program to abcdatalog program in convert below
     abc_program = convert(program)
+    aaa
+    # 				UnstratifiedProgram v = (new DatalogValidator()).withAtomNegationInRuleBody().validate(ast);
+    #
+    # 				StratifiedNegationGraph g = StratifiedNegationGraph.create(v);
+    # 				System.out.print("Stratification:\n\t" + g);
 
     pass
 
