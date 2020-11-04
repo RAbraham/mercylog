@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import *
-from mercylog.abcdatalog.ast.visitors.term_visitor import TermVisitor
-from mercylog.abcdatalog.util.substitution.substitution import Substitution
+# from mercylog.abcdatalog.ast.visitors.term_visitor import TermVisitor
+# from mercylog.abcdatalog.util.substitution.substitution import Substitution
 #
 # /**
 #  * A Datalog term (i.e., a constant or variable).
@@ -18,11 +18,11 @@ class Term(ABC):
         super().__init__()
 
     @abstractmethod
-    def accept_term_visitor(self, visitor: TermVisitor[I, O], state: I):
+    def accept_term_visitor(self, visitor , state: I):
         pass
 
     @abstractmethod
-    def applySubst(self, subst: Substitution) -> "Term":
+    def applySubst(self, subst ) -> "Term":
         pass
 
 

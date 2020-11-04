@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 from mercylog.abcdatalog.ast.binary_unifier import BinaryUnifier
 from mercylog.abcdatalog.ast.negated_atom import NegatedAtom
-from mercylog.abcdatalog.ast.postive_atom import PositiveAtom
+from mercylog.abcdatalog.ast.positive_atom import PositiveAtom
 
 # import abcdatalog.engine.bottomup.AnnotatedAtom;
 from mercylog.abcdatalog.engine.bottomup.annotated_atom import AnnotatedAtom

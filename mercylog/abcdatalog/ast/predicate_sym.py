@@ -90,6 +90,8 @@ class PredicateSym:
     def __str__(self) -> str:
         return self.sym
 
+    def __repr__(self):
+        return self.sym
 
 # /*******************************************************************************
 #  * This file is part of the AbcDatalog project.

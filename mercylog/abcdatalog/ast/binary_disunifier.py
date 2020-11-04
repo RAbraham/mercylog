@@ -1,4 +1,4 @@
-from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
+# from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
 from mercylog.abcdatalog.ast.premise import Premise
 from mercylog.abcdatalog.ast.term import Term
 from typing import *
@@ -24,7 +24,7 @@ class BinaryDisunifier(Premise):
         return [self.left, self.right]
     pass
 
-    def accept(self, visitor: PremiseVisitor, state):
+    def accept(self, visitor, state):
         return visitor.visit_binary_disunifier(self, state)
 
     def __str__(self):

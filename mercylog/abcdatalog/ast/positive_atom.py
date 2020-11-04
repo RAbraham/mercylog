@@ -1,14 +1,14 @@
 from copy import deepcopy
 from typing import *
-from mercylog.abcdatalog.ast.visitors.head_visitor import HeadVisitor
-from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
+# from mercylog.abcdatalog.ast.visitors.head_visitor import HeadVisitor
+# from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
 from mercylog.abcdatalog.util.substitution.simple_const_substitution import SimpleConstSubstitution
 from mercylog.abcdatalog.ast.premise import Premise
 from mercylog.abcdatalog.ast.head import Head
 from mercylog.abcdatalog.ast.predicate_sym import PredicateSym
 from mercylog.abcdatalog.ast.term import Term
 from mercylog.abcdatalog.ast.constant import Constant
-from mercylog.abcdatalog.util.substitution.substitution import Substitution
+# from mercylog.abcdatalog.util.substitution.substitution import Substitution
 from dataclasses import dataclass
 
 I = TypeVar("I")
@@ -30,7 +30,7 @@ class PositiveAtom(Premise, Head):
 # 	 * Arguments of this atom.
 # 	 */
 # 	protected final Term[] args;
-    args: List[Term]
+    args: Tuple[Term]
 # 	/**
 # 	 * Is the atom ground (i.e., all arguments are constants)?
 # 	 */
@@ -54,7 +54,7 @@ class PositiveAtom(Premise, Head):
 
     @classmethod
     def create(cls, pred: PredicateSym, args: List[Term]):
-        return PositiveAtom(pred, deepcopy(args))
+        return PositiveAtom(pred, deepcopy(tuple(args)))
 
 #
 # 	/**
@@ -103,7 +103,7 @@ class PositiveAtom(Premise, Head):
 # 	 *            the fact
 # 	 * @return a substitution, or null if the atoms do not unify
 # 	 */
-    def unify(self, fact: "PositiveAtom") -> Optional[Substitution]:
+    def unify(self, fact: "PositiveAtom"):
         assert fact.isGround()
         if self.getPred() != fact.getPred():
             return None
@@ -118,7 +118,7 @@ class PositiveAtom(Premise, Head):
 # 	 * @return a new atom with the substitution applied
 # 	 */
 
-    def applySubst(self, subst: Substitution) -> "PositiveAtom":
+    def applySubst(self, subst) -> "PositiveAtom":
         return PositiveAtom.create(self.pred, subst.apply(self.args))
 
 
@@ -128,10 +128,10 @@ class PositiveAtom(Premise, Head):
         else:
             return f"{self.pred}({', '.join([str(a) for a in self.args])})"
 
-    def accept_premise_visitor(self, visitor: PremiseVisitor[I, O] , state: I  ) -> O:
+    def accept_premise_visitor(self, visitor, state: I  ) -> O:
         return visitor.visit_positive_atom(self, state)
 
-    def accept_head_visitor(self, visitor: HeadVisitor[I, O] , state: I ) -> O:
+    def accept_head_visitor(self, visitor , state: I ) -> O:
         return visitor.visit(self, state)
 
 

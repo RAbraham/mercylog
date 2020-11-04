@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 # import abcdatalog.ast.visitors.PremiseVisitor;
-from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
+# from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
 from typing import *
 
 I = TypeVar("I")
@@ -20,7 +20,7 @@ class Premise(ABC):
         super().__init__()
 
     @abstractmethod
-    def accept_premise_visitor(self, premise_visitor: PremiseVisitor[I, O], state: I) -> O:
+    def accept_premise_visitor(self, premise_visitor, state: I) -> O:
         pass
 
 

@@ -11,7 +11,7 @@ from abc import ABC, abstractmethod
 #  *
 #  */
 # public interface ConstOnlySubstitution extends Substitution {
-class ConstOnlySubstitution(ABC, Substitution):
+class ConstOnlySubstitution(Substitution):
     def __init__(self):
         super().__init__()
 

@@ -1,6 +1,6 @@
 from typing import *
 # import abcdatalog.ast.visitors.PremiseVisitor;
-from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
+# from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
 from mercylog.abcdatalog.ast.premise import Premise
 from mercylog.abcdatalog.ast.predicate_sym import PredicateSym
 from mercylog.abcdatalog.ast.term import Term
@@ -48,7 +48,7 @@ class NegatedAtom(Premise):
 # 	public <I, O> O accept(PremiseVisitor<I, O> visitor, I state) {
 # 		return visitor.visit(this, state);
 # 	}
-    def accept_premise_visitor(self, premise_visitor: PremiseVisitor[I, O], state: I) -> O:
+    def accept_premise_visitor(self, premise_visitor, state: I) -> O:
         return premise_visitor.visit_negated_atom(self, state)
 
 #

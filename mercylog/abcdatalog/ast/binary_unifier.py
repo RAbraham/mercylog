@@ -1,5 +1,5 @@
 # import abcdatalog.ast.visitors.PremiseVisitor;
-from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
+# from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
 from mercylog.abcdatalog.ast.term import Term
 from mercylog.abcdatalog.ast.premise import Premise
 from typing import *
@@ -24,7 +24,7 @@ class BinaryUnifier(Premise):
     def getArgsIterable(self) -> Sequence:
         return [self.left, self.right]
 
-    def accept(self, visitor: PremiseVisitor, state):
+    def accept(self, visitor, state):
         return visitor.visit_binary_unifier(self, state)
 
     def __str__(self):

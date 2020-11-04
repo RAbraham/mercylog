@@ -27,10 +27,16 @@ def test_reachable():
 
     ]
     abc_program = convert(program)
-    aaa
     # 				UnstratifiedProgram v = (new DatalogValidator()).withAtomNegationInRuleBody().validate(ast);
+    from mercylog.abcdatalog.ast.validation.unstratified_program import UnstratifiedProgram
+    from mercylog.abcdatalog.ast.validation.datalog_validator import DatalogValidator
+    from mercylog.abcdatalog.ast.validation.stratified_negation_graph import StratifiedNegationGraph
+    v: UnstratifiedProgram = DatalogValidator().withAtomNegationInRuleBody().validate(abc_program)
     #
     # 				StratifiedNegationGraph g = StratifiedNegationGraph.create(v);
+    g: StratifiedNegationGraph = StratifiedNegationGraph.create(v)
+    from pprint import pprint
+    pprint(g)
     # 				System.out.print("Stratification:\n\t" + g);
 
     pass

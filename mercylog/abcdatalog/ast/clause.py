@@ -17,7 +17,7 @@ from typing import *
 # 	protected final List<Premise> body;
 class Clause:
 	head: Head
-	body: List[Premise]
+	body: Tuple[Premise]
 
 # 	/**
 # 	 * Returns the head of this clause.
@@ -40,13 +40,16 @@ class Clause:
 # 		return this.body;
 # 	}
 #
-	def getBody(self) -> List[Premise]:
+	def getBody(self) -> Tuple[Premise]:
 		return self.body
 
 	def __str__(self):
 		body_texts = [str(b) for b in self.getBody()]
 		result = str(self.getHead()) + ' :- ' + ','.join(body_texts)
 		return result
+
+	def __repr__(self):
+		return self.__str__()
 
 # ----------------------------------------------------------------------------------
 # public class Clause {

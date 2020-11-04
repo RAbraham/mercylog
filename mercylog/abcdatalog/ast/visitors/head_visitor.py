@@ -1,4 +1,4 @@
-from mercylog.abcdatalog.ast.positive_atom import PositiveAtom
+# from mercylog.abcdatalog.ast.positive_atom import PositiveAtom
 from abc import ABC, abstractmethod
 from typing import *
 
@@ -9,7 +9,7 @@ O = TypeVar("O")
 
 class HeadVisitor(Generic[I, O]):
     @abstractmethod
-    def visit(self, atom: PositiveAtom, state: I) -> O:
+    def visit(self, atom, state: I) -> O:
         pass
 
 

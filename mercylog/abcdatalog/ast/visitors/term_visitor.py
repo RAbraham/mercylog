@@ -1,10 +1,13 @@
 from typing import *
-from mercylog.abcdatalog.ast.constant import Constant
-from mercylog.abcdatalog.ast.variable import Variable
+# from mercylog.abcdatalog.ast.constant import Constant
+# import mercylog.abcdatalog.ast.constant as constant
+# from mercylog.abcdatalog.ast.variable import Variable
+# import mercylog.abcdatalog.ast.variable as variable
 
 I = TypeVar("I")
 O = TypeVar("O")
-
+# Variable = variable.Variable
+# Constant = constant.Constant
 from abc import ABC, abstractmethod
 
 
@@ -13,11 +16,11 @@ class TermVisitor(ABC, Generic[I, O]):
         super().__init__()
 
     @abstractmethod
-    def visit_variable(self, t: Variable, state: I) -> O:
+    def visit_variable(self, t, state: I) -> O:
         pass
 
     @abstractmethod
-    def visit_constant(self, t: Constant, state: I) -> O:
+    def visit_constant(self, t, state: I) -> O:
         pass
 
 

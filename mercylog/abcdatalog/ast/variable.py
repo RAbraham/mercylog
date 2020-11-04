@@ -1,6 +1,6 @@
 from typing import *
-from mercylog.abcdatalog.ast.visitors.term_visitor import TermVisitor
-from mercylog.abcdatalog.util.substitution.substitution import Substitution
+# from mercylog.abcdatalog.ast.visitors.term_visitor import TermVisitor
+# from mercylog.abcdatalog.util.substitution.substitution import Substitution
 from mercylog.abcdatalog.ast.term import Term
 
 I = TypeVar("I")
@@ -83,11 +83,14 @@ class Variable(Term):
     def __str__(self):
         return self.getName()
 
+    def __repr__(self):
+        return self.getName()
+
     # 	@Override
     # 	public <I, O> O accept(TermVisitor<I, O> visitor, I state) {
     # 		return visitor.visit(this, state);
     # 	}
-    def accept_term_visitor(self, visitor: TermVisitor[I, O], state: I) -> O:
+    def accept_term_visitor(self, visitor , state: I) -> O:
         return visitor.visit_variable(self, state)
 
     #
@@ -104,7 +107,7 @@ class Variable(Term):
     # 		Term s = subst.get(this);
     # 		return (s != null) ? s : this;
     # 	}
-    def applySubst(self, subst: Substitution) -> "Term":
+    def applySubst(self, subst) -> "Term":
         s: Term = subst.get(self)
         if s:
             return s
