@@ -3,7 +3,7 @@ from mercylog.abcdatalog.ast.positive_atom import PositiveAtom
 from mercylog.abcdatalog.ast.predicate_sym import PredicateSym
 from mercylog.abcdatalog.ast.premise import Premise
 from mercylog.abcdatalog.ast.term import Term
-from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
+# from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
 from dataclasses import dataclass
 from enum import Enum
 
@@ -68,7 +68,7 @@ class AnnotatedAtom(Premise):
 # 		return visitor.visit(this, state);
 # 	}
 #
-    def accept_premise_visitor(self, premise_visitor: PremiseVisitor[I, O], state: I) -> O:
+    def accept_premise_visitor(self, premise_visitor , state: I) -> O:
         return premise_visitor.visit_annotated_atom(self, state)
 
     def __str__(self):

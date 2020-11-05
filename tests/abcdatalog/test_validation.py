@@ -19,10 +19,10 @@ def test_reachable():
     node = relation("node")
 
     program = [
-        reachable(X, Y) <= edge(X, Y),
-        reachable(X, Y) <= edge(X, Z), reachable(Z, Y),
-        not_reachable(X, Y) <= node(X), node(Y), ~reachable(X, Y),
-        node(X) <= edge(X, _),
+        # reachable(X, Y) <= edge(X, Y),
+        # reachable(X, Y) <= [edge(X, Z), reachable(Z, Y)],
+        # not_reachable(X, Y) <= [node(X), node(Y), ~reachable(X, Y)],
+        # node(X) <= edge(X, _),
         node(X) <= edge(_, X)
 
     ]

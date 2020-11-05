@@ -51,7 +51,7 @@ class UnionFindBasedUnifier(TermUnifier):
     # 	}
 
     def get(self, x: Variable) -> Term:
-        return self.get(x)
+        return self.find(x)
 
     def apply(self, original: List[Term]) -> List[Term]:
         r: List[Term] = []

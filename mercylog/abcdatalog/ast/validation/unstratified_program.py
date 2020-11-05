@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import *
 from mercylog.abcdatalog.ast.positive_atom import PositiveAtom
 from mercylog.abcdatalog.ast.predicate_sym import PredicateSym
-from mercylog.abcdatalog.ast.validation.datalog_validator import ValidClause
+# from mercylog.abcdatalog.ast.validation.datalog_validator import ValidClause
 #
 # /**
 #  * A Datalog program for which each rule and initial fact has been independently
@@ -20,7 +20,7 @@ class UnstratifiedProgram(ABC):
         super().__init__()
 
     @abstractmethod
-    def getRules(self) -> Set[ValidClause]:
+    def getRules(self) -> Set:
         pass
 
     @abstractmethod

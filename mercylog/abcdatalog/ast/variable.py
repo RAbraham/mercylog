@@ -12,6 +12,7 @@ O = TypeVar("O")
 #  *
 #  */
 # public class Variable implements Term {
+
 class Variable(Term):
     # 	/**
     # 	 * Identifier for this variable.

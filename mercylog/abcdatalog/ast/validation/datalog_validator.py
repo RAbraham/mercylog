@@ -117,7 +117,7 @@ class LocalCrashPremiseVisitor(CrashPremiseVisitor):
 
 
 class ValidClause(Clause):
-    def __init__(self, head: Head, body: List[Premise]):
+    def __init__(self, head: Head, body: Tuple[Premise]):
         super().__init__(head, body)
 
 class Program(UnstratifiedProgram):
@@ -411,6 +411,8 @@ class DatalogValidator:
 #
         x: Variable
         for x in possiblyUnboundVars:
+            print(">> Bound Vars")
+            print(boundVars)
             if x not in boundVars and not isinstance(subst.get(x), Constant):
                 raise DatalogValidationException(f"Every variable in a rule must be bound, but {x} is not bound in "
                                                  f"the rule {clause}. A variable X is bound if 1) it appears in a "
@@ -421,9 +423,10 @@ class DatalogValidator:
 # 		if (!hasPositiveAtom.value && !newBody.isEmpty()) {
 # 			newBody.add(0, True.getTrueAtom());
 # 		}
-        newBody: List[Premise] = copy.deepcopy(clause.getBody())
-        if not hasPositiveAtom.value and newBody:
-            newBody.insert(0, TrueAtom.getTrueAtom())
+        newBodyList: List[Premise] = list(copy.deepcopy(clause.getBody()))
+        if not hasPositiveAtom.value and newBodyList:
+            newBodyList.insert(0, TrueAtom.getTrueAtom())
+        newBody = tuple(newBodyList)
 #
 # 		return new ValidClause(clause.getHead(), newBody);
         return ValidClause(clause.getHead(), newBody)

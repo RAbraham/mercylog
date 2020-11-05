@@ -12,15 +12,17 @@ def convert(program: List[Rule]) -> Set:
     converts = list(map(_convert, program))
     from pprint import pprint
     pprint("\n")
-    pprint(converts[0:1])
+    pprint(converts)
 
     return set(converts)
 
 def _convert(r: Rule):
     if isinstance(r, Rule):
         abc_head = convert_relation(r.head)
-        abc_body = [convert_relation(b) for b in r.body]
+        abc_body = tuple([convert_relation(b) for b in r.body])
         return AClause(abc_head, abc_body)
+    else:
+        raise ValueError(f"Unexpected Argument:{r}")
     pass
 
 
@@ -28,7 +30,7 @@ def convert_relation(relation: Union[Relation, InvertedRelationInstance]):
     if isinstance(relation, Relation):
         return make_positive_relation(relation)
     elif isinstance(relation, InvertedRelationInstance):
-        positive_relation = relation.relation()
+        positive_relation = relation.relation_instance
         return ANegatedAtom(make_positive_relation(positive_relation))
 
 

@@ -185,10 +185,10 @@ class InvertedRelationInstance(object):
         self.relation_instance = relation_instance
         pass
 
-    def get_clause(self):
+    def get_clause(self) -> str:
         return "not " + self.relation_instance.get_clause()
 
-    def relation(self):
+    def relation(self) -> str:
         return self.get_clause()
 
     def variables(self):
