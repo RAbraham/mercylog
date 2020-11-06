@@ -204,6 +204,8 @@ class StratifiedNegationGraph:
 
 
         pass
+    def __repr__(self):
+        return self.__str__()
 #
 # 	public static void main(String[] args) throws DatalogParseException {
 # 		Consumer<String> test = program -> {

@@ -247,7 +247,7 @@ class DatalogValidator:
             rewrittenClauses.add(self.checkRule(clause))
 # 		}
 # 		rewrittenClauses.add(new ValidClause(True.getTrueAtom(), Collections.emptyList()));
-        rewrittenClauses.add(ValidClause(TrueAtom.getTrueAtom(), []))
+        rewrittenClauses.add(ValidClause(TrueAtom.getTrueAtom(), tuple([])))
 #
 # 		Set<ValidClause> rules = new HashSet<>();
         rules: Set[ValidClause] = set()
@@ -288,7 +288,7 @@ class DatalogValidator:
         cl: ValidClause
         for cl in rewrittenClauses:
             head: PositiveAtom = cl.getHead().accept_head_visitor(getHeadAsAtom, None)
-            body: List[Premise] = cl.getBody()
+            body: Tuple[Premise] = cl.getBody()
             if not body:
                 bodilessClauses.add(cl)
                 edbPredicateSymbols.add(head.getPred())
@@ -303,7 +303,8 @@ class DatalogValidator:
         initialFacts: Set[PositiveAtom] = set()
 # 		edbPredicateSymbols.removeAll(idbPredicateSymbols);
         for i in idbPredicateSymbols:
-            edbPredicateSymbols.remove(i)
+            if i in edbPredicateSymbols:
+                edbPredicateSymbols.remove(i)
 # 		for (ValidClause cl : bodilessClauses) {
 # 			PositiveAtom head = HeadHelpers.forcePositiveAtom(cl.getHead());
 # 			if (treatIdbFactsAsClauses && idbPredicateSymbols.contains(head.getPred())) {
@@ -411,8 +412,6 @@ class DatalogValidator:
 #
         x: Variable
         for x in possiblyUnboundVars:
-            print(">> Bound Vars")
-            print(boundVars)
             if x not in boundVars and not isinstance(subst.get(x), Constant):
                 raise DatalogValidationException(f"Every variable in a rule must be bound, but {x} is not bound in "
                                                  f"the rule {clause}. A variable X is bound if 1) it appears in a "

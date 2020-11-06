@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import *
 # from mercylog.abcdatalog.ast.visitors.term_visitor import TermVisitor
 # from mercylog.abcdatalog.util.substitution.substitution import Substitution
@@ -6,108 +7,33 @@ from mercylog.abcdatalog.ast.term import Term
 I = TypeVar("I")
 O = TypeVar("O")
 
-#
-# /**
-#  * A Datalog variable.
-#  *
-#  */
-# public class Variable implements Term {
 
+@dataclass(frozen=True)
 class Variable(Term):
-    # 	/**
-    # 	 * Identifier for this variable.
-    # 	 */
-    # 	private final String name;
-    #
-    # 	/**
-    # 	 * Map for memoization.
-    # 	 */
-    # 	private static final ConcurrentMap<String, Variable> memo = new ConcurrentHashMap<>();
-    memo: Dict[str, "Variable"] = dict()
-    #
-    # 	/**
-    # 	 * Returns a variable with the given string identifier.
-    # 	 *
-    # 	 * @param name
-    # 	 *            the string identifier
-    # 	 * @return the variable
-    # 	 */
-    # 	public static Variable create(String name) {
-    # 		Variable c = memo.get(name);
-    # 		if (c != null) {
-    # 			return c;
-    # 		}
-    # 		// try creating it
-    # 		c = new Variable(name);
-    # 		Variable existing = memo.putIfAbsent(name, c);
-    # 		if (existing != null) {
-    # 			return existing;
-    # 		}
-    # 		return c;
-    # 	}
+    name: str
+    pass
+
     @staticmethod
     def create(name: str) -> "Variable":
-        c = Variable.memo.get(name)
-        if c:
-            return c
-        c = Variable(name)
-        Variable.memo[name] = c
-        return c
+        return Variable(name)
 
-    #
-    # 	/**
-    # 	 * Constructs a variable from an identifier.
-    # 	 *
-    # 	 * @param name
-    # 	 *            identifier
-    # 	 */
-    # 	protected Variable(String name) {
-    # 		this.name = name;
-    # 	}
-    #
-    def __init__(self, name: str):
-        self.name = name
-        super().__init__()
-
-    # 	public String getName() {
-    # 		return name;
-    # 	}
-    #
     def getName(self) -> str:
         return self.name
 
-    # 	@Override
-    # 	public String toString() {
-    # 		return this.getName();
-    # 	}
-    #
     def __str__(self):
         return self.getName()
 
     def __repr__(self):
         return self.getName()
 
-    # 	@Override
-    # 	public <I, O> O accept(TermVisitor<I, O> visitor, I state) {
-    # 		return visitor.visit(this, state);
-    # 	}
     def accept_term_visitor(self, visitor , state: I) -> O:
         return visitor.visit_variable(self, state)
 
-    #
-    # 	public static Variable createFreshVariable() {
-    # 		return new Variable("_");
-    # 	}
     @staticmethod
     def createFreshVariable() -> "Variable":
-        return Variable("_")
+        import uuid
+        return Variable("_" + str(uuid.uuid4()) )
 
-    #
-    # 	@Override
-    # 	public Term applySubst(Substitution subst) {
-    # 		Term s = subst.get(this);
-    # 		return (s != null) ? s : this;
-    # 	}
     def applySubst(self, subst) -> "Term":
         s: Term = subst.get(self)
         if s:
@@ -115,6 +41,47 @@ class Variable(Term):
         else:
             return self
 
+#
+# class Variable(Term):
+#     memo: Dict[str, "Variable"] = dict()
+#
+#     @staticmethod
+#     def create(name: str) -> "Variable":
+#         c = Variable.memo.get(name)
+#         if c:
+#             return c
+#         c = Variable(name)
+#         Variable.memo[name] = c
+#         return c
+#
+#     def __init__(self, name: str):
+#         self.name = name
+#         super().__init__()
+#
+#
+#     def getName(self) -> str:
+#         return self.name
+#
+#     def __str__(self):
+#         return self.getName()
+#
+#     def __repr__(self):
+#         return self.getName()
+#
+#     def accept_term_visitor(self, visitor , state: I) -> O:
+#         return visitor.visit_variable(self, state)
+#
+#     @staticmethod
+#     def createFreshVariable() -> "Variable":
+#         return Variable("_")
+#
+#     def applySubst(self, subst) -> "Term":
+#         s: Term = subst.get(self)
+#         if s:
+#             return s
+#         else:
+#             return self
+#
 
 # }
 # /*******************************************************************************

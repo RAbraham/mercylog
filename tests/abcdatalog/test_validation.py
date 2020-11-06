@@ -19,12 +19,11 @@ def test_reachable():
     node = relation("node")
 
     program = [
-        # reachable(X, Y) <= edge(X, Y),
-        # reachable(X, Y) <= [edge(X, Z), reachable(Z, Y)],
-        # not_reachable(X, Y) <= [node(X), node(Y), ~reachable(X, Y)],
-        # node(X) <= edge(X, _),
+        reachable(X, Y) <= edge(X, Y),
+        reachable(X, Y) <= [edge(X, Z), reachable(Z, Y)],
+        not_reachable(X, Y) <= [node(X), node(Y), ~reachable(X, Y)],
+        node(X) <= edge(X, _),
         node(X) <= edge(_, X)
-
     ]
     abc_program = convert(program)
     # 				UnstratifiedProgram v = (new DatalogValidator()).withAtomNegationInRuleBody().validate(ast);
@@ -35,9 +34,11 @@ def test_reachable():
     #
     # 				StratifiedNegationGraph g = StratifiedNegationGraph.create(v);
     g: StratifiedNegationGraph = StratifiedNegationGraph.create(v)
-    from pprint import pprint
-    pprint(g)
-    # 				System.out.print("Stratification:\n\t" + g);
+    sorted_strata = sorted(g.strata,key= lambda s: str(list(s)[0]))
+    sorted_strata_str = [str(s) for s in sorted_strata]
+    exp = ['{node}', '{not_reachable}', '{reachable}']
+    assert sorted_strata_str == exp
+
 
     pass
 
