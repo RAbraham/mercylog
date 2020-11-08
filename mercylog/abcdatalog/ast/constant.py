@@ -2,6 +2,7 @@ from typing import *
 from mercylog.abcdatalog.ast.visitors.term_visitor import TermVisitor
 from mercylog.abcdatalog.util.substitution.substitution import Substitution
 from mercylog.abcdatalog.ast.term import Term
+from dataclasses import dataclass
 
 I = TypeVar("I")
 O = TypeVar("O")
@@ -14,7 +15,9 @@ O = TypeVar("O")
 #  */
 
 # public class Constant implements Term {
+@dataclass(frozen=True)
 class Constant(Term):
+    name: str
 # 	/**
 # 	 * Identifier of the constant.
 # 	 */
@@ -24,7 +27,6 @@ class Constant(Term):
 # 	 * A map for memoization.
 # 	 */
 # 	private static final ConcurrentMap<String, Constant> memo = new ConcurrentHashMap<>();
-    memo: Dict[str, "Constant"] = {}
 #
 # 	/**
 # 	 * Returns a constant with the given string identifier.
@@ -49,19 +51,8 @@ class Constant(Term):
 
     @staticmethod
     def create(name: str) -> "Constant":
-        c: Constant = Constant.memo.get(name)
-        if c:
-            return c
-        c = Constant(name)
-        Constant.memo[name] = c
-        return c
+        return Constant(name)
 
-        pass
-
-
-    def __init__(self, name: str):
-        self.name = name
-        super().__init__()
 
     def getName(self)-> str:
         return self.name
@@ -69,6 +60,9 @@ class Constant(Term):
 
     def __str__(self):
         return self.getName()
+
+    def __repr__(self):
+        return self.__str__()
 
     def accept_term_visitor(self, visitor: TermVisitor[I, O], state: I):
         return visitor.visit_constant(self, state)
