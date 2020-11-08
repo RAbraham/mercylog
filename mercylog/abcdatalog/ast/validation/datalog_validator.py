@@ -25,6 +25,7 @@ from mercylog.abcdatalog.util.substitution.term_unifier import TermUnifier
 from mercylog.abcdatalog.util.substitution.union_find_based_unifier import UnionFindBasedUnifier
 from mercylog.abcdatalog.ast.validation.unstratified_program import UnstratifiedProgram
 from mercylog.abcdatalog.ast.validation.datalog_validation_exception import DatalogValidationException
+from pprint import pprint
 
 I = TypeVar("I")
 O = TypeVar("O")
@@ -248,6 +249,7 @@ class DatalogValidator:
 # 		}
 # 		rewrittenClauses.add(new ValidClause(True.getTrueAtom(), Collections.emptyList()));
         rewrittenClauses.add(ValidClause(TrueAtom.getTrueAtom(), tuple([])))
+
 #
 # 		Set<ValidClause> rules = new HashSet<>();
         rules: Set[ValidClause] = set()

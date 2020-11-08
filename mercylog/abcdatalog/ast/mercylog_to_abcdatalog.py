@@ -11,8 +11,6 @@ from mercylog.abcdatalog.ast.clause import Clause as AClause
 def convert(program: List[Rule]) -> Set:
     converts = list(map(_convert, program))
     from pprint import pprint
-    pprint("\n")
-    pprint(converts)
 
     return set(converts)
 

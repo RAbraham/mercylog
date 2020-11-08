@@ -73,6 +73,9 @@ class AnnotatedAtom(Premise):
 
     def __str__(self):
         return str(self.atom) + '<' + self.anno.value + '>'
+
+    def __repr__(self):
+        return self.__str__()
 #
 # }
 

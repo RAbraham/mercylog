@@ -34,9 +34,11 @@ def test_reachable():
     #
     # 				StratifiedNegationGraph g = StratifiedNegationGraph.create(v);
     g: StratifiedNegationGraph = StratifiedNegationGraph.create(v)
-    sorted_strata = sorted(g.strata,key= lambda s: str(list(s)[0]))
-    sorted_strata_str = [str(s) for s in sorted_strata]
-    exp = ['{node}', '{not_reachable}', '{reachable}']
+    print('Strata')
+    print(g.strata)
+    # sorted_strata = sorted(g.strata,key= lambda s: str(list(s)[0]))
+    sorted_strata_str = [str(s) for s in g.strata]
+    exp = ['{reachable}', '{node}', '{not_reachable}']
     assert sorted_strata_str == exp
 
 

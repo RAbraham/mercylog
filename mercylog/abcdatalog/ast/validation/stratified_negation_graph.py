@@ -1,5 +1,6 @@
 from typing import *
 from mercylog.abcdatalog.ast.clause import Clause
+from pprint import pprint
 from mercylog.abcdatalog.ast.negated_atom import NegatedAtom
 from mercylog.abcdatalog.ast.positive_atom import PositiveAtom
 from mercylog.abcdatalog.ast.predicate_sym import PredicateSym
@@ -40,6 +41,9 @@ class AnnotatedEdge(DirectedEdge[PredicateSym]):
 # 		public PredicateSym getSource() {
 # 			return this.source;
 # 		}
+
+    def __repr__(self):
+        return f'AnnotatedEdge: Source:{self.source} => Dest:{self.dest}, isNegated={self._isNegated}'
     def getSource(self) -> PredicateSym:
         return self.source
 #
@@ -90,8 +94,7 @@ class LocalDefaultConjunctVisitor(DefaultConjunctVisitor):
 
     def visit_positive_atom(self, atom: PositiveAtom, headPred: PredicateSym):
         if atom.getPred() not in self.program.getEdbPredicateSyms():
-                self.graph.addEdge(AnnotatedEdge(atom.getPred(), headPred, False))
-        pass
+            self.graph.addEdge(AnnotatedEdge(atom.getPred(), headPred, False))
 
     def visit_negated_atom(self, atom: NegatedAtom, headPred: PredicateSym):
         # TODO: duplicate if condition
@@ -99,13 +102,24 @@ class LocalDefaultConjunctVisitor(DefaultConjunctVisitor):
         if atom.getPred() not in self.program.getEdbPredicateSyms():
             self.graph.addEdge(AnnotatedEdge(atom.getPred(), headPred, True))
 
+    # def visit_positive_atom(self, atom: PositiveAtom, headPred: PredicateSym):
+    #     if atom.getPred() not in self.program.getEdbPredicateSyms():
+    #         self.graph.addEdge(AnnotatedEdge(atom.getPred(), headPred, False))
+    #     pass
+    #
+    # def visit_negated_atom(self, atom: NegatedAtom, headPred: PredicateSym):
+    #     # TODO: duplicate if condition
+    #
+    #     if atom.getPred() not in self.program.getEdbPredicateSyms():
+    #         self.graph.addEdge(AnnotatedEdge(atom.getPred(), headPred, True))
+
     pass
 # class StratifiedNegationGraph {
 
 class StratifiedNegationGraph:
 # 	public static StratifiedNegationGraph create(UnstratifiedProgram program) throws DatalogValidationException {
     @staticmethod
-    def create(program: UnstratifiedProgram)-> "StratifiedNegationGraph":
+    def create(program: UnstratifiedProgram) -> "StratifiedNegationGraph":
         graph: Digraph[PredicateSym, AnnotatedEdge] = Digraph()
         getHeadPred: HeadVisitor = HeadVisitorBuilder().onPositiveAtom(lambda atom, nothing: atom.getPred()).orCrash()
         addEdge: PremiseVisitor = LocalDefaultConjunctVisitor(program, graph)

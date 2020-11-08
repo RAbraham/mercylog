@@ -80,8 +80,8 @@ class Digraph(Generic[V, E]):
 # 	public Set<V> getVertices() {
 # 		return this.graph.keySet();
 # 	}
-    def getVertices(self) -> Set[V]:
-        return set(self.graph.keys())
+    def getVertices(self) -> List[V]:
+        return list(self.graph.keys())
 #
 # 	public Digraph<V, E> getTranspose(Function<E, E> reverseEdge) {
 # 		Digraph<V, E> t = new Digraph<>();
@@ -166,6 +166,8 @@ class Digraph(Generic[V, E]):
         dfs.value = dfs_func
         time.value = 0
         vertices = self.getVertices()
+        print('\n >> Vertices')
+        print(vertices)
         for vertex in vertices:
             if vertex not in visited:
                 dfs_func(vertex, time, visited, self.getOutgoingEdges, vertices, finishingTimes)
@@ -177,9 +179,13 @@ class Digraph(Generic[V, E]):
         orderedVertices: List[V] = []
         items = finishingTimes.items()
         sorted_items = sorted(items, key=lambda i: i[1], reverse=True)
+        print("\n Sorted finishing times")
+        print(sorted_items)
         for e in sorted_items:
             orderedVertices.append(e[0])
 
+        print('orderedVertices')
+        print(orderedVertices)
         components: List[Set[V]] = []
         visited.clear()
         vertex: V

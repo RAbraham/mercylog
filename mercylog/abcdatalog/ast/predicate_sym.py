@@ -1,11 +1,51 @@
 from typing import *
+from dataclasses import dataclass
 
-# #
-# # /**
-# #  * A basic predicate symbol in Datalog.
-# #  *
-# #  */
+@dataclass(frozen=True)
 class PredicateSym:
+    sym: str
+    arity: int
+
+    @staticmethod
+    def create(sym: str, arity: int):
+        return PredicateSym(sym, arity)
+    #
+    # 	/**
+    # 	 * Returns the string identifier of this predicate symbol.
+    # 	 *
+    # 	 * @return the string identifier
+    # 	 */
+    def getSym(self) -> str:
+        return self.sym
+
+    #
+    # 	/**
+    # 	 * Returns the arity of this predicate symbol.
+    # 	 *
+    # 	 * @return the arity
+    # 	 */
+
+    def getArity(self) -> int:
+        return self.arity
+
+    def __post_init__(self):
+        arity = self.arity
+        sym = self.sym
+        if arity < 0:
+            raise ValueError(
+                f"Arity cannot be negative"
+                f"but predicate symbol: {sym} "
+                f"initialized with an arity of {arity}."
+            )
+
+    def __str__(self) -> str:
+        return self.sym
+
+    def __repr__(self):
+        return self.sym
+
+
+class OldPredicateSym:
 
     # 	/**
     # 	 * Identifier of the predicate symbol (i.e. the symbol itself).
@@ -20,7 +60,7 @@ class PredicateSym:
     # 	/**
     # 	 * Map for memoization.
     # 	 */
-    memo: Dict[str, Dict[int, "PredicateSym"]] = {}
+    memo: Dict[str, Dict[int, "OldPredicateSym"]] = {}
     #
     # 	/**
     # 	 * Returns a predicate symbol with the given string identifier and arity.
@@ -33,16 +73,16 @@ class PredicateSym:
     # 	 */
 
     @staticmethod
-    def create(sym: str, arity: int) -> "PredicateSym":
+    def create(sym: str, arity: int) -> "OldPredicateSym":
         # TODO: This literal Java translation seems very complicate. We should simplify it later.
-        byArity = PredicateSym.memo.get(sym)
+        byArity = OldPredicateSym.memo.get(sym)
         if byArity is None:
             byArity = {}
-            PredicateSym.memo[sym] = byArity
+            OldPredicateSym.memo[sym] = byArity
 
         ps = byArity.get(arity)
         if ps is None:
-            ps = PredicateSym(sym, arity)
+            ps = OldPredicateSym(sym, arity)
             byArity[arity] = ps
 
         return ps
