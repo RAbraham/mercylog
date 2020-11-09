@@ -11,15 +11,23 @@ from mercylog.abcdatalog.ast.validation.datalog_validation_exception import Data
 # import abcdatalog.ast.validation.DatalogValidator;
 from mercylog.abcdatalog.ast.validation.datalog_validator import  DatalogValidator
 # import abcdatalog.ast.validation.StratifiedNegationValidator;
-from mercylog.abcdatalog.ast.validation.stratified_negation_validator import aaa
+from mercylog.abcdatalog.ast.validation.stratified_negation_validator import StratifiedNegationValidator
 # import abcdatalog.ast.validation.StratifiedProgram;
+from mercylog.abcdatalog.ast.validation.stratified_program import StratifiedProgram
 # import abcdatalog.ast.validation.DatalogValidator.ValidClause;
+from mercylog.abcdatalog.ast.validation.datalog_validator import ValidClause
 # import abcdatalog.ast.validation.UnstratifiedProgram;
+from mercylog.abcdatalog.ast.validation.unstratified_program import UnstratifiedProgram
 # import abcdatalog.ast.visitors.HeadVisitor;
+from mercylog.abcdatalog.ast.visitors.head_visitor import HeadVisitor
 # import abcdatalog.ast.visitors.PremiseVisitor;
+from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
 # import abcdatalog.ast.visitors.PremiseVisitorBuilder;
+from mercylog.abcdatalog.ast.visitors.premise_visitor_builder import PremiseVisitorBuilder
 # import abcdatalog.engine.bottomup.AnnotatedAtom;
+from mercylog.abcdatalog.engine.bottomup.annotated_atom import AnnotatedAtom
 # import abcdatalog.engine.bottomup.ClauseEvaluator;
+from mercylog.abcdatalog.engine.bottomup.clause_evaluator import ClauseEvaluator
 # import abcdatalog.engine.bottomup.EvalManager;
 # import abcdatalog.engine.bottomup.SemiNaiveClauseAnnotator;
 # import abcdatalog.engine.bottomup.SemiNaiveClauseAnnotator.SemiNaiveClause;
@@ -31,6 +39,8 @@ from mercylog.abcdatalog.ast.validation.stratified_negation_validator import aaa
 # import abcdatalog.util.substitution.ClauseSubstitution;
 #
 # public class SemiNaiveEvalManager implements EvalManager {
+class SemiNaiveEvalManager(EvalManager):
+    pass
 # 	private final ConcurrentFactIndexer<Set<PositiveAtom>> allFacts = FactIndexerFactory
 # 			.createConcurrentSetFactIndexer();
 # 	private final List<StratumEvaluator> stratumEvals = new ArrayList<>();

@@ -7,10 +7,10 @@ from mercylog.abcdatalog.ast.predicate_sym import PredicateSym
 from mercylog.abcdatalog.ast.validation.datalog_validator import ValidClause
 from mercylog.abcdatalog.ast.validation.datalog_validator import UnstratifiedProgram
 from mercylog.abcdatalog.ast.validation.stratified_negation_graph import StratifiedNegationGraph
-
+from mercylog.abcdatalog.ast.validation.stratified_program import StratifiedProgram
 
 # 		return new StratifiedProgram() {
-class StratifiedProgram:
+class LocalStratifiedProgram(StratifiedProgram):
 #
 # 			@Override
 # 			public Set<ValidClause> getRules() {
@@ -19,6 +19,7 @@ class StratifiedProgram:
     def __init__(self, prog: UnstratifiedProgram, g: StratifiedNegationGraph):
         self.prog = prog
         self.g = g
+        super().__init__()
 
     def getRules(self) -> Set[ValidClause]:
         return self.prog.getRules()
@@ -70,7 +71,6 @@ class StratifiedProgram:
 #  */
 # public final class StratifiedNegationValidator {
 class StratifiedNegationValidator:
-    aaa
 # 	/**
 # 	 * Validates that the given unstratified program can be stratified for
 # 	 * negation and returns a witness stratified program.
@@ -82,44 +82,10 @@ class StratifiedNegationValidator:
 # 	 *             if the given program cannot be stratified for negation
 # 	 */
 # 	public static StratifiedProgram validate(UnstratifiedProgram prog) throws DatalogValidationException {
-# 		StratifiedNegationGraph g = StratifiedNegationGraph.create(prog);
-# 		return new StratifiedProgram() {
-#
-# 			@Override
-# 			public Set<ValidClause> getRules() {
-# 				return prog.getRules();
-# 			}
-#
-# 			@Override
-# 			public Set<PositiveAtom> getInitialFacts() {
-# 				return prog.getInitialFacts();
-# 			}
-#
-# 			@Override
-# 			public Set<PredicateSym> getEdbPredicateSyms() {
-# 				return prog.getEdbPredicateSyms();
-# 			}
-#
-# 			@Override
-# 			public Set<PredicateSym> getIdbPredicateSyms() {
-# 				return prog.getIdbPredicateSyms();
-# 			}
-#
-# 			@Override
-# 			public List<Set<PredicateSym>> getStrata() {
-# 				return g.getStrata();
-# 			}
-#
-# 			@Override
-# 			public Map<PredicateSym, Integer> getPredToStratumMap() {
-# 				return g.getPredToStratumMap();
-# 			}
-#
-# 		};
-# 	}
-#
-# }
-    pass
+    @staticmethod
+    def validate(prog: UnstratifiedProgram) -> StratifiedProgram:
+        g: StratifiedNegationGraph = StratifiedNegationGraph.create(prog)
+        return LocalStratifiedProgram(prog, g)
 # /*******************************************************************************
 #  * This file is part of the AbcDatalog project.
 #  *
