@@ -31,7 +31,41 @@ from mercylog.abcdatalog.ast.visitors.premise_visitor_builder import PremiseVisi
 # import abcdatalog.util.Box;
 from mercylog.abcdatalog.util.box import Box
 #
+from mercylog.abcdatalog.engine.bottomup.annotated_atom import AnnotatedAtom, Annotation
 from typing import *
+
+class SingletonSet:
+    def __init__(self, value):
+        self.singleton_set = {value}
+
+
+# 	public static final class SemiNaiveClause extends Clause {
+class SemiNaiveClause(Clause):
+#
+# 		private SemiNaiveClause(Head head, List<Premise> body) {
+    def __init__(self, head: Head, body: List[Premise]):
+# 			super(head, body);
+        super(SemiNaiveClause, self).__init__(head, body)
+# 			if (body.isEmpty()) {
+# 				throw new IllegalArgumentException("Body must not be empty.");
+# 			}
+        if not body:
+            raise ValueError("Body must not be empty")
+# 		}
+#
+# 		public AnnotatedAtom getFirstAtom() {
+# 			assert body.get(0) instanceof AnnotatedAtom;
+# 			return (AnnotatedAtom) body.get(0);
+# 		}
+    def getFirstAtom(self) -> AnnotatedAtom:
+        assert isinstance(self.body[0], AnnotatedAtom)
+        return self.body[0]
+#
+# 	}
+#
+# }
+
+
 # /**
 #  * A class for annotating a clause with annotations helpful for semi-naive
 #  * evaluation.
@@ -47,7 +81,6 @@ class SemiNaiveClauseAnnotator:
 # 		this.idbPreds = idbPreds;
 # 	}
 #
-aaa
 # 	/**
 # 	 * Returns a set of annotated clauses for a given unannotated clause. If the
 # 	 * given clause only contains atoms with EDB predicate symbols, the
@@ -61,13 +94,20 @@ aaa
 # 	 * @return a set of annotated clauses
 # 	 */
 # 	public Set<SemiNaiveClause> annotate(ValidClause original) {
+    def annotate(self, original: ValidClause) -> Set[SemiNaiveClause]:
 # 		List<Premise> body = original.getBody();
+        body: Tuple[Premise] = original.getBody()
 # 		if (body.isEmpty()) {
 # 			throw new IllegalArgumentException("Cannot annotate a bodiless clause.");
 # 		}
+        if not body:
+            raise ValueError("Cannot annotate a bodiless clause")
 # 		List<Premise> body2 = new ArrayList<>();
+        body2: List[Premise] = []
 # 		List<Integer> idbPositions = new ArrayList<>();
+        idbPositions: List[int] = []
 # 		Box<Integer> edbPos = new Box<>();
+        edbPos: Box[int] = Box()
 # 		PremiseVisitor<Integer, Void> findIdbs = (new PremiseVisitorBuilder<Integer, Void>())
 # 				.onPositiveAtom((atom, pos) -> {
 # 					if (idbPreds.contains(atom.getPred())) {
@@ -84,11 +124,31 @@ aaa
 # 					body2.add(premise);
 # 					return null;
 # 				});
-# 		int pos = 0;
+#
+        def add_to_body2(atom, pos):
+            if atom.getPred() in self.idbPreds:
+                idbPositions.append(pos)
+                body2.append(atom)
+            else:
+                if not edbPos.value:
+                    edbPos.value = pos
+                    body2.append(AnnotatedAtom(atom, Annotation.EDB))
+            return None
+        def simple_add_to_body2(premise, ignore):
+            body2.append(premise)
+
+        findIdbs: PremiseVisitor[int, None] = PremiseVisitorBuilder().onPositiveAtom(add_to_body2).or_(simple_add_to_body2)
+ 		# int pos = 0;
+        pos: int = 0
+        c: Premise
 # 		for (Premise c : body) {
 # 			c.accept(findIdbs, pos++);
 # 		}
+        for c in body:
+            pos += 1
+            c.accept_premise_visitor(findIdbs, pos)
 # 		body = body2;
+        body = tuple(body2)
 #
 # 		if (idbPositions.isEmpty()) {
 # 			if (edbPos.value == null) {
@@ -97,10 +157,21 @@ aaa
 # 			return Collections.singleton(sort(new Clause(original.getHead(), body), edbPos.value));
 # 		}
 #
+        if not idbPositions:
+            if not edbPos.value:
+                edbPos.value = 0
+            return SingletonSet(self.sort(Clause(original.getHead(), body), edbPos.value))
+
 # 		Set<SemiNaiveClause> r = new HashSet<>();
+        r: Set[SemiNaiveClause] = set()
 # 		for (Integer i : idbPositions) {
+        i: int
+        for i in idbPositions:
 # 			List<Premise> newBody = new ArrayList<>();
+            newBody: List[Premise] = []
 # 			PremiseVisitor<AnnotatedAtom.Annotation, Void> annotator = (new PremiseVisitorBuilder<AnnotatedAtom.Annotation, Void>())
+#           aaa. This is difficult as newBody is within the for loop so it's initiallized all the time. Maybe we'll have to initialize it twice, once outside the loop and once inside again? Then we'll be able to create the functions outside the for loop
+            annotator: PremiseVisitor[Annotation, None] = PremiseVisitorBuilder().onPositiveAtom(add1).or_(add2)
 # 					.onPositiveAtom((atom, anno) -> {
 # 						newBody.add(new AnnotatedAtom(atom, anno));
 # 						return null;
@@ -221,23 +292,7 @@ aaa
 # 		return new SemiNaiveClause(original.getHead(), body);
 # 	}
 #
-# 	public static final class SemiNaiveClause extends Clause {
-#
-# 		private SemiNaiveClause(Head head, List<Premise> body) {
-# 			super(head, body);
-# 			if (body.isEmpty()) {
-# 				throw new IllegalArgumentException("Body must not be empty.");
-# 			}
-# 		}
-#
-# 		public AnnotatedAtom getFirstAtom() {
-# 			assert body.get(0) instanceof AnnotatedAtom;
-# 			return (AnnotatedAtom) body.get(0);
-# 		}
-#
-# 	}
-#
-# }
+
 # /*******************************************************************************
 #  * This file is part of the AbcDatalog project.
 #  *
