@@ -1,42 +1,139 @@
-# import abcdatalog.ast.BinaryDisunifier;
 from mercylog.abcdatalog.ast.binary_disunifier import BinaryDisunifier
-# import abcdatalog.ast.BinaryUnifier;
 from mercylog.abcdatalog.ast.binary_unifier import BinaryUnifier
-# import abcdatalog.ast.Clause;
 from mercylog.abcdatalog.ast.clause import Clause
-# import abcdatalog.ast.Constant;
 from mercylog.abcdatalog.ast.constant import Constant
-# import abcdatalog.ast.Head;
 from mercylog.abcdatalog.ast.head import Head
-# import abcdatalog.ast.NegatedAtom;
 from mercylog.abcdatalog.ast.negated_atom import NegatedAtom
-# import abcdatalog.ast.PredicateSym;
 from mercylog.abcdatalog.ast.predicate_sym import PredicateSym
-# import abcdatalog.ast.Premise;
 from mercylog.abcdatalog.ast.premise import Premise
-# import abcdatalog.ast.Term;
 from mercylog.abcdatalog.ast.term import Term
-# import abcdatalog.ast.Variable;
 from mercylog.abcdatalog.ast.variable import Variable
-# import abcdatalog.ast.validation.DatalogValidator.ValidClause;
 from mercylog.abcdatalog.ast.validation.datalog_validator import ValidClause
-# import abcdatalog.ast.visitors.CrashPremiseVisitor;
 from mercylog.abcdatalog.ast.visitors.crash_premise_visitor import CrashPremiseVisitor
-# import abcdatalog.ast.visitors.DefaultConjunctVisitor;
 from mercylog.abcdatalog.ast.visitors.default_conjunct_visitor import DefaultConjunctVisitor
-# import abcdatalog.ast.visitors.PremiseVisitor;
 from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
-# import abcdatalog.ast.visitors.PremiseVisitorBuilder;
 from mercylog.abcdatalog.ast.visitors.premise_visitor_builder import PremiseVisitorBuilder
-# import abcdatalog.util.Box;
 from mercylog.abcdatalog.util.box import Box
-#
 from mercylog.abcdatalog.engine.bottomup.annotated_atom import AnnotatedAtom, Annotation
 from typing import *
 
-class SingletonSet:
-    def __init__(self, value):
-        self.singleton_set = {value}
+# PremiseVisitor<Set<Variable>, Double> scorer = new CrashPremiseVisitor<Set<Variable>, Double>() {
+class LocalCrashPremiseVisitor(CrashPremiseVisitor):
+#     @Override
+#     public Double visit(AnnotatedAtom atom, Set<Variable> boundVars) {
+#         int count = 0, total = 0;
+#         for (Term t : atom.getArgs()) {
+#             if (t instanceof Constant || boundVars.contains(t)) {
+#                 ++count;
+#             }
+#             ++total;
+#         }
+#         return (total == 0) ? 1.0 : count / total;
+#     }
+#
+    def visit_annotated_atom(self, atom: AnnotatedAtom, boundVars: Set[Variable]) -> float:
+        count: int = 0
+        total: int = 0
+        t: Term
+        for t in atom.getArgs():
+            if isinstance(t, Constant) or t in boundVars:
+                count += 1
+            total += 1
+
+        return 1.0 if (total == 0) else count / total
+
+#     @Override
+#     public Double visit(BinaryUnifier u, Set<Variable> boundVars) {
+#         for (Term t : u.getArgsIterable()) {
+#             if (t instanceof Constant || boundVars.contains(t)) {
+#                 return Double.POSITIVE_INFINITY;
+#             }
+#         }
+#         return Double.NEGATIVE_INFINITY;
+#     }
+#
+#     @Override
+    def visit_binary_unifier(self, u: BinaryUnifier, boundVars: Set[Variable]) -> float:
+        t: Term
+        for t in u.getArgsIterable():
+            if isinstance(t, Constant) or t in boundVars:
+                return float("inf")
+        return float("-inf")
+
+
+
+
+#     public Double visit(BinaryDisunifier u, Set<Variable> boundVars) {
+#         for (Term t : u.getArgsIterable()) {
+#             if (!(t instanceof Constant || boundVars.contains(t))) {
+#                 return Double.NEGATIVE_INFINITY;
+#             }
+#         }
+#         return Double.POSITIVE_INFINITY;
+#     }
+    def visit_binary_disunifier(self, u: BinaryDisunifier, boundVars: Set[Variable]) -> float:
+        t: Term
+        for t in u.get_args_iterable():
+            if not (isinstance(t, Constant) or t in boundVars):
+                return float('-inf')
+        return float('inf')
+#
+#     @Override
+#     public Double visit(NegatedAtom atom, Set<Variable> boundVars) {
+#         for (Term t : atom.getArgs()) {
+#             if (!(t instanceof Constant || boundVars.contains(t))) {
+#                 return Double.NEGATIVE_INFINITY;
+#             }
+#         }
+#         return Double.POSITIVE_INFINITY;
+#     }
+    def visit_negated_atom(self, atom: NegatedAtom, boundVars: Set[Variable]) -> float:
+        t: Term
+        for t in atom.getArgs():
+            if not (isinstance(t, Constant) or t in boundVars):
+                return float('-inf')
+        return float('inf')
+
+
+# };
+
+
+# PremiseVisitor<Set<Variable>, Void> boundVarUpdater = new DefaultConjunctVisitor<Set<Variable>, Void>() {
+class LocalDefaultConjunctVisitor(DefaultConjunctVisitor):
+#     @Override
+#     public Void visit(AnnotatedAtom atom, Set<Variable> boundVars) {
+#         for (Term t : atom.getArgs()) {
+#             if (t instanceof Variable) {
+#                 boundVars.add((Variable) t);
+#             }
+#         }
+#         return null;
+#     }
+
+    def visit_annotated_atom(self, atom: AnnotatedAtom, boundVars: Set[Variable]) -> None:
+        t: Term
+        for t in atom.getArgs():
+            if isinstance(t, Variable):
+                boundVars.add(t)
+        return None
+#
+#     @Override
+#     public Void visit(BinaryUnifier u, Set<Variable> boundVars) {
+#         for (Term t : u.getArgsIterable()) {
+#             if (t instanceof Variable) {
+#                 boundVars.add((Variable) t);
+#             }
+#         }
+#         return null;
+#     }
+# };
+    def visit_binary_unifier(self, u: BinaryUnifier, boundVars: Set[Variable]) -> None:
+        # TODO: Duplication with above visit method
+        t: Term
+        for t in u.getArgsIterable():
+            if isinstance(t, Variable):
+                boundVars.add(t)
+        return None
 
 
 # 	public static final class SemiNaiveClause extends Clause {
@@ -94,7 +191,7 @@ class SemiNaiveClauseAnnotator:
 # 	 * @return a set of annotated clauses
 # 	 */
 # 	public Set<SemiNaiveClause> annotate(ValidClause original) {
-    def annotate(self, original: ValidClause) -> Set[SemiNaiveClause]:
+    def annotate_single(self, original: ValidClause) -> Set[SemiNaiveClause]:
 # 		List<Premise> body = original.getBody();
         body: Tuple[Premise] = original.getBody()
 # 		if (body.isEmpty()) {
@@ -160,10 +257,19 @@ class SemiNaiveClauseAnnotator:
         if not idbPositions:
             if not edbPos.value:
                 edbPos.value = 0
-            return SingletonSet(self.sort(Clause(original.getHead(), body), edbPos.value))
+            singleton_set = set()
+            singleton_set.add(SemiNaiveClauseAnnotator.sort(Clause(original.getHead(), body), edbPos.value))
+            assert len(singleton_set) == 1, 'Supposed to be a singleton set'
+            return singleton_set
 
 # 		Set<SemiNaiveClause> r = new HashSet<>();
         r: Set[SemiNaiveClause] = set()
+        def add1(l_newBody: List, atom, anno):
+            l_newBody.append(AnnotatedAtom(atom, anno))
+            return None
+        def add2(l_newBody: List, premise, ignore):
+            l_newBody.append(premise)
+            return None
 # 		for (Integer i : idbPositions) {
         i: int
         for i in idbPositions:
@@ -171,7 +277,9 @@ class SemiNaiveClauseAnnotator:
             newBody: List[Premise] = []
 # 			PremiseVisitor<AnnotatedAtom.Annotation, Void> annotator = (new PremiseVisitorBuilder<AnnotatedAtom.Annotation, Void>())
 #           aaa. This is difficult as newBody is within the for loop so it's initiallized all the time. Maybe we'll have to initialize it twice, once outside the loop and once inside again? Then we'll be able to create the functions outside the for loop
-            annotator: PremiseVisitor[Annotation, None] = PremiseVisitorBuilder().onPositiveAtom(add1).or_(add2)
+            add1_l = lambda atom, anno: add1(newBody, atom, anno)
+            add2_l = lambda premise, ignore: add2(newBody, premise, ignore)
+            annotator: PremiseVisitor[Annotation, None] = PremiseVisitorBuilder().onPositiveAtom(add1_l).or_(add2_l)
 # 					.onPositiveAtom((atom, anno) -> {
 # 						newBody.add(new AnnotatedAtom(atom, anno));
 # 						return null;
@@ -179,16 +287,36 @@ class SemiNaiveClauseAnnotator:
 # 						newBody.add(premise);
 # 						return null;
 # 					});
+
 # 			Iterator<Premise> it = body.iterator();
 # 			for (int j = 0; j < i; ++j) {
 # 				it.next().accept(annotator, AnnotatedAtom.Annotation.IDB);
 # 			}
+            it = iter(body)
+            item = None
+            for j, _ in enumerate(body):
+                if j >= i:
+                    break
+                item = next(it)
+                item.accept_premise_visitor(annotator, Annotation.IDB)
+
+
 # 			it.next().accept(annotator, AnnotatedAtom.Annotation.DELTA);
+            item = next(it)
+            item.accept_premise_visitor(annotator, Annotation.DELTA)
 # 			while (it.hasNext()) {
 # 				it.next().accept(annotator, AnnotatedAtom.Annotation.IDB_PREV);
 # 			}
+            while True:
+                try:
+                    item = next(it)
+                    item.accept_premise_visitor(annotator, Annotation.IDB_PREV)
+                except StopIteration:
+                    break
 # 			r.add(sort(new Clause(original.getHead(), newBody), i));
+            r.add(SemiNaiveClauseAnnotator.sort(Clause(original.getHead(), tuple(newBody)), i))
 # 		}
+        return r
 # 		return r;
 # 	}
 #
@@ -199,13 +327,27 @@ class SemiNaiveClauseAnnotator:
 # 		}
 # 		return r;
 # 	}
+    def annotate_many(self, clauses: Set[ValidClause]) -> Set[SemiNaiveClause]:
+        r: Set[SemiNaiveClause] = set()
+        clause: ValidClause
+        for clause in clauses:
+            for a in self.annotate_single(clause):
+                r.add(a)
+        return r
 #
 # 	private static SemiNaiveClause sort(Clause original, int firstConjunctPos) {
+    @staticmethod
+    def sort(original: Clause, firstConjunctPos: int) -> SemiNaiveClause:
 # 		List<Premise> body = new ArrayList<>(original.getBody());
+        body: List[Premise] = list(original.getBody())
 # 		if (body.isEmpty()) {
 # 			return new SemiNaiveClause(original.getHead(), body);
 # 		}
+        if not body:
+            return SemiNaiveClause(original.getHead(), body)
 # 		PremiseVisitor<Set<Variable>, Void> boundVarUpdater = new DefaultConjunctVisitor<Set<Variable>, Void>() {
+
+        boundVarUpdate: PremiseVisitor[Set[Variable]] = LocalDefaultConjunctVisitor()
 # 			@Override
 # 			public Void visit(AnnotatedAtom atom, Set<Variable> boundVars) {
 # 				for (Term t : atom.getArgs()) {
@@ -227,7 +369,10 @@ class SemiNaiveClauseAnnotator:
 # 			}
 # 		};
 #
+
+
 # 		PremiseVisitor<Set<Variable>, Double> scorer = new CrashPremiseVisitor<Set<Variable>, Double>() {
+        scorer: PremiseVisitor[Set[Variable], float] = LocalCrashPremiseVisitor()
 # 			@Override
 # 			public Double visit(AnnotatedAtom atom, Set<Variable> boundVars) {
 # 				int count = 0, total = 0;
@@ -271,6 +416,7 @@ class SemiNaiveClauseAnnotator:
 # 			}
 # 		};
 #
+        aaa
 # 		Collections.swap(body, 0, firstConjunctPos);
 # 		int size = body.size();
 # 		Set<Variable> boundVars = new HashSet<>();
