@@ -276,7 +276,6 @@ class SemiNaiveClauseAnnotator:
 # 			List<Premise> newBody = new ArrayList<>();
             newBody: List[Premise] = []
 # 			PremiseVisitor<AnnotatedAtom.Annotation, Void> annotator = (new PremiseVisitorBuilder<AnnotatedAtom.Annotation, Void>())
-#           aaa. This is difficult as newBody is within the for loop so it's initiallized all the time. Maybe we'll have to initialize it twice, once outside the loop and once inside again? Then we'll be able to create the functions outside the for loop
             add1_l = lambda atom, anno: add1(newBody, atom, anno)
             add2_l = lambda premise, ignore: add2(newBody, premise, ignore)
             annotator: PremiseVisitor[Annotation, None] = PremiseVisitorBuilder().onPositiveAtom(add1_l).or_(add2_l)
@@ -347,7 +346,7 @@ class SemiNaiveClauseAnnotator:
             return SemiNaiveClause(original.getHead(), body)
 # 		PremiseVisitor<Set<Variable>, Void> boundVarUpdater = new DefaultConjunctVisitor<Set<Variable>, Void>() {
 
-        boundVarUpdate: PremiseVisitor[Set[Variable]] = LocalDefaultConjunctVisitor()
+        boundVarUpdater: PremiseVisitor[Set[Variable]] = LocalDefaultConjunctVisitor()
 # 			@Override
 # 			public Void visit(AnnotatedAtom atom, Set<Variable> boundVars) {
 # 				for (Term t : atom.getArgs()) {
@@ -416,26 +415,43 @@ class SemiNaiveClauseAnnotator:
 # 			}
 # 		};
 #
-        aaa
 # 		Collections.swap(body, 0, firstConjunctPos);
+        body[0], body[firstConjunctPos] = body[firstConjunctPos], body[0]
 # 		int size = body.size();
+        size: int = len(body)
 # 		Set<Variable> boundVars = new HashSet<>();
+        boundVars: Set[Variable] = set()
 # 		for (int i = 1; i < size; ++i) {
+        for i in range(1, size):
 # 			body.get(i - 1).accept(boundVarUpdater, boundVars);
+            body[i-1].accept_premise_visitor(boundVarUpdater, boundVars)
 # 			int bestPos = -1;
+            bestPos: int = -1
 # 			double bestScore = Double.NEGATIVE_INFINITY;
+            bestScore: float = float("-inf")
+
 # 			for (int j = i; j < size; ++j) {
+            j: int = i
+            while j < size:
 # 				Double score = body.get(j).accept(scorer, boundVars);
+                score: float = body[j].accept_premise_visitor(scorer, boundVars)
 # 				if (score > bestScore) {
+                if score > bestScore:
 # 					bestScore = score;
+                    bestScore = score
 # 					bestPos = j;
+                    bestPos = j
 # 				}
+                j += 1
 # 			}
 # 			assert bestPos != -1;
+            assert bestPos != -1
 # 			Collections.swap(body, i, bestPos);
+            body[i], body[bestPos] = body[bestPos], body[i]
 # 		}
 #
 # 		return new SemiNaiveClause(original.getHead(), body);
+        return SemiNaiveClause(original.getHead(), body)
 # 	}
 #
 

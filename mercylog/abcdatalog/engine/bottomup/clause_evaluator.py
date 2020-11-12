@@ -31,8 +31,10 @@ from mercylog.abcdatalog.ast.visitors.crash_head_visitor import CrashHeadVisitor
 # import abcdatalog.ast.visitors.CrashPremiseVisitor;
 from mercylog.abcdatalog.ast.visitors.crash_premise_visitor import CrashPremiseVisitor
 # import abcdatalog.engine.bottomup.SemiNaiveClauseAnnotator.SemiNaiveClause;
-from mercylog.abcdatalog.engine.bottomup.semi_naive_clause_annotator.semi_naive_clause import SemiNaiveClause
+from mercylog.abcdatalog.engine.bottomup.semi_naive_clause_annotator import SemiNaiveClause
 # import abcdatalog.util.substitution.ClauseSubstitution;
+from mercylog.abcdatalog.util.substitution.clause_substitution import ClauseSubstitution
+aaa
 #
 # /**
 #  * This class provides a way to derive all the new facts that are derivable from

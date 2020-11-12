@@ -4,7 +4,7 @@ from mercylog.abcdatalog.ast.clause import Clause
 # import abcdatalog.ast.validation.DatalogValidationException;
 from mercylog.abcdatalog.ast.validation.datalog_validation_exception import DatalogValidationException
 # import abcdatalog.util.datastructures.IndexableFactCollection;
-from mercylog.abcdatalog.util.datastructures.
+from mercylog.abcdatalog.util.datastructures
 #
 # /**
 #  * The saturating evaluation manager for a bottom-up Datalog evaluation engine.
