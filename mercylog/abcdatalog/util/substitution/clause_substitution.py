@@ -1,3 +1,5 @@
+import copy
+from typing import *
 # import abcdatalog.ast.BinaryDisunifier;
 from mercylog.abcdatalog.ast.binary_disunifier import BinaryDisunifier
 # import abcdatalog.ast.BinaryUnifier;
@@ -20,19 +22,62 @@ from mercylog.abcdatalog.ast.term import Term
 from mercylog.abcdatalog.ast.term_helpers import TermHelpers
 # import abcdatalog.ast.Variable;
 from mercylog.abcdatalog.ast.variable import Variable
-# import abcdatalog.ast.validation.DatalogValidationException;
 from mercylog.abcdatalog.ast.validation.datalog_validation_exception import DatalogValidationException
-aaa
-# import abcdatalog.ast.validation.DatalogValidator;
-# import abcdatalog.ast.validation.DatalogValidator.ValidClause;
-# import abcdatalog.ast.validation.UnstratifiedProgram;
-# import abcdatalog.ast.visitors.CrashPremiseVisitor;
-# import abcdatalog.ast.visitors.PremiseVisitor;
-# import abcdatalog.ast.visitors.TermVisitor;
-# import abcdatalog.ast.visitors.TermVisitorBuilder;
-# import abcdatalog.engine.bottomup.AnnotatedAtom;
-# import abcdatalog.engine.bottomup.SemiNaiveClauseAnnotator;
-# import abcdatalog.engine.bottomup.SemiNaiveClauseAnnotator.SemiNaiveClause;
+from mercylog.abcdatalog.ast.validation.datalog_validator import DatalogValidator
+from mercylog.abcdatalog.ast.validation.datalog_validator import ValidClause
+from mercylog.abcdatalog.ast.validation.unstratified_program import UnstratifiedProgram
+from mercylog.abcdatalog.ast.visitors.crash_premise_visitor import CrashPremiseVisitor
+from mercylog.abcdatalog.ast.visitors.premise_visitor import PremiseVisitor
+from mercylog.abcdatalog.ast.visitors.term_visitor import TermVisitor
+from mercylog.abcdatalog.ast.visitors.term_visitor_builder import TermVisitorBuilder
+from mercylog.abcdatalog.engine.bottomup.annotated_atom import AnnotatedAtom
+from mercylog.abcdatalog.engine.bottomup.semi_naive_clause_annotator import SemiNaiveClauseAnnotator, SemiNaiveClause
+from mercylog.abcdatalog.util.substitution.const_only_substitution import ConstOnlySubstitution
+
+
+# 		PremiseVisitor<Integer, Integer> varFinder = new CrashPremiseVisitor<Integer, Integer>() {
+class LocalCrashPremiseVisitor(CrashPremiseVisitor):
+    def __init__(self, idxByConj: List[int], tv: TermVisitor[int, int]):
+        self.idxByConj = idxByConj
+        self.tv = tv
+
+# 			@Override
+# 			public Integer visit(AnnotatedAtom atom, Integer count) {
+# 				idxByConj.add(count);
+# 				return TermHelpers.fold(atom.getArgs(), tv, count);
+# 			}
+    def visit_annotated_atom(self, atom: AnnotatedAtom, count: int) -> int:
+        self.idxByConj.append(count)
+        return TermHelpers.fold(atom.getArgs(), self.tv, count)
+#
+# 			@Override
+# 			public Integer visit(BinaryUnifier u, Integer count) {
+# 				idxByConj.add(count);
+# 				return TermHelpers.fold(u.getArgsIterable(), tv, count);
+# 			}
+#
+    def visit_binary_unifier(self, u: BinaryUnifier, count: int) -> int:
+        self.idxByConj.append(count)
+        return TermHelpers.fold(u.getArgsIterable(), self.tv, count)
+# 			@Override
+# 			public Integer visit(BinaryDisunifier u, Integer count) {
+# 				idxByConj.add(count);
+# 				return TermHelpers.fold(u.getArgsIterable(), tv, count);
+# 			}
+#
+    def visit_binary_disunifier(self, u: BinaryDisunifier, count: int) -> int:
+        self.idxByConj.append(count)
+        return TermHelpers.fold(u.get_args_iterable(), self.tv, count)
+# 			@Override
+# 			public Integer visit(NegatedAtom atom, Integer count) {
+# 				idxByConj.add(count);
+# 				return TermHelpers.fold(atom.getArgs(), tv, count);
+# 			}
+# 		};
+#
+    def visit_negated_atom(self, atom: NegatedAtom, count: int):
+        self.idxByConj.append(count)
+        return TermHelpers.fold(atom.getArgs(), self.tv, count)
 #
 # /**
 #  * This is a substitution tailor-made for a particular clause. Mappings can only
@@ -42,6 +87,7 @@ aaa
 #  *
 #  */
 # public class ClauseSubstitution implements ConstOnlySubstitution {
+class ClauseSubstitution(ConstOnlySubstitution):
 # 	private final Constant[] subst;
 # 	private final Map<Variable, Integer> index;
 # 	private final int[] indexByConj;
@@ -49,10 +95,20 @@ aaa
 # 	private final int bodySize;
 #
 # 	public ClauseSubstitution(SemiNaiveClause c) {
+    def __init__(self, c: SemiNaiveClause):
 # 		Map<Variable, Integer> idx = new HashMap<>();
+        idx: Dict[Variable, int] = dict()
 # 		List<Integer> idxByConj = new ArrayList<>();
+        idxByConj: List[int] = []
 #
 # 		TermVisitor<Integer, Integer> tv = (new TermVisitorBuilder<Integer, Integer>()).onVariable((x, curCount) -> {
+        def variable_func(x, curCount):
+            if x not in idx:
+                idx[x] = curCount
+                return curCount + 1
+            return curCount
+
+        tv: TermVisitor[int, int] = TermVisitorBuilder.onVariable(variable_func).or_(lambda x, curCount: curCount)
 # 			if (idx.get(x) == null) {
 # 				idx.put(x, curCount);
 # 				return curCount + 1;
@@ -61,6 +117,7 @@ aaa
 # 		}).or((x, curCount) -> curCount);
 #
 # 		PremiseVisitor<Integer, Integer> varFinder = new CrashPremiseVisitor<Integer, Integer>() {
+        varFinder: PremiseVisitor[int, int] = LocalCrashPremiseVisitor(idxByConj, tv)
 # 			@Override
 # 			public Integer visit(AnnotatedAtom atom, Integer count) {
 # 				idxByConj.add(count);
@@ -87,19 +144,35 @@ aaa
 # 		};
 #
 # 		int count = 0;
+        count: int = 0
 # 		for (Premise conj : c.getBody()) {
+        conj: Premise
+        for conj in c.getBody():
 # 			count = conj.accept(varFinder, count);
+            count = conj.accept_premise_visitor(varFinder, count)
 # 		}
 #
 # 		this.subst = new Constant[count];
+        self.subst = []
 # 		this.index = idx;
+        self.index = idx
 # 		this.bodySize = c.getBody().size();
+        self.bodySize = len(c.getBody())
 # 		this.indexByConj = new int[this.bodySize];
+        self.indexByConj = []
 # 		Iterator<Integer> iter = idxByConj.iterator();
+        it: Iterator[int] = iter(idxByConj)
+        i = 0
 # 		for (int i = 0; i < this.bodySize; ++i) {
+        while i < self.bodySize:
 # 			this.indexByConj[i] = iter.next();
+            self.indexByConj[i] = next(it)
+            i += 1
 # 		}
+        super(ClauseSubstitution, self).__init__()
+
 # 	}
+aaa
 #
 # 	private ClauseSubstitution(Constant[] subst, Map<Variable, Integer> index, int[] indexByConj, int pos,
 # 			int bodySize) {
