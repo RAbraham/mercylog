@@ -140,7 +140,7 @@ class LocalDefaultConjunctVisitor(DefaultConjunctVisitor):
 class SemiNaiveClause(Clause):
 #
 # 		private SemiNaiveClause(Head head, List<Premise> body) {
-    def __init__(self, head: Head, body: List[Premise]):
+    def __init__(self, head: Head, body: Tuple[Premise]):
 # 			super(head, body);
         super(SemiNaiveClause, self).__init__(head, body)
 # 			if (body.isEmpty()) {
@@ -235,15 +235,19 @@ class SemiNaiveClauseAnnotator:
             body2.append(premise)
 
         findIdbs: PremiseVisitor[int, None] = PremiseVisitorBuilder().onPositiveAtom(add_to_body2).or_(simple_add_to_body2)
+
+
  		# int pos = 0;
         pos: int = 0
         c: Premise
 # 		for (Premise c : body) {
 # 			c.accept(findIdbs, pos++);
 # 		}
+
         for c in body:
-            pos += 1
             c.accept_premise_visitor(findIdbs, pos)
+            pos += 1
+# RA: something happens above c.accept_premise_visitor to change edPos value to 1
 # 		body = body2;
         body = tuple(body2)
 #
@@ -254,6 +258,7 @@ class SemiNaiveClauseAnnotator:
 # 			return Collections.singleton(sort(new Clause(original.getHead(), body), edbPos.value));
 # 		}
 #
+
         if not idbPositions:
             if not edbPos.value:
                 edbPos.value = 0
@@ -451,7 +456,7 @@ class SemiNaiveClauseAnnotator:
 # 		}
 #
 # 		return new SemiNaiveClause(original.getHead(), body);
-        return SemiNaiveClause(original.getHead(), body)
+        return SemiNaiveClause(original.getHead(), tuple(body))
 # 	}
 #
 

@@ -96,7 +96,7 @@ class ClauseSubstitution(ConstOnlySubstitution):
 #
 # 	public ClauseSubstitution(SemiNaiveClause c) {
     @staticmethod
-    def make_with_seminaive_clause(self, c: SemiNaiveClause):
+    def make_with_seminaive_clause(c: SemiNaiveClause):
 # 		Map<Variable, Integer> idx = new HashMap<>();
         idx: Dict[Variable, int] = dict()
 # 		List<Integer> idxByConj = new ArrayList<>();
@@ -109,7 +109,7 @@ class ClauseSubstitution(ConstOnlySubstitution):
                 return curCount + 1
             return curCount
 
-        tv: TermVisitor[int, int] = TermVisitorBuilder.onVariable(variable_func).or_(lambda x, curCount: curCount)
+        tv: TermVisitor[int, int] = TermVisitorBuilder().onVariable(variable_func).or_(lambda x, curCount: curCount)
 # 			if (idx.get(x) == null) {
 # 				idx.put(x, curCount);
 # 				return curCount + 1;
@@ -166,9 +166,9 @@ class ClauseSubstitution(ConstOnlySubstitution):
         it: Iterator[int] = iter(idxByConj)
         i = 0
 # 		for (int i = 0; i < this.bodySize; ++i) {
-        while i < self.bodySize:
+        while i < bodySize:
 # 			this.indexByConj[i] = iter.next();
-            indexByConj[i] = next(it)
+            indexByConj.append(next(it))
             i += 1
 # 		}
         return ClauseSubstitution(subst,index,indexByConj, 0, bodySize)
@@ -236,6 +236,11 @@ class ClauseSubstitution(ConstOnlySubstitution):
 # 	@Override
 # 	public String toString() {
     def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        print("Subst")
+        print(self.subst)
 # 		Set<Entry<Variable, Integer>> entries = this.index.entrySet();
         entries = self.index.items()
 # 		int curConj = 0;
@@ -243,9 +248,11 @@ class ClauseSubstitution(ConstOnlySubstitution):
 # 		Variable[] orderedVars = new Variable[entries.size()];
         orderedVars: List[Variable] = []
 # 		for (Entry<Variable, Integer> entry : entries) {
-        for v, k in entries:
+        sorted_entries = sorted(entries, key=lambda t: t[1])
+        for k, v in sorted_entries:
 # 			orderedVars[entry.getValue()] = entry.getKey();
-            orderedVars[v] = k
+#             orderedVars[v] = k
+            orderedVars.append(k)
 # 		}
 #
 # 		StringBuilder sb = new StringBuilder();

@@ -2,12 +2,15 @@ import pytest
 from mercylog.abcdatalog.ast.predicate_sym import PredicateSym
 from mercylog.abcdatalog.ast.variable import Variable
 from mercylog.abcdatalog.ast.constant import Constant
+from mercylog.abcdatalog.ast.clause import Clause
 from mercylog.abcdatalog.ast.positive_atom import PositiveAtom
 from mercylog.abcdatalog.ast.premise import Premise
 from mercylog.abcdatalog.ast.binary_unifier import BinaryUnifier
 from mercylog.abcdatalog.engine.bottomup.semi_naive_clause_annotator import SemiNaiveClause
 from mercylog.abcdatalog.util.substitution.clause_substitution import ClauseSubstitution
 from mercylog.abcdatalog.ast.validation.datalog_validator import DatalogValidator
+from mercylog.abcdatalog.ast.validation.unstratified_program import UnstratifiedProgram
+from mercylog.abcdatalog.engine.bottomup.semi_naive_clause_annotator import SemiNaiveClauseAnnotator
 from typing import *
 
 def test_create_substitution_1():
@@ -71,24 +74,39 @@ def test_create_substitution_1():
 #			System.out.print("> ");
             print("> ")
 #			System.out.println(new ClauseSubstitution(c));
-            print(str(ClauseSubstitution.make_with_seminaive_clause(c)))
+            print(ClauseSubstitution.make_with_seminaive_clause(c))
 #		}
 #	};
+    print('\n')
 #	for (PredicateSym pred : idbPreds) {
     for pred in idbPreds:
 #		System.out.println(pred);
         print(pred)
+        pass
 #	}
-    aaa
 #	DatalogValidator validator = (new DatalogValidator()).withBinaryUnificationInRuleBody();
+    validator: DatalogValidator = DatalogValidator().withBinaryUnificationInRuleBody()
 
 
 #	UnstratifiedProgram prog = validator
 #			.validate(Collections.singleton(new Clause(pAtom, Collections.singletonList(pAtom))));
+    prog: UnstratifiedProgram = validator.validate({Clause(pAtom, tuple([pAtom]))}) #ignore
 #	SemiNaiveClauseAnnotator annotator = new SemiNaiveClauseAnnotator(idbPreds);
+    annotator: SemiNaiveClauseAnnotator = SemiNaiveClauseAnnotator(idbPreds)
 #	createAndPrint.accept(annotator.annotate(prog.getRules().iterator().next()));
-#	prog = validator.validate(Collections.singleton(new Clause(pAtom, Collections.singletonList(qAtom))));
+    it = iter(prog.getRules())
+    rule = next(it)
+
+    # createAndPrint(annotator.annotate_single(rule))
+    _clause = list(annotator.annotate_single(rule))[0]
+    # TODO: Uncomment below assert
+    # assert str(ClauseSubstitution.make_with_seminaive_clause(_clause)) == "{ }"
+
+	# prog = validator.validate(Collections.singleton(new Clause(pAtom, Collections.singletonList(qAtom))));
+    prog: UnstratifiedProgram = validator.validate({Clause(pAtom, tuple([qAtom]))})  # ignore
 #	createAndPrint.accept(annotator.annotate(prog.getRules().iterator().next()));
+    it = iter(prog.getRules())
+    createAndPrint(annotator.annotate_single(next(it)))
 #
 #	List<Premise> l = new ArrayList<>();
 #	l.add(qAtom);

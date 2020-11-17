@@ -24,8 +24,8 @@ class BinaryUnifier(Premise):
     def getArgsIterable(self) -> Sequence:
         return [self.left, self.right]
 
-    def accept(self, visitor, state):
-        return visitor.visit_binary_unifier(self, state)
+    def accept_premise_visitor(self, premise_visitor, state):
+        return premise_visitor.visit_binary_unifier(self, state)
 
     def __str__(self):
         return str(self.left) + " = " + str(self.right)
