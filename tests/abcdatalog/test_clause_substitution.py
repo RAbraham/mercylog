@@ -11,6 +11,7 @@ from mercylog.abcdatalog.util.substitution.clause_substitution import ClauseSubs
 from mercylog.abcdatalog.ast.validation.datalog_validator import DatalogValidator
 from mercylog.abcdatalog.ast.validation.unstratified_program import UnstratifiedProgram
 from mercylog.abcdatalog.engine.bottomup.semi_naive_clause_annotator import SemiNaiveClauseAnnotator
+from mercylog.abcdatalog.ast.validation.datalog_validator import ValidClause
 from typing import *
 
 def test_create_substitution_1():
@@ -62,59 +63,37 @@ def test_create_substitution_1():
     u2: Premise = BinaryUnifier(z, z)
     #
 
-
-#	System.out.println("Testing creating substitutions...");
-#	Consumer<Set<SemiNaiveClause>> createAndPrint = clauses -> {
     def createAndPrint(clauses: Set[SemiNaiveClause]):
-#		for (SemiNaiveClause c : clauses) {
         c: SemiNaiveClause
         for c in clauses:
-#			System.out.println("Substitution for: " + c);
             print(f"Substitution for: {c}")
-#			System.out.print("> ");
             print("> ")
-#			System.out.println(new ClauseSubstitution(c));
             print(ClauseSubstitution.make_with_seminaive_clause(c))
-#		}
-#	};
     print('\n')
-#	for (PredicateSym pred : idbPreds) {
     for pred in idbPreds:
-#		System.out.println(pred);
         print(pred)
         pass
-#	}
-#	DatalogValidator validator = (new DatalogValidator()).withBinaryUnificationInRuleBody();
     validator: DatalogValidator = DatalogValidator().withBinaryUnificationInRuleBody()
 
 
-#	UnstratifiedProgram prog = validator
-#			.validate(Collections.singleton(new Clause(pAtom, Collections.singletonList(pAtom))));
-    prog: UnstratifiedProgram = validator.validate({Clause(pAtom, tuple([pAtom]))}) #ignore
-#	SemiNaiveClauseAnnotator annotator = new SemiNaiveClauseAnnotator(idbPreds);
     annotator: SemiNaiveClauseAnnotator = SemiNaiveClauseAnnotator(idbPreds)
-#	createAndPrint.accept(annotator.annotate(prog.getRules().iterator().next()));
-    it = iter(prog.getRules())
-    rule = next(it)
+    expected_value = "{ }"
+    input_clause = {Clause(pAtom, tuple([pAtom]))}
 
-    # createAndPrint(annotator.annotate_single(rule))
-    _clause = list(annotator.annotate_single(rule))[0]
-    # TODO: Uncomment below assert
-    # assert str(ClauseSubstitution.make_with_seminaive_clause(_clause)) == "{ }"
+    assert_annotation(validator, annotator, input_clause, expected_value)
+    assert_annotation(validator, annotator, {Clause(pAtom, tuple([qAtom]))}, "{ ^ <0> X -> None, Y -> None }")
 
-	# prog = validator.validate(Collections.singleton(new Clause(pAtom, Collections.singletonList(qAtom))));
-    prog: UnstratifiedProgram = validator.validate({Clause(pAtom, tuple([qAtom]))})  # ignore
-#	createAndPrint.accept(annotator.annotate(prog.getRules().iterator().next()));
-    it = iter(prog.getRules())
-    createAndPrint(annotator.annotate_single(next(it)))
-#
-#	List<Premise> l = new ArrayList<>();
-#	l.add(qAtom);
-#	l.add(rAtom);
-#	ValidClause cl = validator.validate(Collections.singleton(new Clause(pAtom, l))).getRules().iterator().next();
-#	createAndPrint.accept(annotator.annotate(cl));
-#	Collections.swap(l, 0, 1);
-#	createAndPrint.accept(annotator.annotate(cl));
+    l: List[Premise] = []
+    l.append(qAtom)
+    l.append(rAtom)
+
+    assert_annotation(validator, annotator, {Clause(pAtom, tuple(l))}, "{ ^ <0> X -> None, Y -> None }")
+    l[0], l[1] = l[1], l[0]
+
+    assert_annotation(validator, annotator, {Clause(pAtom, tuple(l))}, "{ ^ <0> X -> None, Y -> None }")
+
+
+print(">> Current")
 #	l.add(sAtom);
 #	createAndPrint.accept(annotator.annotate(cl));
 #	l.add(u1);
@@ -173,3 +152,10 @@ def test_create_substitution_1():
 #	assert subst.get(z) == null;
 #
 #
+def assert_annotation(validator, annotator, input_clause, expected_value):
+    prog: UnstratifiedProgram = validator.validate(input_clause)  # ignore
+    it = iter(prog.getRules())
+    rule = next(it)
+    _clause = list(annotator.annotate_single(rule))[0]
+    assert str(ClauseSubstitution.make_with_seminaive_clause(_clause)) == expected_value
+    return annotator

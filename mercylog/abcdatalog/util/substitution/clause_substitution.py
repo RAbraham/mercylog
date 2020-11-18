@@ -239,8 +239,6 @@ class ClauseSubstitution(ConstOnlySubstitution):
         return self.__str__()
 
     def __str__(self):
-        print("Subst")
-        print(self.subst)
 # 		Set<Entry<Variable, Integer>> entries = this.index.entrySet();
         entries = self.index.items()
 # 		int curConj = 0;
@@ -269,25 +267,22 @@ class ClauseSubstitution(ConstOnlySubstitution):
 # 			while (curConj < this.bodySize && this.indexByConj[curConj] == i) {
             while curConj < self.bodySize and self.indexByConj[curConj] == i:
 # 				sb.append("<" + curConj++ + "> ");
+                sb = sb + "<" + str(curConj) + "> "
                 curConj += 1
-                sb = sb + "<" + str(curConj) + ">"
 # 			}
 # 			sb.append(orderedVars[i]);
             sb = sb + str(orderedVars[i])
 # 			sb.append(" -> ");
             sb = sb  + " -> "
 # 			Constant c = this.subst[i];
-            c: Constant = self.subst[i]
 # 			if (c != null) {
+#             c: Constant = self.subst[i]
+            c: Constant = _get_from_subst(self.subst, i)
             if c:
-# 				sb.append(c);
                 sb = sb + str(c)
-# 			} else {
             else:
-# 				sb.append("None");
                 sb = sb + "None"
-# 			}
-#
+
 # 			if (i < orderedVars.length - 1) {
             if i < (len(orderedVars) - 1):
 # 				sb.append(", ");
@@ -330,6 +325,14 @@ class ClauseSubstitution(ConstOnlySubstitution):
             terms.append(t)
         return terms
 #
+def _get_from_subst(subst, i):
+    if subst:
+        return subst[i]
+    else:
+        return None
+    pass
+            # c: Constant = self.subst[i]
+            # c: Constant = _get_from_subst(self.subst)
 
 
 # }
