@@ -65,6 +65,8 @@ def test_create_substitution_1():
 
     def createAndPrint(clauses: Set[SemiNaiveClause]):
         c: SemiNaiveClause
+        print('>> Clauses')
+        print(clauses)
         for c in clauses:
             print(f"Substitution for: {c}")
             print("> ")
@@ -90,24 +92,23 @@ def test_create_substitution_1():
     assert_annotation(validator, annotator, {Clause(pAtom, tuple(l))}, "{ ^ <0> X -> None, Y -> None }")
     l[0], l[1] = l[1], l[0]
 
-    assert_annotation(validator, annotator, {Clause(pAtom, tuple(l))}, "{ ^ <0> X -> None, Y -> None }")
+    assert_annotation(validator, annotator, [Clause(pAtom, tuple(l))], "{ ^ <0> X -> None, Y -> None }")
 
 
-print(">> Current")
-#	l.add(sAtom);
-#	createAndPrint.accept(annotator.annotate(cl));
-#	l.add(u1);
-#	createAndPrint.accept(annotator.annotate(cl));
-#	l.add(u2);
-#	createAndPrint.accept(annotator.annotate(cl));
-#
+    print(">> Current")
+    # createAndPrint(annotator.annotate_single(get_cl(validator, {Clause(pAtom, tuple(l))})))
 #	System.out.println("\nTesting adding...");
-#	l.clear();
+    l = []
+
 #	l.add(qAtom);
+    l.append(qAtom)
 #	l.add(sAtom);
+    l.append(sAtom)
 #	idbPreds.clear();
+    idbPreds = set()
 #	cl = validator.validate(Collections.singleton(new Clause(pAtom, l))).getRules().iterator().next();
 #	ClauseSubstitution subst = new ClauseSubstitution(annotator.annotate(cl).iterator().next());
+    assert_annotation(validator, annotator, [Clause(pAtom, tuple(l))], "{ ^ <0> X -> None, Y -> None, <1> Z -> None }")
 #	System.out.println(subst);
 #	subst.add(x, a);
 #	System.out.println(subst);
@@ -153,9 +154,14 @@ print(">> Current")
 #
 #
 def assert_annotation(validator, annotator, input_clause, expected_value):
-    prog: UnstratifiedProgram = validator.validate(input_clause)  # ignore
-    it = iter(prog.getRules())
-    rule = next(it)
+    rule = get_cl(validator, input_clause)
     _clause = list(annotator.annotate_single(rule))[0]
     assert str(ClauseSubstitution.make_with_seminaive_clause(_clause)) == expected_value
     return annotator
+
+
+def get_cl(validator, input_clause):
+    prog: UnstratifiedProgram = validator.validate(input_clause)  # ignore
+    it = iter(prog.getRules())
+    rule = next(it)
+    return rule
