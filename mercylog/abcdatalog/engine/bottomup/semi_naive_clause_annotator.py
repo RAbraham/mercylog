@@ -169,10 +169,14 @@ class SemiNaiveClause(Clause):
 #  *
 #  */
 # public class SemiNaiveClauseAnnotator {
+
+def unique(t): return list(dict.fromkeys(t))
 class SemiNaiveClauseAnnotator:
 # 	private final Set<PredicateSym> idbPreds;
     def __init__(self, idbPreds: Set[PredicateSym]):
-        self.idbPreds = idbPreds
+
+
+        self.idbPreds = unique(idbPreds)
 #
 # 	public SemiNaiveClauseAnnotator(Set<PredicateSym> idbPreds) {
 # 		this.idbPreds = idbPreds;
@@ -191,7 +195,7 @@ class SemiNaiveClauseAnnotator:
 # 	 * @return a set of annotated clauses
 # 	 */
 # 	public Set<SemiNaiveClause> annotate(ValidClause original) {
-    def annotate_single(self, original: ValidClause) -> Set[SemiNaiveClause]:
+    def annotate_single(self, original: ValidClause) -> List[SemiNaiveClause]:
 # 		List<Premise> body = original.getBody();
         body: Tuple[Premise] = original.getBody()
 # 		if (body.isEmpty()) {
@@ -262,13 +266,16 @@ class SemiNaiveClauseAnnotator:
         if not idbPositions:
             if not edbPos.value:
                 edbPos.value = 0
-            singleton_set = set()
-            singleton_set.add(SemiNaiveClauseAnnotator.sort(Clause(original.getHead(), body), edbPos.value))
+            # singleton_set = set()
+            singleton_set = []
+            # singleton_set.add(SemiNaiveClauseAnnotator.sort(Clause(original.getHead(), body), edbPos.value))
+            singleton_set.append(SemiNaiveClauseAnnotator.sort(Clause(original.getHead(), body), edbPos.value))
             assert len(singleton_set) == 1, 'Supposed to be a singleton set'
             return singleton_set
 
 # 		Set<SemiNaiveClause> r = new HashSet<>();
-        r: Set[SemiNaiveClause] = set()
+#         r: Set[SemiNaiveClause] = set()
+        r: List[SemiNaiveClause] = []
         def add1(l_newBody: List, atom, anno):
             l_newBody.append(AnnotatedAtom(atom, anno))
             return None
@@ -318,8 +325,9 @@ class SemiNaiveClauseAnnotator:
                 except StopIteration:
                     break
 # 			r.add(sort(new Clause(original.getHead(), newBody), i));
-            r.add(SemiNaiveClauseAnnotator.sort(Clause(original.getHead(), tuple(newBody)), i))
+            r.append(SemiNaiveClauseAnnotator.sort(Clause(original.getHead(), tuple(newBody)), i))
 # 		}
+        r = unique(r)
         return r
 # 		return r;
 # 	}

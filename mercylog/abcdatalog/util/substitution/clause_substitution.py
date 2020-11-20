@@ -207,9 +207,15 @@ class ClauseSubstitution(ConstOnlySubstitution):
 # 	}
     def add(self, x: Variable, c: Constant) -> bool:
         idx: int = self.index.get(x)
-        assert idx and idx == self.pos
-        self.pos = self.pos + 1
+
+        assert idx is not None
+        assert idx == self.pos
+        print(">> self.pos")
+        print(self.pos)
+        print(">> subst")
+        print(self.subst)
         self.subst[self.pos] = c
+        self.pos = self.pos + 1
         return True
 #
 # 	public Constant get(Variable x) {
