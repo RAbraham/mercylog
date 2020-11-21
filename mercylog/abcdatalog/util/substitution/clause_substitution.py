@@ -155,7 +155,7 @@ class ClauseSubstitution(ConstOnlySubstitution):
 #
 
 # 		this.subst = new Constant[count];
-        subst = []
+        subst = count * [None]
 # 		this.index = idx;
         index = idx
 # 		this.bodySize = c.getBody().size();
@@ -184,7 +184,7 @@ class ClauseSubstitution(ConstOnlySubstitution):
 # 		this.bodySize = bodySize;
 # 	}
 
-    def __init__(self, subst: List[Constant], index: Dict[Variable, int], indexByConj: List[int], pos: int, bodySize: int):
+    def __init__(self, subst: List[Optional[Constant]], index: Dict[Variable, int], indexByConj: List[int], pos: int, bodySize: int):
         self.subst = subst
         self.index = index
         self.indexByConj = indexByConj
@@ -210,10 +210,6 @@ class ClauseSubstitution(ConstOnlySubstitution):
 
         assert idx is not None
         assert idx == self.pos
-        print(">> self.pos")
-        print(self.pos)
-        print(">> subst")
-        print(self.subst)
         self.subst[self.pos] = c
         self.pos = self.pos + 1
         return True
@@ -282,8 +278,8 @@ class ClauseSubstitution(ConstOnlySubstitution):
             sb = sb  + " -> "
 # 			Constant c = this.subst[i];
 # 			if (c != null) {
-#             c: Constant = self.subst[i]
-            c: Constant = _get_from_subst(self.subst, i)
+            c: Constant = self.subst[i]
+#             c: Constant = _get_from_subst(self.subst, i)
             if c:
                 sb = sb + str(c)
             else:
@@ -331,13 +327,13 @@ class ClauseSubstitution(ConstOnlySubstitution):
             terms.append(t)
         return terms
 #
-def _get_from_subst(subst, i):
-    if subst:
-        return subst[i]
-    else:
-        return None
-    pass
-            # c: Constant = self.subst[i]
+# def _get_from_subst(subst, i):
+#     if subst:
+#         return subst[i]
+#     else:
+#         return None
+#     pass
+#             # c: Constant = self.subst[i]
             # c: Constant = _get_from_subst(self.subst)
 
 

@@ -59,52 +59,59 @@ def test_create_substitution_1():
     expected_value = "{ }"
     input_clause = {Clause(pAtom, tuple([pAtom]))}
 
-    assert_annotation(validator, annotator, input_clause, expected_value)
-    assert_annotation(validator, annotator, {Clause(pAtom, tuple([qAtom]))}, "{ ^ <0> X -> None, Y -> None }")
+    # assert_annotation(validator, annotator, input_clause, expected_value)
+    # assert_annotation(validator, annotator, {Clause(pAtom, tuple([qAtom]))}, "{ ^ <0> X -> None, Y -> None }")
 
-    l: List[Premise] = []
-    l.append(qAtom)
-    l.append(rAtom)
+    # l: List[Premise] = []
+    # l.append(qAtom)
+    # l.append(rAtom)
+    #
+    # assert_annotation(validator, annotator, {Clause(pAtom, tuple(l))}, "{ ^ <0> X -> None, Y -> None }")
+    # l[0], l[1] = l[1], l[0]
+    #
+    # assert_annotation(validator, annotator, [Clause(pAtom, tuple(l))], "{ ^ <0> X -> None, Y -> None }")
 
-    assert_annotation(validator, annotator, {Clause(pAtom, tuple(l))}, "{ ^ <0> X -> None, Y -> None }")
-    l[0], l[1] = l[1], l[0]
-
-    assert_annotation(validator, annotator, [Clause(pAtom, tuple(l))], "{ ^ <0> X -> None, Y -> None }")
-
-
-#	System.out.println("\nTesting adding...");
     l = []
     l.append(qAtom)
     l.append(sAtom)
     idbPreds = []
-    # assert_annotation(validator, annotator, [Clause(pAtom, tuple(l))], "{ ^ <0> X -> None, Y -> None, <1> Z -> None }")
     subst = clause_substitution(annotator, [Clause(pAtom, tuple(l))], validator)
-    assert str(subst) == "{ ^ <0> X -> None, Y -> None, <1> Z -> None }"
+    # assert str(subst) == "{ ^ <0> X -> None, Y -> None, <1> Z -> None }"
 
 	# subst.add(x, a);
     subst.add(x, a)
 
+    # print(subst)
+    # assert str(subst) == "{ <0> X -> a, ^ Y -> None, <1> Z -> None }"
+
+
+#	System.out.println(subst);
+	# try {
+	# 	subst.add(z, a);
+	# 	System.err.println("BAD");
+	# } catch (AssertionError e) {
+	# 	System.out.println("Correctly threw error when adding in wrong order");
+	# }
+    with pytest.raises(AssertionError): #Correctly threw error when adding in wrong order"
+        subst.add(z, a)
+	# subst.add(y, b);
+    subst.add(y, b)
+#	System.out.println(subst);
     print(">> Current")
-    print(subst)
-
-
-#	System.out.println(subst);
-#	try {
-#		subst.add(z, a);
-#		System.err.println("BAD");
-#	} catch (AssertionError e) {
-#		System.out.println("Correctly threw error when adding in wrong order");
-#	}
-#	subst.add(y, b);
-#	System.out.println(subst);
+    assert str(subst) == "{ <0> X -> a, Y -> b, ^ <1> Z -> None }"
 #	try {
 #		subst.add(x, a);
 #		System.err.println("BAD");
 #	} catch (AssertionError e) {
 #		System.out.println("Correctly threw error when adding in wrong order");
 #	}
-#	subst.add(z, a);
+    with pytest.raises(AssertionError): # Correctly threw error when adding in wrong order
+        subst.add(x, a)
+	# subst.add(z, a);
+    subst.add(z, a)
 #	System.out.println(subst);
+    print(subst)
+    assert str(subst) == "{ <0> X -> a, Y -> b, <1> Z -> a }"
 #	try {
 #		subst.add(Variable.create("w"), b);
 #		System.err.println("BAD");
@@ -112,11 +119,18 @@ def test_create_substitution_1():
 #		System.out.println("Correctly threw error when adding a variable not in substitution");
 #	}
 #
-#	System.out.println("\nTesting getting and resetting...");
+    with pytest.raises(AssertionError): # Correctly threw error when adding a variable not in substitution
+        subst.add(Variable.create("w"), b)
+	# System.out.println("\nTesting getting and resetting...");
 #	subst.resetState(0);
-#	assert subst.get(x) == null;
+    subst.resetState(0)
+	# assert subst.get(x) == null;
+    assert subst.get(x) == None
 #	subst.add(x, a);
+    subst.add(x, a)
 #	assert subst.get(x).equals(a);
+    print(">> Current. Below Fails")
+    assert subst.get(x) == a
 #	subst.add(y, b);
 #	assert subst.get(x).equals(a);
 #	assert subst.get(y).equals(b);
@@ -147,8 +161,8 @@ def assert_annotation(validator, annotator, input_clause, expected_value):
 def clause_substitution(annotator, input_clause, validator):
     rule = get_cl(validator, input_clause)
     _clause = list(annotator.annotate_single(rule))[0]
-    act_value = ClauseSubstitution.make_with_seminaive_clause(_clause)
-    return act_value
+    subst = ClauseSubstitution.make_with_seminaive_clause(_clause)
+    return subst
 
 
 def get_cl(validator, input_clause):
