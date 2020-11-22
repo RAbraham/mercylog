@@ -173,7 +173,7 @@ class SemiNaiveClause(Clause):
 def unique(t): return list(dict.fromkeys(t))
 class SemiNaiveClauseAnnotator:
 # 	private final Set<PredicateSym> idbPreds;
-    def __init__(self, idbPreds: Set[PredicateSym]):
+    def __init__(self, idbPreds: List[PredicateSym]):
 
 
         self.idbPreds = unique(idbPreds)

@@ -223,7 +223,8 @@ class ClauseSubstitution(ConstOnlySubstitution):
 # 	}
     def get(self, x: Variable) -> Optional[Constant]:
         idx: int = self.index.get(x)
-        if not idx or idx >= self.pos:
+
+        if idx is None or idx >= self.pos:
             return None
         return self.subst[idx]
 #
