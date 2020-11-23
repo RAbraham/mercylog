@@ -1,40 +1,52 @@
-# import abcdatalog.ast.BinaryDisunifier;
+from typing import *
 from mercylog.abcdatalog.ast.binary_disunifier import BinaryDisunifier
-# import abcdatalog.ast.BinaryUnifier;
 from mercylog.abcdatalog.ast.binary_unifier import BinaryUnifier
-# import abcdatalog.ast.Clause;
 from mercylog.abcdatalog.ast.clause import Clause
-# import abcdatalog.ast.Constant;
 from mercylog.abcdatalog.ast.constant import Constant
-# import abcdatalog.ast.NegatedAtom;
 from mercylog.abcdatalog.ast.negated_atom import NegatedAtom
-# import abcdatalog.ast.PositiveAtom;
 from mercylog.abcdatalog.ast.positive_atom import PositiveAtom
-# import abcdatalog.ast.PredicateSym;
 from mercylog.abcdatalog.ast.predicate_sym import PredicateSym
-# import abcdatalog.ast.Premise;
 from mercylog.abcdatalog.ast.premise import Premise
-# import abcdatalog.ast.Term;
 from mercylog.abcdatalog.ast.term import Term
-# import abcdatalog.ast.TermHelpers;
 from mercylog.abcdatalog.ast.term_helpers import TermHelpers
-# import abcdatalog.ast.Variable;
 from mercylog.abcdatalog.ast.variable import Variable
-# import abcdatalog.ast.validation.DatalogValidationException;
 from mercylog.abcdatalog.ast.validation.datalog_validation_exception import DatalogValidationException
-# import abcdatalog.ast.validation.DatalogValidator;
 from mercylog.abcdatalog.ast.validation.datalog_validator import DatalogValidator
-# import abcdatalog.ast.validation.UnstratifiedProgram;
 from mercylog.abcdatalog.ast.validation.unstratified_program import UnstratifiedProgram
-# import abcdatalog.ast.visitors.CrashHeadVisitor;
 from mercylog.abcdatalog.ast.visitors.crash_head_visitor import CrashHeadVisitor
-# import abcdatalog.ast.visitors.CrashPremiseVisitor;
 from mercylog.abcdatalog.ast.visitors.crash_premise_visitor import CrashPremiseVisitor
-# import abcdatalog.engine.bottomup.SemiNaiveClauseAnnotator.SemiNaiveClause;
 from mercylog.abcdatalog.engine.bottomup.semi_naive_clause_annotator import SemiNaiveClause
-# import abcdatalog.util.substitution.ClauseSubstitution;
 from mercylog.abcdatalog.util.substitution.clause_substitution import ClauseSubstitution
-aaa
+from mercylog.abcdatalog.util.substitution.clause_substitution import ClauseSubstitution
+from mercylog.abcdatalog.engine.bottomup.annotated_atom import AnnotatedAtom
+
+
+class LocalCrashHeadVisitor(CrashHeadVisitor):
+    def __init__(self, newFact, head):
+        self.newFact = newFact
+        self.head = head
+        super(LocalCrashHeadVisitor, self).__init__()
+
+    def visit(self, atom, state) -> Callable[[ClauseSubstitution], None]:
+        return lambda s: self.newFact(self.head, s)
+
+
+# private Consumer<ClauseSubstitution> makeAction(SemiNaiveClause cl, int i) {
+def makeAction(cl: SemiNaiveClause, i: int, newFact, head):
+    #     if (i == cl.getBody().size()) {
+    if (i == len(cl.getBody())):
+        return cl.getHead().accept_head_visitor(LocalCrashHeadVisitor(newFact, head), None)
+
+
+#         return cl.getHead().accept(new CrashHeadVisitor<Void, Consumer<ClauseSubstitution>>() {
+#             @Override
+#             public Consumer<ClauseSubstitution> visit(PositiveAtom head, Void nothing) {
+#                 return s -> newFact.accept(head, s);
+#             }
+#         }, null);
+#     }
+#
+
 #
 # /**
 #  * This class provides a way to derive all the new facts that are derivable from
@@ -43,6 +55,7 @@ aaa
 #  *
 #  */
 # public class ClauseEvaluator {
+class ClauseEvaluator:
 # 	// TODO We can make this smarter by using fact that ahead of time we know
 # 	// which terms are going to be variables and which are going to be constant,
 # 	// so we can skip checks.
@@ -53,11 +66,17 @@ aaa
 #
 # 	public ClauseEvaluator(SemiNaiveClause cl, BiConsumer<PositiveAtom, ClauseSubstitution> newFact,
 # 			BiFunction<AnnotatedAtom, ClauseSubstitution, Iterable<PositiveAtom>> getFacts) {
+    def __init__(self, cl: SemiNaiveClause, newFact: Callable[[PositiveAtom, ClauseSubstitution], None], getFacts: Callable[[AnnotatedAtom, ClauseSubstitution], Iterable[PositiveAtom]]):
 # 		assert !cl.getBody().isEmpty();
+        assert cl.getBody()
 # 		this.newFact = newFact;
+        self.newFact = newFact
 # 		this.getFacts = getFacts;
+        self.getFacts = getFacts
 # 		this.substTemplate = new ClauseSubstitution(cl);
+        self.substTemplate = ClauseSubstitution.make_with_seminaive_clause(cl)
 #
+        aaa
 # 		Consumer<ClauseSubstitution> secondAction = makeAction(cl, 1);
 # 		this.firstAction = cl.getBody().get(0).accept(new CrashPremiseVisitor<Void, Consumer<PositiveAtom>>() {
 # 			@Override
@@ -294,16 +313,7 @@ aaa
 # 		}, null);
 # 	}
 #
-# 	private Consumer<ClauseSubstitution> makeAction(SemiNaiveClause cl, int i) {
-# 		if (i == cl.getBody().size()) {
-# 			return cl.getHead().accept(new CrashHeadVisitor<Void, Consumer<ClauseSubstitution>>() {
-# 				@Override
-# 				public Consumer<ClauseSubstitution> visit(PositiveAtom head, Void nothing) {
-# 					return s -> newFact.accept(head, s);
-# 				}
-# 			}, null);
-# 		}
-#
+
 # 		Consumer<ClauseSubstitution> nextAction = makeAction(cl, i + 1);
 #
 # 		return cl.getBody().get(i).accept(new CrashPremiseVisitor<Integer, Consumer<ClauseSubstitution>>() {
@@ -376,6 +386,7 @@ aaa
 # 		this.firstAction.accept(newFact);
 # 	}
 #
+
 # 	public static void main(String[] args) {
 # 		Constant a = Constant.create("a");
 # 		Constant b = Constant.create("b");
