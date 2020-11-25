@@ -18,7 +18,87 @@ from mercylog.abcdatalog.ast.visitors.crash_premise_visitor import CrashPremiseV
 from mercylog.abcdatalog.engine.bottomup.semi_naive_clause_annotator import SemiNaiveClause
 from mercylog.abcdatalog.util.substitution.clause_substitution import ClauseSubstitution
 from mercylog.abcdatalog.util.substitution.clause_substitution import ClauseSubstitution
-from mercylog.abcdatalog.engine.bottomup.annotated_atom import AnnotatedAtom
+from mercylog.abcdatalog.engine.bottomup.annotated_atom import AnnotatedAtom, Annotation
+from mercylog.abcdatalog.util.substitution.const_only_substitution import ConstOnlySubstitution
+from mercylog.abcdatalog.util.substitution.term_unifier import TermUnifier
+
+class LocalActionCrashPremiseVisitor(CrashPremiseVisitor):
+    def __init__(self, getFacts, nextAction):
+        self.getFacts = getFacts
+        self.nextAction = nextAction
+#   return cl.getBody().get(i).accept(new CrashPremiseVisitor<Integer, Consumer<ClauseSubstitution>>() {
+#       @Override
+#       public Consumer<ClauseSubstitution> visit(AnnotatedAtom atom, Integer i) {
+    def visit_annotated_atom(self, atom: AnnotatedAtom, i: int):
+        def annotated_atom_func(s):
+      # return s -> {
+      #     s.resetState(i); // TODO is this necessary?
+            s.resetState(i)
+      #     Iterator<PositiveAtom> iter = getFacts.apply(atom, s).iterator();
+            facts: Iterator[PositiveAtom] = list(iter(self.getFacts(atom, s)))
+      #     while (iter.hasNext()) {
+            for fact in facts:
+      #         s.resetState(i);
+                s.resetState(i)
+              # PositiveAtom fact = iter.next(); # RA: No need
+      #         if (unifyAtomWithFact(atom.asUnannotatedAtom(), fact, s)) {
+                if unifyAtomWithFact(atom.asUnannotatedAtom(), fact, s):
+      #             nextAction.accept(s);
+                    self.nextAction(s)
+        return annotated_atom_func
+
+    def visit_negated_atom(self, atom: NegatedAtom, i: int):
+  # public Consumer<ClauseSubstitution> visit(NegatedAtom atom, Integer i) {
+        def negated_func(s):
+  #     return s -> {
+  #         Iterator<PositiveAtom> iter = getFacts
+  #                 .apply(new AnnotatedAtom(atom.asPositiveAtom(), AnnotatedAtom.Annotation.IDB), s)
+  #                 .iterator();
+            _facts = self.getFacts(AnnotatedAtom(atom.asPositiveAtom(), Annotation.IDB), s)
+            facts = list(iter(_facts))
+  #         while (iter.hasNext()) {
+            for fact in facts:
+  #             s.resetState(i);
+                s.resetState(i)
+  #             PositiveAtom fact = iter.next(); # RA No need
+  #             if (unifyAtomWithFact(atom.asPositiveAtom(), fact, s)) {
+                if unifyAtomWithFact(atom.asPositiveAtom(), fact, s):
+  #                 return;
+                    return
+  #             }
+  #         }
+  #         nextAction.accept(s);
+            self.nextAction(s)
+  #     };
+        return negated_func
+  # }
+
+
+  # public Consumer<ClauseSubstitution> visit(BinaryUnifier u, Integer i) {
+    def visit_binary_unifier(self, u: BinaryUnifier, i: int):
+  #     return s -> {
+        def binary_unifier_func(s):
+            unify_func = get_unify_func(s)
+            if unify_func(u.getLeft(), u.getRight(), s):
+  #             nextAction.accept(s);
+                self.nextAction(s)
+        return binary_unifier_func
+
+
+  # public Consumer<ClauseSubstitution> visit(BinaryDisunifier u, Integer i) {
+    def visit_binary_disunifier(self, u: BinaryDisunifier, i: int):
+        def binary_disunifier_func(s):
+            unify_func = get_unify_func(s)
+  #     return s -> {
+  #         if (!TermHelpers.unify(u.getLeft(), u.getRight(), s)) {
+            if not unify_func(u.get_left(), u.get_right(), s):
+  #             nextAction.accept(s);
+                self.nextAction(s)
+  #         }
+  #     };
+  # }
+#   }, i);
+
 
 # 	private boolean unifyAtomWithFact(PositiveAtom atom, PositiveAtom fact, ClauseSubstitution s) {
 # 		assert atom.getPred().equals(fact.getPred());
@@ -32,13 +112,27 @@ from mercylog.abcdatalog.engine.bottomup.annotated_atom import AnnotatedAtom
 # 		}
 # 		return true;
 # 	}
+def get_unify_func(s):
+    def null_func(*args):
+        raise ValueError("This Function Should not have been called")
+
+    unify_func = null_func
+    if isinstance(s, ConstOnlySubstitution):
+        unify_func = TermHelpers.unify_const_only_substitution
+    elif isinstance(s, TermUnifier):
+        unify_func = TermHelpers.unify_term_unifier
+    else:
+        assert f"Invalid for TermHelper. Only two options available:s:{type(s)}"
+
+    return unify_func
 
 def unifyAtomWithFact(atom: PositiveAtom, fact: PositiveAtom, s: ClauseSubstitution) -> bool:
     assert atom.getPred() == fact.getPred()
     atomArgs = atom.getArgs()
     factArgs = fact.getArgs()
     for af in zip(atomArgs, factArgs):
-        if not TermHelpers.unify_const_only_substitution(af[0], af[1], s):
+        unify_func = get_unify_func(s)
+        if not unify_func(af[0], af[1], s):
             return False
     return True
 
@@ -80,7 +174,7 @@ class LocalCrashHeadVisitor(CrashHeadVisitor):
 
 
 # private Consumer<ClauseSubstitution> makeAction(SemiNaiveClause cl, int i) {
-def makeAction(cl: SemiNaiveClause, i: int, newFact):
+def makeAction(cl: SemiNaiveClause, i: int, newFact, getFacts):
     #     if (i == cl.getBody().size()) {
     if i == len(cl.getBody()):
         return cl.getHead().accept_head_visitor(LocalCrashHeadVisitor(newFact), None)
@@ -93,59 +187,60 @@ def makeAction(cl: SemiNaiveClause, i: int, newFact):
 #     }
 #
 #   Consumer < ClauseSubstitution > nextAction = makeAction(cl, i + 1);
-    nextAction = makeAction(cl, i+1, newFact)
-    aaa
-#   return cl.getBody().get(i).accept(new CrashPremiseVisitor<Integer, Consumer<ClauseSubstitution>>() {
-#       @Override
-#       public Consumer<ClauseSubstitution> visit(AnnotatedAtom atom, Integer i) {
-#           return s -> {
-#               s.resetState(i); // TODO is this necessary?
-#               Iterator<PositiveAtom> iter = getFacts.apply(atom, s).iterator();
-#               while (iter.hasNext()) {
-#                   s.resetState(i);
-#                   PositiveAtom fact = iter.next();
-#                   if (unifyAtomWithFact(atom.asUnannotatedAtom(), fact, s)) {
-#                       nextAction.accept(s);
-#                   }
-#               }
-#           };
-#       }
-#
-#       @Override
-#       public Consumer<ClauseSubstitution> visit(NegatedAtom atom, Integer i) {
-#           return s -> {
-#               Iterator<PositiveAtom> iter = getFacts
-#                       .apply(new AnnotatedAtom(atom.asPositiveAtom(), AnnotatedAtom.Annotation.IDB), s)
-#                       .iterator();
-#               while (iter.hasNext()) {
-#                   s.resetState(i);
-#                   PositiveAtom fact = iter.next();
-#                   if (unifyAtomWithFact(atom.asPositiveAtom(), fact, s)) {
-#                       return;
-#                   }
-#               }
-#               nextAction.accept(s);
-#           };
-#       }
-#
-#       @Override
-#       public Consumer<ClauseSubstitution> visit(BinaryUnifier u, Integer i) {
-#           return s -> {
-#               if (TermHelpers.unify(u.getLeft(), u.getRight(), s)) {
-#                   nextAction.accept(s);
-#               }
-#           };
-#       }
-#
-#       @Override
-#       public Consumer<ClauseSubstitution> visit(BinaryDisunifier u, Integer i) {
-#           return s -> {
-#               if (!TermHelpers.unify(u.getLeft(), u.getRight(), s)) {
-#                   nextAction.accept(s);
-#               }
-#           };
-#       }
-#   }, i);
+    nextAction = makeAction(cl, i+1, newFact, getFacts)
+    #   return cl.getBody().get(i).accept(new CrashPremiseVisitor<Integer, Consumer<ClauseSubstitution>>() {
+    #       @Override
+    #       public Consumer<ClauseSubstitution> visit(AnnotatedAtom atom, Integer i) {
+    #           return s -> {
+    #               s.resetState(i); // TODO is this necessary?
+    #               Iterator<PositiveAtom> iter = getFacts.apply(atom, s).iterator();
+    #               while (iter.hasNext()) {
+    #                   s.resetState(i);
+    #                   PositiveAtom fact = iter.next();
+    #                   if (unifyAtomWithFact(atom.asUnannotatedAtom(), fact, s)) {
+    #                       nextAction.accept(s);
+    #                   }
+    #               }
+    #           };
+    #       }
+    #
+    #       @Override
+    #       public Consumer<ClauseSubstitution> visit(NegatedAtom atom, Integer i) {
+    #           return s -> {
+    #               Iterator<PositiveAtom> iter = getFacts
+    #                       .apply(new AnnotatedAtom(atom.asPositiveAtom(), AnnotatedAtom.Annotation.IDB), s)
+    #                       .iterator();
+    #               while (iter.hasNext()) {
+    #                   s.resetState(i);
+    #                   PositiveAtom fact = iter.next();
+    #                   if (unifyAtomWithFact(atom.asPositiveAtom(), fact, s)) {
+    #                       return;
+    #                   }
+    #               }
+    #               nextAction.accept(s);
+    #           };
+    #       }
+    #
+    #       @Override
+    #       public Consumer<ClauseSubstitution> visit(BinaryUnifier u, Integer i) {
+    #           return s -> {
+    #               if (TermHelpers.unify(u.getLeft(), u.getRight(), s)) {
+    #                   nextAction.accept(s);
+    #               }
+    #           };
+    #       }
+    #
+    #       @Override
+    #       public Consumer<ClauseSubstitution> visit(BinaryDisunifier u, Integer i) {
+    #           return s -> {
+    #               if (!TermHelpers.unify(u.getLeft(), u.getRight(), s)) {
+    #                   nextAction.accept(s);
+    #               }
+    #           };
+    #       }
+    #   }, i);
+
+    return cl.getBody()[i].accept_premise_visitor(LocalActionCrashPremiseVisitor(getFacts, nextAction), i)
 
 #
 # /**
@@ -171,7 +266,7 @@ class ClauseEvaluator:
         self.newFact = newFact
         self.getFacts = getFacts
         self.substTemplate = ClauseSubstitution.make_with_seminaive_clause(cl)
-        secondAction = makeAction(cl, 1, self.newFact)
+        secondAction = makeAction(cl, 1, self.newFact, self.getFacts)
 # 		this.firstAction = cl.getBody().get(0).accept(new CrashPremiseVisitor<Void, Consumer<PositiveAtom>>() {
         self.firstAction = cl.getBody()[0].accept_premise_visitor(LocalCrashPremiseVisitor(self.substTemplate, secondAction), None)
 
@@ -181,6 +276,8 @@ class ClauseEvaluator:
 # 	public void evaluate(PositiveAtom newFact) {
 # 		this.firstAction.accept(newFact);
 # 	}
+    def evaluate(self, newFact: PositiveAtom):
+        self.firstAction(newFact)
 #
 # 	public static void main(String[] args) {
 # 		Constant a = Constant.create("a");

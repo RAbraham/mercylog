@@ -10,6 +10,8 @@ from mercylog.abcdatalog.ast.validation.unstratified_program import Unstratified
 from mercylog.abcdatalog.ast.validation.datalog_validator import DatalogValidator, DatalogValidationException
 from mercylog.abcdatalog.engine.bottomup.semi_naive_clause_annotator import SemiNaiveClauseAnnotator
 from mercylog.abcdatalog.engine.bottomup.clause_evaluator import ClauseEvaluator
+
+
 def test_clause_evaluator():
     a = Constant.create("a")
     b = Constant.create("b")
