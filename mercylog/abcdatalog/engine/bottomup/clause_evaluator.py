@@ -1,3 +1,4 @@
+from pprint import pprint
 from typing import *
 from mercylog.abcdatalog.ast.binary_disunifier import BinaryDisunifier
 from mercylog.abcdatalog.ast.binary_unifier import BinaryUnifier
@@ -266,6 +267,9 @@ class ClauseEvaluator:
         self.newFact = newFact
         self.getFacts = getFacts
         self.substTemplate = ClauseSubstitution.make_with_seminaive_clause(cl)
+        pprint(">> substTemplate Index")
+        pprint(self.substTemplate.index)
+
         secondAction = makeAction(cl, 1, self.newFact, self.getFacts)
 # 		this.firstAction = cl.getBody().get(0).accept(new CrashPremiseVisitor<Void, Consumer<PositiveAtom>>() {
         self.firstAction = cl.getBody()[0].accept_premise_visitor(LocalCrashPremiseVisitor(self.substTemplate, secondAction), None)

@@ -87,6 +87,32 @@ def test_create_substitution_1():
     assert subst.get(y) == b
     assert not subst.get(z)
 
+def test_evaluation_error():
+    x = Variable.create("X")
+    y = Variable.create("Y")
+    z = Variable.create("Z")
+    w = Variable.create("W")
+    p = PredicateSym.create("p", 2)
+    q = PredicateSym.create("q", 2)
+    qXY = PositiveAtom.create(q, [x, y])
+    pXW = PositiveAtom.create(p, [x, w])
+    qZW = PositiveAtom.create(q, [z, w])
+    body = [qXY, qZW]
+
+    cl = Clause(pXW, tuple(body))
+    prog: UnstratifiedProgram = DatalogValidator().withBinaryUnificationInRuleBody().withBinaryDisunificationInRuleBody().validate(
+        {cl})
+    annotator = SemiNaiveClauseAnnotator(list(prog.getIdbPredicateSyms()))
+    it = iter(prog.getRules())
+    rule = next(it)
+    annotated = annotator.annotate_single(rule)
+    it_annotated = iter(annotated)
+    ordered = next(it_annotated)
+    subst = ClauseSubstitution.make_with_seminaive_clause(ordered)
+    assert subst.index == {z: 2, w: 3, x: 0, y: 1}
+    assert str(subst) == "{ ^ <0> X -> None, Y -> None, <1> Z -> None, W -> None }"
+
+
 def assert_annotation(validator, annotator, input_clause, expected_value):
     act_value = clause_substitution(annotator, input_clause, validator)
     assert str(act_value) == expected_value
