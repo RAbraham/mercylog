@@ -198,6 +198,8 @@ class SemiNaiveClauseAnnotator:
     def annotate_single(self, original: ValidClause) -> List[SemiNaiveClause]:
 # 		List<Premise> body = original.getBody();
         body: Tuple[Premise] = original.getBody()
+
+
 # 		if (body.isEmpty()) {
 # 			throw new IllegalArgumentException("Cannot annotate a bodiless clause.");
 # 		}
@@ -231,7 +233,7 @@ class SemiNaiveClauseAnnotator:
                 idbPositions.append(pos)
                 body2.append(atom)
             else:
-                if not edbPos.value:
+                if edbPos.value is None:
                     edbPos.value = pos
                     body2.append(AnnotatedAtom(atom, Annotation.EDB))
             return None

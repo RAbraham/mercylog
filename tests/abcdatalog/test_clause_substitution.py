@@ -106,6 +106,8 @@ def test_evaluation_error():
     it = iter(prog.getRules())
     rule = next(it)
     annotated = annotator.annotate_single(rule)
+    print("\n>> annotated")
+    print(annotated)
     it_annotated = iter(annotated)
     ordered = next(it_annotated)
     subst = ClauseSubstitution.make_with_seminaive_clause(ordered)
