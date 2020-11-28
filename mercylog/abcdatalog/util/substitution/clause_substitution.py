@@ -171,7 +171,7 @@ class ClauseSubstitution(ConstOnlySubstitution):
             indexByConj.append(next(it))
             i += 1
 # 		}
-        return ClauseSubstitution(subst,index,indexByConj, 0, bodySize)
+        return ClauseSubstitution(subst, index, indexByConj, 0, bodySize)
 
 # 	}
 #
@@ -197,7 +197,7 @@ class ClauseSubstitution(ConstOnlySubstitution):
 # 		return new ClauseSubstitution(new Constant[subst.length], this.index, this.indexByConj, 0, this.bodySize);
 # 	}
     def getCleanCopy(self) -> "ClauseSubstitution":
-        return ClauseSubstitution(copy.deepcopy([]), self.index, self.indexByConj, 0, self.bodySize)
+        return ClauseSubstitution(copy.deepcopy(self.subst), self.index, self.indexByConj, 0, self.bodySize)
 #
 # 	public boolean add(Variable x, Constant c) {
 # 		Integer idx = this.index.get(x);

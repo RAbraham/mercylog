@@ -45,7 +45,7 @@ class Clause:
 
 	def __str__(self):
 		body_texts = [str(b) for b in self.getBody()]
-		result = str(self.getHead()) + ' :- ' + ','.join(body_texts) + '.'
+		result = str(self.getHead()) + ' :- ' + ', '.join(body_texts) + '.'
 		return result
 
 	def __repr__(self):

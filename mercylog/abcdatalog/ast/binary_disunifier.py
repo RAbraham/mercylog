@@ -24,7 +24,7 @@ class BinaryDisunifier(Premise):
         return [self.left, self.right]
     pass
 
-    def accept(self, visitor, state):
+    def accept_premise_visitor(self, visitor, state):
         return visitor.visit_binary_disunifier(self, state)
 
     def __str__(self):

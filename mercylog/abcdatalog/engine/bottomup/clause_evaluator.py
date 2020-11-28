@@ -27,11 +27,12 @@ class LocalActionCrashPremiseVisitor(CrashPremiseVisitor):
     def __init__(self, getFacts, nextAction):
         self.getFacts = getFacts
         self.nextAction = nextAction
+        super(LocalActionCrashPremiseVisitor, self).__init__()
 #   return cl.getBody().get(i).accept(new CrashPremiseVisitor<Integer, Consumer<ClauseSubstitution>>() {
 #       @Override
 #       public Consumer<ClauseSubstitution> visit(AnnotatedAtom atom, Integer i) {
     def visit_annotated_atom(self, atom: AnnotatedAtom, i: int):
-        def annotated_atom_func(s):
+        def annotated_atom_func(s, nextAction):
       # return s -> {
       #     s.resetState(i); // TODO is this necessary?
             s.resetState(i)
@@ -45,8 +46,12 @@ class LocalActionCrashPremiseVisitor(CrashPremiseVisitor):
       #         if (unifyAtomWithFact(atom.asUnannotatedAtom(), fact, s)) {
                 if unifyAtomWithFact(atom.asUnannotatedAtom(), fact, s):
       #             nextAction.accept(s);
-                    self.nextAction(s)
-        return annotated_atom_func
+                    nextAction(s)
+        from functools import partial
+        print(">> Next Action")
+        print(self.nextAction)
+        partial_annotated_atom_func = partial(annotated_atom_func, nextAction=self.nextAction)
+        return partial_annotated_atom_func
 
     def visit_negated_atom(self, atom: NegatedAtom, i: int):
   # public Consumer<ClauseSubstitution> visit(NegatedAtom atom, Integer i) {
@@ -267,8 +272,6 @@ class ClauseEvaluator:
         self.newFact = newFact
         self.getFacts = getFacts
         self.substTemplate = ClauseSubstitution.make_with_seminaive_clause(cl)
-        pprint(">> substTemplate Index")
-        pprint(self.substTemplate.index)
 
         secondAction = makeAction(cl, 1, self.newFact, self.getFacts)
 # 		this.firstAction = cl.getBody().get(0).accept(new CrashPremiseVisitor<Void, Consumer<PositiveAtom>>() {

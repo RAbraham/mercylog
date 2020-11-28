@@ -235,7 +235,7 @@ class SemiNaiveClauseAnnotator:
             else:
                 if edbPos.value is None:
                     edbPos.value = pos
-                    body2.append(AnnotatedAtom(atom, Annotation.EDB))
+                body2.append(AnnotatedAtom(atom, Annotation.EDB))
             return None
         def simple_add_to_body2(premise, ignore):
             body2.append(premise)
