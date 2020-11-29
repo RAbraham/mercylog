@@ -29,9 +29,13 @@ from mercylog.abcdatalog.engine.bottomup.annotated_atom import AnnotatedAtom
 # import abcdatalog.engine.bottomup.ClauseEvaluator;
 from mercylog.abcdatalog.engine.bottomup.clause_evaluator import ClauseEvaluator
 # import abcdatalog.engine.bottomup.EvalManager;
+from mercylog.abcdatalog.engine.bottomup.eval_manager import EvalManager
 # import abcdatalog.engine.bottomup.SemiNaiveClauseAnnotator;
+from mercylog.abcdatalog.engine.bottomup.semi_naive_clause_annotator import SemiNaiveClauseAnnotator
 # import abcdatalog.engine.bottomup.SemiNaiveClauseAnnotator.SemiNaiveClause;
+from mercylog.abcdatalog.engine.bottomup.semi_naive_clause_annotator import SemiNaiveClause
 # import abcdatalog.util.Utilities;
+from mercylog.abcdatalog.util.utilities import Utilities
 # import abcdatalog.util.datastructures.ConcurrentFactIndexer;
 # import abcdatalog.util.datastructures.FactIndexer;
 # import abcdatalog.util.datastructures.FactIndexerFactory;

@@ -1,26 +1,33 @@
-
-# import abcdatalog.ast.Clause;
 from mercylog.abcdatalog.ast.clause import Clause
-# import abcdatalog.ast.validation.DatalogValidationException;
 from mercylog.abcdatalog.ast.validation.datalog_validation_exception import DatalogValidationException
-# import abcdatalog.util.datastructures.IndexableFactCollection;
-from mercylog.abcdatalog.util.datastructures
+from mercylog.abcdatalog.util.datastructures.indexable_fact_collection import IndexableFactCollection
+from abc import ABC, abstractmethod
+from typing import *
 #
 # /**
 #  * The saturating evaluation manager for a bottom-up Datalog evaluation engine.
 #  *
 #  */
 # public interface EvalManager {
-# 	/**
-# 	 * Initialize this manager with a program.
-# 	 *
-# 	 * @param program
-# 	 *            the program
-# 	 * @throws DatalogValidationException
-# 	 *             if the program is invalid
-# 	 */
-# 	void initialize(Set<Clause> program) throws DatalogValidationException;
-#
+class EvalManager(ABC):
+
+    def __init__(self):
+        super().__init__()
+
+    # 	/**
+    # 	 * Initialize this manager with a program.
+    # 	 *
+    # 	 * @param program
+    # 	 *            the program
+    # 	 * @throws DatalogValidationException
+    # 	 *             if the program is invalid
+    # 	 */
+    # 	void initialize(Set<Clause> program) throws DatalogValidationException;
+    #
+    @abstractmethod
+    def initialize(self, program: Set[Clause]):
+        pass
+
 # 	/**
 # 	 * Saturate all facts derivable from the program with which this manager has
 # 	 * been initialized.
@@ -30,6 +37,9 @@ from mercylog.abcdatalog.util.datastructures
 # 	 * @return the facts
 # 	 */
 # 	IndexableFactCollection eval();
+    @abstractmethod
+    def eval(self) -> IndexableFactCollection:
+        pass
 # }
 # /*******************************************************************************
 #  * This file is part of the AbcDatalog project.

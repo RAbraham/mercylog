@@ -48,8 +48,6 @@ class LocalActionCrashPremiseVisitor(CrashPremiseVisitor):
       #             nextAction.accept(s);
                     nextAction(s)
         from functools import partial
-        print(">> Next Action")
-        print(self.nextAction)
         partial_annotated_atom_func = partial(annotated_atom_func, nextAction=self.nextAction)
         return partial_annotated_atom_func
 
@@ -103,6 +101,7 @@ class LocalActionCrashPremiseVisitor(CrashPremiseVisitor):
   #         }
   #     };
   # }
+        return binary_disunifier_func
 #   }, i);
 
 
