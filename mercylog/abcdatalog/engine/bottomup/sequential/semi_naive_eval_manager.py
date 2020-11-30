@@ -34,9 +34,9 @@ from mercylog.abcdatalog.engine.bottomup.eval_manager import EvalManager
 from mercylog.abcdatalog.engine.bottomup.semi_naive_clause_annotator import SemiNaiveClauseAnnotator
 # import abcdatalog.engine.bottomup.SemiNaiveClauseAnnotator.SemiNaiveClause;
 from mercylog.abcdatalog.engine.bottomup.semi_naive_clause_annotator import SemiNaiveClause
-# import abcdatalog.util.Utilities;
 from mercylog.abcdatalog.util.utilities import Utilities
 # import abcdatalog.util.datastructures.ConcurrentFactIndexer;
+aaaa
 # import abcdatalog.util.datastructures.FactIndexer;
 # import abcdatalog.util.datastructures.FactIndexerFactory;
 # import abcdatalog.util.datastructures.IndexableFactCollection;

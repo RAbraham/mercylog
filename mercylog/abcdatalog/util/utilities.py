@@ -1,9 +1,15 @@
+from typing import *
+
+K = TypeVar("K")
+V = TypeVar("V")
+
+
 # /**
 #  * "Static" class containing utility methods.
 #  *
 #  */
-aaa. Only implement getSetFromMap
 # public final class Utilities {
+class Utilities:
 #
 # 	private Utilities() {
 # 		// Cannot be instantiated.
@@ -30,12 +36,19 @@ aaa. Only implement getSetFromMap
 # 	 * @return the set
 # 	 */
 # 	public static <K, V> Set<V> getSetFromMap(Map<K, Set<V>> map, K key) {
+    @staticmethod
+    def getSetFromMap(map: Dict[K, Set[V]], key: K)-> Set[V]:
 # 		Set<V> vals = map.get(key);
+        vals = map.get(key)
 # 		if (vals == null) {
+        if vals is None:
 # 			vals = new LinkedHashSet<>();
+            vals = set()
 # 			map.put(key, vals);
+            map[key] = vals
 # 		}
 # 		return vals;
+        return vals
 # 	}
 #
 # }
