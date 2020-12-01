@@ -67,6 +67,8 @@ class ConcurrentFactIndexer(FactIndexer):
         self.generator = generator
         self.addFunc = addFunc
         self.empty = empty
+        self.coarseIdx: Dict[PredicateSym, T] = dict()
+        self.fineIdx: Dict[PredicateSym, List[Optional[Dict[Constant, T]]]] = dict()
         super(ConcurrentFactIndexer, self).__init__()
 
 # 	/**
@@ -95,38 +97,73 @@ class ConcurrentFactIndexer(FactIndexer):
 # 		assert fact.isGround();
         assert fact.isGround()
 # 		T rough = this.coarseIdx.get(fact.getPred());
+        rough = self.coarseIdx.get(fact.getPred())
 # 		if (rough == null) {
+        if rough is None:
 # 			rough = this.generator.get();
+            rough = self.generator()
 # 			T existing = this.coarseIdx.putIfAbsent(fact.getPred(), rough);
 # 			if (existing != null) {
 # 				rough = existing;
 # 			}
+            existing = self.coarseIdx.get(fact.getPred())
+            if existing is None:
+                self.coarseIdx[fact.getPred()] = rough
+            else:
+                rough = existing
 # 		}
 # 		this.addFunc.accept(rough, fact);
+        self.addFunc(rough, fact)
 #
 # 		AtomicReferenceArray<ConcurrentMap<Constant, T>> byPos = this.fineIdx.get(fact.getPred());
+        byPos: List[Optional[Dict[Constant, T]]]
+        byPos = self.fineIdx.get(fact.getPred())
 # 		if (byPos == null) {
+        if byPos is None:
 # 			byPos = new AtomicReferenceArray<>(fact.getPred().getArity());
+            byPos = fact.getPred().getArity() * [None]
 # 			AtomicReferenceArray<ConcurrentMap<Constant, T>> existing = this.fineIdx.putIfAbsent(fact.getPred(), byPos);
 # 			if (existing != null) {
 # 				byPos = existing;
 # 			}
+            existing = self.fineIdx.get(fact.getPred())
+            if existing is None:
+                self.fineIdx[fact.getPred()] = byPos
+            else:
+                byPos = existing
+
 # 		}
 # 		assert byPos != null;
+        assert byPos is not None
 #
 # 		Term[] args = fact.getArgs();
+        args = fact.getArgs()
 # 		for (int i = 0; i < args.length; ++i) {
+        for i, a in enumerate(args):
 # 			ConcurrentMap<Constant, T> byConstant = byPos.get(i);
+            byConstant = byPos[i]
 # 			if (byConstant == null) {
+            if byConstant is None:
 # 				byConstant = Utilities.createConcurrentMap();
+                byConstant = dict()
 # 				if (!byPos.compareAndSet(i, null, byConstant)) {
 # 					byConstant = byPos.get(i);
 # 				}
+                a_val = byPos[i]
+                if a_val is None:
+                    byPos[i] = byConstant
+                else:
+                    byConstant = byPos[i]
 # 			}
 # 			Constant key = (Constant) args[i];
+            key = args[i]
 # 			T n = byConstant.get(key);
+            n = byConstant.get(key)
 # 			if (n == null) {
+            if n is None:
 # 				n = this.generator.get();
+                n = self.generator()
+                aaa
 # 				T existing = byConstant.putIfAbsent(key, n);
 # 				if (existing != null) {
 # 					n = existing;
