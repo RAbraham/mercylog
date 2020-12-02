@@ -45,7 +45,7 @@ class IndexableFactCollection(ABC):
 # 	public Iterable<PositiveAtom> indexInto(PositiveAtom atom,
 # 			ConstOnlySubstitution subst);
     @abstractmethod
-    def indexInto_patom_with_substitution(self, atom: PositiveAtom, subst: ConstOnlySubstitution) -> Iterable[PositiveAtom]:
+    def indexInto_patom_with_substitution(self, atom: PositiveAtom, subst: Optional[ConstOnlySubstitution]) -> Iterable[PositiveAtom]:
         pass
 #
 # 	/**

@@ -18,6 +18,22 @@ from mercylog.abcdatalog.util.substitution.const_only_substitution import ConstO
 from mercylog.abcdatalog.util.datastructures.fact_indexer import FactIndexer
 
 T = TypeVar("T")
+
+def make_tv():
+# private static final TermVisitor<ConstOnlySubstitution, Constant> tv = (new TermVisitorBuilder<ConstOnlySubstitution, Constant>())
+#         .onConstant((c, s) -> c).onVariable((x, s) -> {
+#             if (s != null) {
+#                 return s.get(x);
+#             }
+#             return null;
+#         }).orCrash();
+    def variable_func(x, s):
+        if s is not None:
+            return s.get(x)
+        return None
+    tv = TermVisitorBuilder().onConstant(lambda c, s: c).onVariable(variable_func).orCrash()
+    return tv
+
 #
 # /**
 #  * An index that holds facts. The facts are indexed by predicate symbol and then
@@ -37,6 +53,16 @@ T = TypeVar("T")
 # public class ConcurrentFactIndexer<T extends Iterable<PositiveAtom>> implements FactIndexer {
 # TODO: Currently Python does not have threads, so we'll keep this single threaded for now, later maybe we'll look at concurrency
 class ConcurrentFactIndexer(FactIndexer):
+# 	private static final TermVisitor<ConstOnlySubstitution, Constant> tv = (new TermVisitorBuilder<ConstOnlySubstitution, Constant>())
+# 			.onConstant((c, s) -> c).onVariable((x, s) -> {
+# 				if (s != null) {
+# 					return s.get(x);
+# 				}
+# 				return null;
+# 			}).orCrash();
+#
+    tv = make_tv()
+
 # 	private final Supplier<T> generator;
 # 	private final BiConsumer<T,PositiveAtom> addFunc;
 # 	private final Supplier<T> empty;
@@ -163,13 +189,18 @@ class ConcurrentFactIndexer(FactIndexer):
             if n is None:
 # 				n = this.generator.get();
                 n = self.generator()
-                aaa
 # 				T existing = byConstant.putIfAbsent(key, n);
 # 				if (existing != null) {
 # 					n = existing;
 # 				}
+                existing = byConstant.get(key)
+                if existing is None:
+                    byConstant[key] = n
+                else:
+                    n = existing
 # 			}
 # 			this.addFunc.accept(n, fact);
+            self.addFunc(n, fact)
 # 		}
 # 	}
 #
@@ -180,49 +211,69 @@ class ConcurrentFactIndexer(FactIndexer):
 # 	 *            the facts
 # 	 */
 # 	public void addAll(Iterable<PositiveAtom> facts) {
+    def addAll(self, facts: Iterable[PositiveAtom]):
 # 		for (PositiveAtom a : facts) {
+        for a in facts:
 # 			this.add(a);
+            self.add(a)
 # 		}
 # 	}
 #
 # 	@Override
 # 	public T indexInto(PositiveAtom a) {
+    def indexInto(self, a: PositiveAtom) -> T:
 # 		return this.indexInto(a, null);
+        return self.indexInto_patom_with_substitution(a, None)
 # 	}
 #
-# 	private static final TermVisitor<ConstOnlySubstitution, Constant> tv = (new TermVisitorBuilder<ConstOnlySubstitution, Constant>())
-# 			.onConstant((c, s) -> c).onVariable((x, s) -> {
-# 				if (s != null) {
-# 					return s.get(x);
-# 				}
-# 				return null;
-# 			}).orCrash();
-#
+
+aaa. Just review your indexInto code below that you wrote yesterday
 # 	@Override
 # 	public T indexInto(PositiveAtom a, ConstOnlySubstitution s) {
+    def indexInto(self, a: PositiveAtom, s: ConstOnlySubstitution) -> T:
 # 		AtomicReferenceArray<ConcurrentMap<Constant, T>> byPos = this.fineIdx.get(a.getPred());
+        byPos = self.fineIdx.get(a.getPred())
 # 		if (byPos == null) {
 # 			return this.empty.get();
 # 		}
+        if byPos is None:
+            return self.empty()
 #
 # 		int bestIdx = -1;
+        bestIdx: int = -1
 # 		Term bestConst = null;
+        bestConst: Optional[Term] = None
 # 		int maxKeySetSize = -1;
+        maxKeySetSize: int = -1
 # 		Term[] args = a.getArgs();
+        args = a.getArgs()
 # 		for (int i = 0; i < args.length; ++i) {
+        for i, _ in enumerate(args):
 # 			Term t = args[i];
+            t: Term = args[i]
 # //			if (!(t instanceof DummyTerm) && (t instanceof Constant || (s != null && (t = s.get((Variable) t)) != null))) {
 # 			if ((t = t.accept(tv, s)) != null) {
+            t = t.accept_term_visitor(ConcurrentFactIndexer.tv, s)
+            if t is not None:
 # 				ConcurrentMap<Constant, T> byConstant = byPos.get(i);
+                byConstant: Dict[Constant, T] = byPos[i]
 # 				if (byConstant != null) {
+                if byConstant is not None:
 # 					if (!byConstant.containsKey(t)) {
+                    if t not in byConstant:
 # 						return this.empty.get();
+                        return self.empty()
 # 					}
 # 					int keySetSize = byConstant.size();
+                    keySetSize = len(byConstant)
 # 					if (keySetSize > maxKeySetSize) {
+                    if keySetSize > maxKeySetSize:
 # 						maxKeySetSize = keySetSize;
+                        maxKeySetSize = keySetSize
 # 						bestIdx = i;
+                        bestIdx = i
 # 						bestConst = t;
+                        bestConst = t
 # 					}
 # 				}
 # 			}
@@ -231,8 +282,11 @@ class ConcurrentFactIndexer(FactIndexer):
 # 		if (bestIdx == -1) {
 # 			return this.coarseIdx.get(a.getPred());
 # 		}
+        if bestIdx == -1:
+            return self.coarseIdx.get(a.getPred())
 #
 # 		return byPos.get(bestIdx).get(bestConst);
+        return byPos[bestIdx].get(bestConst)
 # 	}
 #
 # 	@Override
