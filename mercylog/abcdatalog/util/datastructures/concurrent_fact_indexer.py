@@ -17,6 +17,7 @@ from mercylog.abcdatalog.util.utilities import Utilities
 from mercylog.abcdatalog.util.substitution.const_only_substitution import ConstOnlySubstitution
 from mercylog.abcdatalog.util.datastructures.fact_indexer import FactIndexer
 
+from mercylog.abcdatalog.util.datastructures.indexable_fact_collection import IndexableFactCollection
 T = TypeVar("T")
 
 def make_tv():
@@ -211,7 +212,7 @@ class ConcurrentFactIndexer(FactIndexer):
 # 	 *            the facts
 # 	 */
 # 	public void addAll(Iterable<PositiveAtom> facts) {
-    def addAll(self, facts: Iterable[PositiveAtom]):
+    def addAll_facts(self, facts: Iterable[PositiveAtom]):
 # 		for (PositiveAtom a : facts) {
         for a in facts:
 # 			this.add(a);
@@ -221,16 +222,15 @@ class ConcurrentFactIndexer(FactIndexer):
 #
 # 	@Override
 # 	public T indexInto(PositiveAtom a) {
-    def indexInto(self, a: PositiveAtom) -> T:
+    def indexInto_patom(self, a: PositiveAtom) ->  T:
 # 		return this.indexInto(a, null);
         return self.indexInto_patom_with_substitution(a, None)
 # 	}
 #
 
-aaa. Just review your indexInto code below that you wrote yesterday
 # 	@Override
 # 	public T indexInto(PositiveAtom a, ConstOnlySubstitution s) {
-    def indexInto(self, a: PositiveAtom, s: ConstOnlySubstitution) -> T:
+    def indexInto_patom_with_substitution(self, a: PositiveAtom, s: ConstOnlySubstitution) -> T:
 # 		AtomicReferenceArray<ConcurrentMap<Constant, T>> byPos = this.fineIdx.get(a.getPred());
         byPos = self.fineIdx.get(a.getPred())
 # 		if (byPos == null) {
@@ -291,42 +291,59 @@ aaa. Just review your indexInto code below that you wrote yesterday
 #
 # 	@Override
 # 	public T indexInto(PredicateSym pred) {
+    def indexInto_predsym(self, pred: PredicateSym):
 # 		T t = this.coarseIdx.get(pred);
+        t = self.coarseIdx.get(pred)
 # 		if (t == null) {
+        if t is None:
 # 			t = this.empty.get();
+            t = self.empty()
 # 		}
 # 		return t;
+        return t
 # 	}
 #
 # 	/**
 # 	 * Clears this index.
 # 	 */
 # 	public void clear() {
+    def clear(self):
 # 		this.fineIdx.clear();
+        self.fineIdx.clear()
 # 		this.coarseIdx.clear();
+        self.coarseIdx.clear()
 # 	}
 #
 # 	@Override
 # 	public boolean isEmpty() {
+    def isEmpty(self):
 # 		return this.coarseIdx.isEmpty();
+        return len(self.coarseIdx) == 0
 # 	}
 #
 # 	public ConcurrentFactIndexer<T> getCopy() {
+    def getCopy(self) -> "ConcurrentFactIndexer":
 # 		// Lazy man's copy function... probably be faster if we actually
 # 		// recursed through data structure copying whole indices. On the other
 # 		// hand, that might end up creating a new fact indexer with an
 # 		// inconsistent state.
 # 		ConcurrentFactIndexer<T> r = new ConcurrentFactIndexer<>(this.generator, this.addFunc, this.empty);
+        r = ConcurrentFactIndexer(self.generator, self.addFunc, self.empty)
 # 		for (PredicateSym pred : this.coarseIdx.keySet()) {
+        for pred in self.coarseIdx.keys():
 # 			r.addAll(this.indexInto(pred));
+            r.addAll(self.indexInto_predsym(pred))
 # 		}
 # 		return r;
+        return r
 # 	}
 #
 # 	@Override
 # 	public Set<PredicateSym> getPreds() {
 # 		return this.coarseIdx.keySet();
 # 	}
+    def getPreds(self) -> Set[PredicateSym]:
+        return set(self.coarseIdx.keys())
 #
 # 	/**
 # 	 * Add all the facts from an indexable fact collection to this index.
@@ -335,8 +352,11 @@ aaa. Just review your indexInto code below that you wrote yesterday
 # 	 *            the indexable fact collection
 # 	 */
 # 	public void addAll(IndexableFactCollection that) {
+    def addAll_indexable_fact_collection(self, that: IndexableFactCollection):
 # 		for (PredicateSym pred : that.getPreds()) {
+        for pred in that.getPreds():
 # 			this.addAll(that.indexInto(pred));
+            self.addAll(that.indexInto_predsym(pred))
 # 		}
 # 	}
 #

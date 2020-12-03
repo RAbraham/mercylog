@@ -36,9 +36,11 @@ from mercylog.abcdatalog.engine.bottomup.semi_naive_clause_annotator import Semi
 from mercylog.abcdatalog.engine.bottomup.semi_naive_clause_annotator import SemiNaiveClause
 from mercylog.abcdatalog.util.utilities import Utilities
 # import abcdatalog.util.datastructures.ConcurrentFactIndexer;
-aaaa
+from mercylog.abcdatalog.util.datastructures.concurrent_fact_indexer import ConcurrentFactIndexer
 # import abcdatalog.util.datastructures.FactIndexer;
+from mercylog.abcdatalog.util.datastructures.fact_indexer import FactIndexer
 # import abcdatalog.util.datastructures.FactIndexerFactory;
+from mercylog.abcdatalog.util.datastructures.aaaa
 # import abcdatalog.util.datastructures.IndexableFactCollection;
 # import abcdatalog.util.substitution.ClauseSubstitution;
 #

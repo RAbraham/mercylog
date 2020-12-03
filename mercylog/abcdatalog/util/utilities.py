@@ -2,7 +2,7 @@ from typing import *
 
 K = TypeVar("K")
 V = TypeVar("V")
-
+T = TypeVar("T")
 
 # /**
 #  * "Static" class containing utility methods.
@@ -18,8 +18,11 @@ class Utilities:
 # 	public static final int concurrency = Runtime.getRuntime()
 # 			.availableProcessors();
 #
+    @staticmethod
 # 	public static <T> Set<T> createConcurrentSet() {
+    def createConcurrentSet() -> Set[T]:
 # 		return Collections.newSetFromMap(createConcurrentMap());
+        return set()
 # 	}
 #
 # 	public static <K, V> ConcurrentMap<K, V> createConcurrentMap() {
