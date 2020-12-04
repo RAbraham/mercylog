@@ -41,7 +41,9 @@ class FactIndexerFactory:
 # 	public static ConcurrentFactIndexer<Queue<PositiveAtom>> createConcurrentQueueFactIndexer() {
     @staticmethod
     def createConcurrentQueueFactIndexer() -> ConcurrentFactIndexer[Queue[PositiveAtom]]:
-        generator = lambda: aaaa
+        from collections import deque
+        generator = lambda: deque()
+        addFunc = lambda queue, fact: queue.append(fact)
 # 		return new ConcurrentFactIndexer<>(() -> new ConcurrentLinkedQueue<>(), (queue,
         return ConcurrentFactIndexer.create_no_empty(generator, addFunc)
 # 				fact) -> queue.add(fact));

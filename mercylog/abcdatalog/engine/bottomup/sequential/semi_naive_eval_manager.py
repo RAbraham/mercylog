@@ -1,3 +1,4 @@
+from typing import *
 # import abcdatalog.ast.Clause;
 from mercylog.abcdatalog.ast.clause import Clause
 # import abcdatalog.ast.PositiveAtom;
@@ -40,13 +41,26 @@ from mercylog.abcdatalog.util.datastructures.concurrent_fact_indexer import Conc
 # import abcdatalog.util.datastructures.FactIndexer;
 from mercylog.abcdatalog.util.datastructures.fact_indexer import FactIndexer
 # import abcdatalog.util.datastructures.FactIndexerFactory;
-from mercylog.abcdatalog.util.datastructures.aaaa
+from mercylog.abcdatalog.util.datastructures.fact_indexer_factory import FactIndexerFactory
 # import abcdatalog.util.datastructures.IndexableFactCollection;
+from mercylog.abcdatalog.util.datastructures.indexable_fact_collection import IndexableFactCollection
 # import abcdatalog.util.substitution.ClauseSubstitution;
+from mercylog.abcdatalog.util.substitution.clause_substitution import ClauseSubstitution
+
+# HeadVisitor<Void, PredicateSym> getHeadPred = new HeadVisitor<Void, PredicateSym>() {
+class LocalHeadVisitor(HeadVisitor):
+    def __init__(self):
+        super(LocalHeadVisitor, self).__init__()
+#     @Override
+#     public PredicateSym visit(PositiveAtom atom, Void state) {
+    def visit(self, atom: PositiveAtom, state) -> PredicateSym:
+#         return atom.getPred();
+        return atom.getPred()
+#     }
 #
+# };
 # public class SemiNaiveEvalManager implements EvalManager {
 class SemiNaiveEvalManager(EvalManager):
-    pass
 # 	private final ConcurrentFactIndexer<Set<PositiveAtom>> allFacts = FactIndexerFactory
 # 			.createConcurrentSetFactIndexer();
 # 	private final List<StratumEvaluator> stratumEvals = new ArrayList<>();
@@ -54,34 +68,56 @@ class SemiNaiveEvalManager(EvalManager):
 # 	@SuppressWarnings("unchecked")
 # 	@Override
 # 	public synchronized void initialize(Set<Clause> program) throws DatalogValidationException {
+    def initialize(self, program: Set[Clause]):
 # 		UnstratifiedProgram prog = (new DatalogValidator()).withBinaryDisunificationInRuleBody()
 # 				.withBinaryUnificationInRuleBody().withAtomNegationInRuleBody().validate(program);
+        prog: UnstratifiedProgram = DatalogValidator().withBinaryDisunificationInRuleBody().withBinaryUnificationInRuleBody().withAtomNegationInRuleBody().validate(program)
 # 		StratifiedProgram stratProg = StratifiedNegationValidator.validate(prog);
+        stratProg: StratifiedProgram = StratifiedNegationValidator.validate(prog)
+
 # 		List<Set<PredicateSym>> strata = stratProg.getStrata();
+        strata: List[Set[PredicateSym]] = stratProg.getStrata()
 # 		int nstrata = strata.size();
+        nstrata = len(strata)
 # 		Map<PredicateSym, Set<SemiNaiveClause>>[] firstRoundRules = new HashMap[nstrata];
+        firstRoundRules: List[Dict[PredicateSym, Set[SemiNaiveClause]]] = []
 # 		Map<PredicateSym, Set<SemiNaiveClause>>[] laterRoundRules = new HashMap[nstrata];
+        laterRoundRules: List[Dict[PredicateSym, Set[SemiNaiveClause]]] = []
 # 		Set<PositiveAtom>[] initialIdbFacts = new HashSet[nstrata];
+        initialIdbFacts: List[Set[PositiveAtom]] = []
 # 		for (int i = 0; i < nstrata; ++i) {
+        for i in range(nstrata):
 # 			firstRoundRules[i] = new HashMap<>();
+            firstRoundRules[i] = dict()
 # 			laterRoundRules[i] = new HashMap<>();
+            laterRoundRules[i] = dict()
 # 			initialIdbFacts[i] = new HashSet<>();
+            initialIdbFacts[i] = set()
 # 		}
 # 		Map<PredicateSym, Integer> predToStratumMap = stratProg.getPredToStratumMap();
+        predToStratumMap: Dict[PredicateSym, int] = stratProg.getPredToStratumMap()
 #
 # 		HeadVisitor<Void, PredicateSym> getHeadPred = new HeadVisitor<Void, PredicateSym>() {
-#
+        getHeadPred: HeadVisitor = LocalHeadVisitor()
 # 			@Override
 # 			public PredicateSym visit(PositiveAtom atom, Void state) {
 # 				return atom.getPred();
 # 			}
 #
 # 		};
+
+
+
 # 		for (ValidClause clause : prog.getRules()) {
+        for clause in prog.getRules():
 # 			PredicateSym pred = clause.getHead().accept(getHeadPred, null);
+            pred: PredicateSym = clause.getHead().accept_head_visitor(getHeadPred, None)
 # 			int stratum = predToStratumMap.get(pred);
+            stratum: int = predToStratumMap.get(pred)
 # 			// Treat IDB predicates from earlier strata as EDB predicates.
 # 			Set<PredicateSym> idbs = strata.get(stratum);
+            idbs: Set[PredicateSym] = strata[stratum]
+            raj aaaa
 # 			PremiseVisitor<Boolean, Boolean> checkForIdbPred = (new PremiseVisitorBuilder<Boolean, Boolean>())
 # 					.onPositiveAtom((atom, idb) -> idbs.contains(atom.getPred()) || idb).or((premise, idb) -> idb);
 # 			SemiNaiveClauseAnnotator annotator = new SemiNaiveClauseAnnotator(idbs);
