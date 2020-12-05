@@ -47,6 +47,130 @@ from mercylog.abcdatalog.util.datastructures.indexable_fact_collection import In
 # import abcdatalog.util.substitution.ClauseSubstitution;
 from mercylog.abcdatalog.util.substitution.clause_substitution import ClauseSubstitution
 
+# private class StratumEvaluator {
+class StratumEvaluator:
+#     private ConcurrentFactIndexer<Set<PositiveAtom>> idbsPrev = FactIndexerFactory
+#             .createConcurrentSetFactIndexer();
+#     private ConcurrentFactIndexer<Set<PositiveAtom>> deltaOld = FactIndexerFactory
+#             .createConcurrentSetFactIndexer();
+#     private ConcurrentFactIndexer<Set<PositiveAtom>> deltaNew = FactIndexerFactory
+#             .createConcurrentSetFactIndexer();
+#     private final Map<PredicateSym, Set<ClauseEvaluator>> firstRoundEvals;
+#     private final Map<PredicateSym, Set<ClauseEvaluator>> laterRoundEvals;
+#     private final Set<PositiveAtom> initialIdbFacts;
+#
+#     public StratumEvaluator(Map<PredicateSym, Set<SemiNaiveClause>> firstRoundRules,
+#         Map<PredicateSym, Set<SemiNaiveClause>> laterRoundRules, Set<PositiveAtom> initialIdbFacts) {
+
+    def __init__(self, firstRoundRules: Dict[PredicateSym, Set[SemiNaiveClause]], laterRoundRules: Dict[PredicateSym, Set[SemiNaiveClause]], initialIdbFacts: Set[PositiveAtom], addFact, getFacts, allFacts, deltaNew, deltaOld ):
+        #     Function<Map<PredicateSym, Set<SemiNaiveClause>>, Map<PredicateSym, Set<ClauseEvaluator>>> translate = (
+        #             clauseMap) -> {
+        #         Map<PredicateSym, Set<ClauseEvaluator>> evalMap = new HashMap<>();
+        #         for (Map.Entry<PredicateSym, Set<SemiNaiveClause>> entry : clauseMap.entrySet()) {
+        #             Set<ClauseEvaluator> s = new HashSet<>();
+        #             for (SemiNaiveClause cl : entry.getValue()) {
+        #                 s.add(new ClauseEvaluator(cl, this::addFact, this::getFacts));
+        #             }
+        #             evalMap.put(entry.getKey(), s);
+        #         }
+        #         return evalMap;
+        #     };
+        def translate(clauseMap):
+            evalMap: Dict[PredicateSym, Set[ClauseEvaluator]] = dict()
+            entry: Tuple[PredicateSym, Set[SemiNaiveClause]]
+            for entry in clauseMap.items():
+                s: Set[ClauseEvaluator] = set()
+                cl: SemiNaiveClause
+                for cl in entry[1]:
+                    s.add(ClauseEvaluator(cl, addFact, getFacts))
+                evalMap[entry[0]] = s
+            return evalMap
+
+
+#     firstRoundEvals = translate.apply(firstRoundRules);
+        self.firstRoundEvals = translate(firstRoundRules)
+#     laterRoundEvals = translate.apply(laterRoundRules);
+        self.laterRoundEvals = translate(laterRoundRules)
+#     this.initialIdbFacts = initialIdbFacts;
+        self.initialIdbFacts = initialIdbFacts
+        self.addFact = addFact
+        self.getFacts = getFacts
+        self.allFacts = allFacts
+        self.deltaNew: ConcurrentFactIndexer = deltaNew
+        self.deltaOld = deltaOld
+# }
+#
+#     public void eval() {
+    def eval(self):
+#         deltaNew.addAll(this.initialIdbFacts);
+#         evalOneRound(allFacts, firstRoundEvals);
+#         while (evalOneRound(deltaOld, laterRoundEvals)) {
+#             // Loop...
+#         }
+        self.deltaNew.addAll(self.initialIdbFacts)
+        self.evalOneRound(self.allFacts, self.firstRoundEvals)
+        while self.evalOneRound(self.deltaOld, self.laterRoundEvals):
+            pass
+#     }
+#
+    raj
+#     private boolean evalOneRound(FactIndexer index, Map<PredicateSym, Set<ClauseEvaluator>> rules) {
+#         for (PredicateSym pred : index.getPreds()) {
+#             Set<ClauseEvaluator> evals = rules.get(pred);
+#             if (evals != null) {
+#                 for (ClauseEvaluator eval : evals) {
+#                     for (PositiveAtom fact : index.indexInto(pred)) {
+#                         eval.evaluate(fact);
+#                     }
+#                 }
+#             }
+#         }
+#
+#         if (deltaNew.isEmpty()) {
+#             return false;
+#         }
+#
+#         idbsPrev.addAll(deltaOld);
+#         allFacts.addAll(deltaNew);
+#         deltaOld = deltaNew;
+#         deltaNew = FactIndexerFactory.createConcurrentSetFactIndexer();
+#         return true;
+#     }
+#
+#     private boolean addFact(PositiveAtom fact, ClauseSubstitution subst) {
+#         fact = fact.applySubst(subst);
+#         Set<PositiveAtom> set = allFacts.indexInto(fact);
+#         if (!set.contains(fact)) {
+#             deltaNew.add(fact);
+#             return true;
+#         }
+#         return false;
+#     }
+#
+#     private Iterable<PositiveAtom> getFacts(AnnotatedAtom atom, ClauseSubstitution subst) {
+#         Set<PositiveAtom> r = null;
+#         PositiveAtom unannotated = atom.asUnannotatedAtom();
+#         switch (atom.getAnnotation()) {
+#         case EDB:
+#             // Fall through...
+#         case IDB:
+#             r = allFacts.indexInto(unannotated, subst);
+#             break;
+#         case IDB_PREV:
+#             r = idbsPrev.indexInto(unannotated, subst);
+#             break;
+#         case DELTA:
+#             r = deltaOld.indexInto(unannotated, subst);
+#             break;
+#         default:
+#             assert false;
+#         }
+#         return r;
+#     }
+# }
+
+
+
 # HeadVisitor<Void, PredicateSym> getHeadPred = new HeadVisitor<Void, PredicateSym>() {
 class LocalHeadVisitor(HeadVisitor):
     def __init__(self):
@@ -65,6 +189,10 @@ class SemiNaiveEvalManager(EvalManager):
 # 			.createConcurrentSetFactIndexer();
 # 	private final List<StratumEvaluator> stratumEvals = new ArrayList<>();
 #
+    def __init__(self):
+        self.allFacts: ConcurrentFactIndexer[Set[PositiveAtom]] = FactIndexerFactory.createConcurrentSetFactIndexer()
+        self.stratumEvals: List[StratumEvaluator] = []
+
 # 	@SuppressWarnings("unchecked")
 # 	@Override
 # 	public synchronized void initialize(Set<Clause> program) throws DatalogValidationException {
@@ -117,29 +245,48 @@ class SemiNaiveEvalManager(EvalManager):
 # 			// Treat IDB predicates from earlier strata as EDB predicates.
 # 			Set<PredicateSym> idbs = strata.get(stratum);
             idbs: Set[PredicateSym] = strata[stratum]
-            raj aaaa
 # 			PremiseVisitor<Boolean, Boolean> checkForIdbPred = (new PremiseVisitorBuilder<Boolean, Boolean>())
 # 					.onPositiveAtom((atom, idb) -> idbs.contains(atom.getPred()) || idb).or((premise, idb) -> idb);
+            patom_func = lambda atom, idb: atom.getPred() in idbs or idb
+            checkForIdbPred: PremiseVisitor[bool, bool] = PremiseVisitorBuilder().onPositiveAtom(patom_func).or_(lambda premise, idb: idb)
 # 			SemiNaiveClauseAnnotator annotator = new SemiNaiveClauseAnnotator(idbs);
+            annotator: SemiNaiveClauseAnnotator = SemiNaiveClauseAnnotator(list(idbs))
 # 			boolean hasIdbPred = false;
+            hasIdbPred = False
 # 			for (Premise c : clause.getBody()) {
+            c: Premise
+            for c in clause.getBody():
 # 				hasIdbPred = c.accept(checkForIdbPred, hasIdbPred);
+                hasIdbPred = c.accept_premise_visitor(checkForIdbPred, hasIdbPred)
 # 			}
+
 # 			for (SemiNaiveClause rule : annotator.annotate(clause)) {
+            rule: SemiNaiveClause
+            for rule in annotator.annotate_single(clause):
 # 				PredicateSym bodyPred = rule.getFirstAtom().getPred();
+                bodyPred: PredicateSym = rule.getFirstAtom().getPred()
 # 				if (hasIdbPred) {
+                if hasIdbPred:
 # 					Utilities.getSetFromMap(laterRoundRules[stratum], bodyPred).add(rule);
+                    Utilities.getSetFromMap(laterRoundRules[stratum], bodyPred).add(rule)
 # 				} else {
+                else:
 # 					Utilities.getSetFromMap(firstRoundRules[stratum], bodyPred).add(rule);
+                    Utilities.getSetFromMap(firstRoundRules[stratum], bodyPred).add(rule)
 # 				}
 # 			}
 #
 # 		}
 #
 # 		Set<PredicateSym> edbs = prog.getEdbPredicateSyms();
+        edbs: Set[PredicateSym] = prog.getEdbPredicateSyms()
 # 		for (PositiveAtom fact : prog.getInitialFacts()) {
+        fact: PositiveAtom
+        for fact in prog.getInitialFacts():
 # 			if (edbs.contains(fact.getPred())) {
+            if fact.getPred() in edbs:
 # 				allFacts.add(fact);
+                raj
 # 			} else {
 # 				initialIdbFacts[predToStratumMap.get(fact.getPred())].add(fact);
 # 			}
@@ -158,98 +305,7 @@ class SemiNaiveEvalManager(EvalManager):
 # 		return allFacts;
 # 	}
 #
-# 	private class StratumEvaluator {
-# 		private ConcurrentFactIndexer<Set<PositiveAtom>> idbsPrev = FactIndexerFactory
-# 				.createConcurrentSetFactIndexer();
-# 		private ConcurrentFactIndexer<Set<PositiveAtom>> deltaOld = FactIndexerFactory
-# 				.createConcurrentSetFactIndexer();
-# 		private ConcurrentFactIndexer<Set<PositiveAtom>> deltaNew = FactIndexerFactory
-# 				.createConcurrentSetFactIndexer();
-# 		private final Map<PredicateSym, Set<ClauseEvaluator>> firstRoundEvals;
-# 		private final Map<PredicateSym, Set<ClauseEvaluator>> laterRoundEvals;
-# 		private final Set<PositiveAtom> initialIdbFacts;
-#
-# 		public StratumEvaluator(Map<PredicateSym, Set<SemiNaiveClause>> firstRoundRules,
-# 				Map<PredicateSym, Set<SemiNaiveClause>> laterRoundRules, Set<PositiveAtom> initialIdbFacts) {
-# 			Function<Map<PredicateSym, Set<SemiNaiveClause>>, Map<PredicateSym, Set<ClauseEvaluator>>> translate = (
-# 					clauseMap) -> {
-# 				Map<PredicateSym, Set<ClauseEvaluator>> evalMap = new HashMap<>();
-# 				for (Map.Entry<PredicateSym, Set<SemiNaiveClause>> entry : clauseMap.entrySet()) {
-# 					Set<ClauseEvaluator> s = new HashSet<>();
-# 					for (SemiNaiveClause cl : entry.getValue()) {
-# 						s.add(new ClauseEvaluator(cl, this::addFact, this::getFacts));
-# 					}
-# 					evalMap.put(entry.getKey(), s);
-# 				}
-# 				return evalMap;
-# 			};
-# 			firstRoundEvals = translate.apply(firstRoundRules);
-# 			laterRoundEvals = translate.apply(laterRoundRules);
-# 			this.initialIdbFacts = initialIdbFacts;
-# 		}
-#
-# 		public void eval() {
-# 			deltaNew.addAll(this.initialIdbFacts);
-# 			evalOneRound(allFacts, firstRoundEvals);
-# 			while (evalOneRound(deltaOld, laterRoundEvals)) {
-# 				// Loop...
-# 			}
-# 		}
-#
-# 		private boolean evalOneRound(FactIndexer index, Map<PredicateSym, Set<ClauseEvaluator>> rules) {
-# 			for (PredicateSym pred : index.getPreds()) {
-# 				Set<ClauseEvaluator> evals = rules.get(pred);
-# 				if (evals != null) {
-# 					for (ClauseEvaluator eval : evals) {
-# 						for (PositiveAtom fact : index.indexInto(pred)) {
-# 							eval.evaluate(fact);
-# 						}
-# 					}
-# 				}
-# 			}
-#
-# 			if (deltaNew.isEmpty()) {
-# 				return false;
-# 			}
-#
-# 			idbsPrev.addAll(deltaOld);
-# 			allFacts.addAll(deltaNew);
-# 			deltaOld = deltaNew;
-# 			deltaNew = FactIndexerFactory.createConcurrentSetFactIndexer();
-# 			return true;
-# 		}
-#
-# 		private boolean addFact(PositiveAtom fact, ClauseSubstitution subst) {
-# 			fact = fact.applySubst(subst);
-# 			Set<PositiveAtom> set = allFacts.indexInto(fact);
-# 			if (!set.contains(fact)) {
-# 				deltaNew.add(fact);
-# 				return true;
-# 			}
-# 			return false;
-# 		}
-#
-# 		private Iterable<PositiveAtom> getFacts(AnnotatedAtom atom, ClauseSubstitution subst) {
-# 			Set<PositiveAtom> r = null;
-# 			PositiveAtom unannotated = atom.asUnannotatedAtom();
-# 			switch (atom.getAnnotation()) {
-# 			case EDB:
-# 				// Fall through...
-# 			case IDB:
-# 				r = allFacts.indexInto(unannotated, subst);
-# 				break;
-# 			case IDB_PREV:
-# 				r = idbsPrev.indexInto(unannotated, subst);
-# 				break;
-# 			case DELTA:
-# 				r = deltaOld.indexInto(unannotated, subst);
-# 				break;
-# 			default:
-# 				assert false;
-# 			}
-# 			return r;
-# 		}
-# 	}
+
 #
 # }
 # /*******************************************************************************
