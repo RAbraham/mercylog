@@ -46,6 +46,8 @@ from mercylog.abcdatalog.util.datastructures.fact_indexer_factory import FactInd
 from mercylog.abcdatalog.util.datastructures.indexable_fact_collection import IndexableFactCollection
 # import abcdatalog.util.substitution.ClauseSubstitution;
 from mercylog.abcdatalog.util.substitution.clause_substitution import ClauseSubstitution
+from mercylog.abcdatalog.engine.bottomup.annotated_atom import Annotation
+
 
 # private class StratumEvaluator {
 class StratumEvaluator:
@@ -62,7 +64,7 @@ class StratumEvaluator:
 #     public StratumEvaluator(Map<PredicateSym, Set<SemiNaiveClause>> firstRoundRules,
 #         Map<PredicateSym, Set<SemiNaiveClause>> laterRoundRules, Set<PositiveAtom> initialIdbFacts) {
 
-    def __init__(self, firstRoundRules: Dict[PredicateSym, Set[SemiNaiveClause]], laterRoundRules: Dict[PredicateSym, Set[SemiNaiveClause]], initialIdbFacts: Set[PositiveAtom], addFact, getFacts, allFacts, deltaNew, deltaOld ):
+    def __init__(self, firstRoundRules: Dict[PredicateSym, Set[SemiNaiveClause]], laterRoundRules: Dict[PredicateSym, Set[SemiNaiveClause]], initialIdbFacts, allFacts):
         #     Function<Map<PredicateSym, Set<SemiNaiveClause>>, Map<PredicateSym, Set<ClauseEvaluator>>> translate = (
         #             clauseMap) -> {
         #         Map<PredicateSym, Set<ClauseEvaluator>> evalMap = new HashMap<>();
@@ -82,7 +84,7 @@ class StratumEvaluator:
                 s: Set[ClauseEvaluator] = set()
                 cl: SemiNaiveClause
                 for cl in entry[1]:
-                    s.add(ClauseEvaluator(cl, addFact, getFacts))
+                    s.add(ClauseEvaluator(cl, self.addFact, self.getFacts))
                 evalMap[entry[0]] = s
             return evalMap
 
@@ -91,13 +93,11 @@ class StratumEvaluator:
         self.firstRoundEvals = translate(firstRoundRules)
 #     laterRoundEvals = translate.apply(laterRoundRules);
         self.laterRoundEvals = translate(laterRoundRules)
-#     this.initialIdbFacts = initialIdbFacts;
-        self.initialIdbFacts = initialIdbFacts
-        self.addFact = addFact
-        self.getFacts = getFacts
+        self.initialIdbFacts: Set[PositiveAtom] = initialIdbFacts
+        self.deltaNew: ConcurrentFactIndexer = FactIndexerFactory.createConcurrentSetFactIndexer()
+        self.deltaOld: ConcurrentFactIndexer = FactIndexerFactory.createConcurrentSetFactIndexer()
+        self.idbsPrev: ConcurrentFactIndexer = FactIndexerFactory.createConcurrentSetFactIndexer()
         self.allFacts = allFacts
-        self.deltaNew: ConcurrentFactIndexer = deltaNew
-        self.deltaOld = deltaOld
 # }
 #
 #     public void eval() {
@@ -113,8 +113,8 @@ class StratumEvaluator:
             pass
 #     }
 #
-    raj
 #     private boolean evalOneRound(FactIndexer index, Map<PredicateSym, Set<ClauseEvaluator>> rules) {
+    def evalOneRound(self, index: FactIndexer, rules: Dict[PredicateSym, Set[ClauseEvaluator]]) -> bool:
 #         for (PredicateSym pred : index.getPreds()) {
 #             Set<ClauseEvaluator> evals = rules.get(pred);
 #             if (evals != null) {
@@ -126,15 +126,31 @@ class StratumEvaluator:
 #             }
 #         }
 #
+        for pred in index.getPreds():
+            evals: Set[ClauseEvaluator] = rules.get(pred)
+            if evals is not None:
+                eval: ClauseEvaluator
+                for eval in evals:
+                    for fact in index.indexInto_predsym(pred):
+                        eval.evaluate(fact)
+                pass
 #         if (deltaNew.isEmpty()) {
 #             return false;
 #         }
+        if self.deltaNew.isEmpty():
+            return False
 #
 #         idbsPrev.addAll(deltaOld);
 #         allFacts.addAll(deltaNew);
 #         deltaOld = deltaNew;
 #         deltaNew = FactIndexerFactory.createConcurrentSetFactIndexer();
 #         return true;
+
+        self.idbsPrev.addAll(self.deltaOld)
+        self.allFacts.addAll(self.deltaNew)
+        self.deltaOld = self.deltaNew
+        self.deltaNew = FactIndexerFactory.createConcurrentSetFactIndexer()
+        return True
 #     }
 #
 #     private boolean addFact(PositiveAtom fact, ClauseSubstitution subst) {
@@ -147,7 +163,16 @@ class StratumEvaluator:
 #         return false;
 #     }
 #
+    def addFact(self, fact: PositiveAtom, subst: ClauseSubstitution) -> bool:
+        fact = fact.applySubst(subst)
+        a_set: Set[PositiveAtom] = self.allFacts.indexInto(fact)
+        if fact not in a_set:
+            self.deltaNew.add(fact)
+            return True
+        return False
+
 #     private Iterable<PositiveAtom> getFacts(AnnotatedAtom atom, ClauseSubstitution subst) {
+    def getFacts(self, atom: AnnotatedAtom, subst: ClauseSubstitution) -> Iterable[PositiveAtom]:
 #         Set<PositiveAtom> r = null;
 #         PositiveAtom unannotated = atom.asUnannotatedAtom();
 #         switch (atom.getAnnotation()) {
@@ -166,6 +191,16 @@ class StratumEvaluator:
 #             assert false;
 #         }
 #         return r;
+        r: Optional[Set[PositiveAtom]] = None
+        unannotated: PositiveAtom = atom.asUnannotatedAtom()
+        annotation = atom.getAnnotation()
+        if annotation == Annotation.IDB:
+            r = self.allFacts.indexInto(unannotated, subst)
+        elif annotation == Annotation.IDB_PREV:
+            r = self.idbsPrev.indexInto_patom_with_substitution(unannotated, subst)
+        elif annotation == Annotation.DELTA:
+            r = self.deltaOld.indexInto_patom_with_substitution(unannotated, subst)
+        return r
 #     }
 # }
 
@@ -212,7 +247,7 @@ class SemiNaiveEvalManager(EvalManager):
 # 		Map<PredicateSym, Set<SemiNaiveClause>>[] laterRoundRules = new HashMap[nstrata];
         laterRoundRules: List[Dict[PredicateSym, Set[SemiNaiveClause]]] = []
 # 		Set<PositiveAtom>[] initialIdbFacts = new HashSet[nstrata];
-        initialIdbFacts: List[Set[PositiveAtom]] = []
+        self.initialIdbFacts: List[Set[PositiveAtom]] = []
 # 		for (int i = 0; i < nstrata; ++i) {
         for i in range(nstrata):
 # 			firstRoundRules[i] = new HashMap<>();
@@ -220,7 +255,7 @@ class SemiNaiveEvalManager(EvalManager):
 # 			laterRoundRules[i] = new HashMap<>();
             laterRoundRules[i] = dict()
 # 			initialIdbFacts[i] = new HashSet<>();
-            initialIdbFacts[i] = set()
+            self.initialIdbFacts[i] = set()
 # 		}
 # 		Map<PredicateSym, Integer> predToStratumMap = stratProg.getPredToStratumMap();
         predToStratumMap: Dict[PredicateSym, int] = stratProg.getPredToStratumMap()
@@ -286,15 +321,19 @@ class SemiNaiveEvalManager(EvalManager):
 # 			if (edbs.contains(fact.getPred())) {
             if fact.getPred() in edbs:
 # 				allFacts.add(fact);
-                raj
+                self.allFacts.add(fact)
 # 			} else {
+            else:
 # 				initialIdbFacts[predToStratumMap.get(fact.getPred())].add(fact);
+                self.initialIdbFacts[predToStratumMap.get(fact.getPred())].add(fact)
 # 			}
 # 		}
 #
 # 		for (int i = 0; i < nstrata; ++i) {
 # 			stratumEvals.add(new StratumEvaluator(firstRoundRules[i], laterRoundRules[i], initialIdbFacts[i]));
 # 		}
+        for i in range(nstrata):
+            self.stratumEvals.append(StratumEvaluator(firstRoundRules[i], laterRoundRules[i], self.initialIdbFacts[i], self.allFacts))
 # 	}
 #
 # 	@Override
@@ -305,6 +344,12 @@ class SemiNaiveEvalManager(EvalManager):
 # 		return allFacts;
 # 	}
 #
+
+    def eval(self) -> IndexableFactCollection:
+        se: StratumEvaluator
+        for se in self.stratumEvals:
+            se.eval()
+        return self.allFacts
 
 #
 # }
