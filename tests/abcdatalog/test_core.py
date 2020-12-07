@@ -1,8 +1,20 @@
+from typing import *
 # import abcdatalog.ast.PositiveAtom;
+from mercylog.abcdatalog.ast.positive_atom import PositiveAtom
 # import abcdatalog.ast.validation.DatalogValidationException;
+from mercylog.abcdatalog.ast.validation.datalog_validation_exception import DatalogValidationException
 # import abcdatalog.engine.DatalogEngine;
+from mercylog.abcdatalog.engine.bottomup.sequential.semi_naive_eval_manager import SemiNaiveEvalManager
+from mercylog.abcdatalog.engine.datalog_engine import DatalogEngine
+from mercylog.types import relation, Variable, _
+from mercylog.abcdatalog.ast.validation.unstratified_program import UnstratifiedProgram
+from mercylog.abcdatalog.ast.validation.datalog_validator import DatalogValidator
+from mercylog.abcdatalog.ast.validation.stratified_negation_graph import StratifiedNegationGraph
+from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import convert_query
 import pytest
 
+from helper import initEngine_engine, seminaive_engine
+from functools import partial
 # 	@Test
 # 	public void queryUndefinedPredicate() {
 # 		DatalogEngine engine = initEngine("p.");
@@ -10,8 +22,21 @@ import pytest
 # 		assertTrue(rs.isEmpty());
 # 	}
 
-def test_queryUndefinedPredicate():
-    engine: Data
+@pytest.fixture
+def initEngine():
+    semi_engine = seminaive_engine()
+    return partial(initEngine_engine, semi_engine)
+
+
+def test_queryUndefinedPredicate(initEngine):
+    p = relation("p")
+    q = relation("q")
+    program = [p()]
+    engine: DatalogEngine = initEngine(program)
+    aaa. Create a query method in the same file as convert*, query(engine, q) which converts to AbcDatalog
+    rs: Set[PositiveAtom] = engine.query(convert_query(q()))
+
+    assert not rs
 #
 # 	@Test
 # 	public void queryEDBPredicate() {

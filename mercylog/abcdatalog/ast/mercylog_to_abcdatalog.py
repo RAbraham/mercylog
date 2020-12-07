@@ -3,8 +3,8 @@ from mercylog.types import Rule, Relation, InvertedRelationInstance, Term, Varia
 from mercylog.abcdatalog.ast.variable import Variable as AVariable
 from mercylog.abcdatalog.ast.term import Term as ATerm
 from mercylog.abcdatalog.ast.constant import Constant as AConstant
-from mercylog.abcdatalog.ast.positive_atom import PositiveAtom as APositiveAtom
-from mercylog.abcdatalog.ast.predicate_sym import PredicateSym as APredicateSym
+from mercylog.abcdatalog.ast.positive_atom import PositiveAtom as APositiveAtom, PositiveAtom
+from mercylog.abcdatalog.ast.predicate_sym import PredicateSym as APredicateSym, PredicateSym
 from mercylog.abcdatalog.ast.negated_atom import NegatedAtom as ANegatedAtom
 from mercylog.abcdatalog.ast.clause import Clause as AClause
 
@@ -48,6 +48,11 @@ def convert_term(term: Term) -> ATerm:
         AConstant.create(str(term))
 
 
+def convert_query(q: Relation):
+    predSym = q.name
+    args = q.terms
+    array = [convert_term(term) for term in args]
+    return PositiveAtom.create(PredicateSym.create(predSym, len(args)), array)
 '''
 
 class Relation:
