@@ -1,19 +1,9 @@
 from typing import *
-# import abcdatalog.ast.Constant;
 from mercylog.abcdatalog.ast.constant import Constant
-# import abcdatalog.ast.PositiveAtom;
 from mercylog.abcdatalog.ast.positive_atom import PositiveAtom
-# import abcdatalog.ast.PredicateSym;
 from mercylog.abcdatalog.ast.predicate_sym import PredicateSym
-# import abcdatalog.ast.Term;
 from mercylog.abcdatalog.ast.term import Term
-# import abcdatalog.ast.visitors.TermVisitor;
-from mercylog.abcdatalog.ast.visitors.term_visitor import TermVisitor
-# import abcdatalog.ast.visitors.TermVisitorBuilder;
 from mercylog.abcdatalog.ast.visitors.term_visitor_builder import TermVisitorBuilder
-# import abcdatalog.util.Utilities;
-from mercylog.abcdatalog.util.utilities import Utilities
-# import abcdatalog.util.substitution.ConstOnlySubstitution;
 from mercylog.abcdatalog.util.substitution.const_only_substitution import ConstOnlySubstitution
 from mercylog.abcdatalog.util.datastructures.fact_indexer import FactIndexer
 
@@ -332,7 +322,7 @@ class ConcurrentFactIndexer(FactIndexer):
 # 		for (PredicateSym pred : this.coarseIdx.keySet()) {
         for pred in self.coarseIdx.keys():
 # 			r.addAll(this.indexInto(pred));
-            r.addAll(self.indexInto_predsym(pred))
+            r.addAll_facts(self.indexInto_predsym(pred))
 # 		}
 # 		return r;
         return r
@@ -356,7 +346,7 @@ class ConcurrentFactIndexer(FactIndexer):
 # 		for (PredicateSym pred : that.getPreds()) {
         for pred in that.getPreds():
 # 			this.addAll(that.indexInto(pred));
-            self.addAll(that.indexInto_predsym(pred))
+            self.addAll_facts(that.indexInto_predsym(pred))
 # 		}
 # 	}
 #

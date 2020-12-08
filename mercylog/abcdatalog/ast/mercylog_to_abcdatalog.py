@@ -14,15 +14,30 @@ def convert(program: List[Rule]) -> Set:
 
     return set(converts)
 
+# def _convert(r: Rule):
+#     if isinstance(r, Rule):
+#         abc_head = convert_relation(r.head)
+#         abc_body = tuple([convert_relation(b) for b in r.body])
+#         return AClause(abc_head, abc_body)
+#     else:
+#
+#         raise ValueError(f"Unexpected Argument:{r} of type: {type(r)}")
+#     pass
+
+
 def _convert(r: Rule):
     if isinstance(r, Rule):
         abc_head = convert_relation(r.head)
         abc_body = tuple([convert_relation(b) for b in r.body])
         return AClause(abc_head, abc_body)
+    elif isinstance(r, Relation):
+        abc_head = convert_relation(r)
+        abc_body = tuple([])
+        return AClause(abc_head, abc_body)
     else:
-        raise ValueError(f"Unexpected Argument:{r}")
-    pass
 
+        raise ValueError(f"Unexpected Argument:{r} of type: {type(r)}")
+    pass
 
 def convert_relation(relation: Union[Relation, InvertedRelationInstance]):
     if isinstance(relation, Relation):
@@ -48,11 +63,22 @@ def convert_term(term: Term) -> ATerm:
         AConstant.create(str(term))
 
 
-def convert_query(q: Relation):
-    predSym = q.name
-    args = q.terms
-    array = [convert_term(term) for term in args]
-    return PositiveAtom.create(PredicateSym.create(predSym, len(args)), array)
+# def convert_query(q: Relation):
+#     predSym = q.name
+#     args = q.terms
+#     array = [convert_term(term) for term in args]
+#     return PositiveAtom.create(PredicateSym.create(predSym, len(args)), array)
+
+def convert_query(q: Rule):
+    return convert([q])
+
+def q(engine, query):
+    rs: Set[PositiveAtom] = engine.query(convert_query(query))
+    return {dict(name=r.getPred().getSym(), terms=r.getArgs()) for r in rs}
+
+def rconvert_patom(r: PositiveAtom) -> Rule:
+
+    pass
 '''
 
 class Relation:

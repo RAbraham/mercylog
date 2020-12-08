@@ -24,7 +24,7 @@ class FactIndexerFactory:
 # 	 */
 # 	public static ConcurrentFactIndexer<Set<PositiveAtom>> createConcurrentSetFactIndexer() {
     @staticmethod
-    def createConcurrentSetFactIndexer() -> ConcurrentFactIndexer[Set[PositiveAtom]]:
+    def createConcurrentSetFactIndexer() -> ConcurrentFactIndexer:
 # 		return new ConcurrentFactIndexer<>(() -> Utilities.createConcurrentSet(), (set,
 # 				fact) -> set.add(fact));
         generator = lambda: Utilities.createConcurrentSet()
@@ -40,7 +40,7 @@ class FactIndexerFactory:
 # 	 */
 # 	public static ConcurrentFactIndexer<Queue<PositiveAtom>> createConcurrentQueueFactIndexer() {
     @staticmethod
-    def createConcurrentQueueFactIndexer() -> ConcurrentFactIndexer[Queue[PositiveAtom]]:
+    def createConcurrentQueueFactIndexer() -> ConcurrentFactIndexer:
         from collections import deque
         generator = lambda: deque()
         addFunc = lambda queue, fact: queue.append(fact)

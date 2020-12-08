@@ -29,7 +29,11 @@ class FactIndexer(IndexableFactCollection):
 # 	 */
     @abstractmethod
 # 	public void addAll(Iterable<PositiveAtom> facts);
-    def addAll(self, facts: Iterable[PositiveAtom]):
+    def addAll_facts(self, facts: Iterable[PositiveAtom]):
+        pass
+
+    @abstractmethod
+    def addAll_indexable_fact_collection(self, that: IndexableFactCollection):
         pass
 # }
 # /*******************************************************************************

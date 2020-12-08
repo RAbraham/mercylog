@@ -10,10 +10,10 @@ from mercylog.types import relation, Variable, _
 from mercylog.abcdatalog.ast.validation.unstratified_program import UnstratifiedProgram
 from mercylog.abcdatalog.ast.validation.datalog_validator import DatalogValidator
 from mercylog.abcdatalog.ast.validation.stratified_negation_graph import StratifiedNegationGraph
-from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import convert_query
+from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import convert, q as do_query
 import pytest
 
-from helper import initEngine_engine, seminaive_engine
+from tests.abcdatalog.helper import initEngine_engine, seminaive_engine
 from functools import partial
 # 	@Test
 # 	public void queryUndefinedPredicate() {
@@ -33,9 +33,7 @@ def test_queryUndefinedPredicate(initEngine):
     q = relation("q")
     program = [p()]
     engine: DatalogEngine = initEngine(program)
-    aaa. Create a query method in the same file as convert*, query(engine, q) which converts to AbcDatalog
-    rs: Set[PositiveAtom] = engine.query(convert_query(q()))
-
+    rs = do_query(engine, q())
     assert not rs
 #
 # 	@Test
