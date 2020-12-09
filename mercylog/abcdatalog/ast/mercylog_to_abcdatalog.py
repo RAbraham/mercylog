@@ -74,6 +74,7 @@ def convert_query(q: Rule):
     return list(convert([q]))[0].getHead()
 
 def q(engine, query):
+    # TODO: There is a chance that users will input the relationcreator instead of the relation for no arity predicates e.g. q(). Give a helpful error message if it does
     rs: Set[PositiveAtom] = engine.query(convert_query(query))
     # return [dict(name=r.getPred().getSym(), terms=r.getArgs()) for r in rs]
     return [rconvert_patom(r) for r in rs]
