@@ -10,5 +10,6 @@ def seminaive_engine():
     return BottomUpEngineFrame(SemiNaiveEvalManager())
 
 def initEngine_engine(engine: DatalogEngine, program: List[Rule]):
-     engine.init(convert(list(program)))
-     return engine
+    converted = convert(list(program))
+    engine.init(converted)
+    return engine

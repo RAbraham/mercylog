@@ -25,7 +25,7 @@ def convert(program: List[Rule]) -> Set:
 #     pass
 
 
-def _convert(r: Rule):
+def _convert(r):
     if isinstance(r, Rule):
         abc_head = convert_relation(r.head)
         abc_body = tuple([convert_relation(b) for b in r.body])
@@ -49,6 +49,7 @@ def convert_relation(relation: Union[Relation, InvertedRelationInstance]):
 
 def make_positive_relation(relation):
     abc_vars = list(map(convert_term, relation.terms))
+
     return APositiveAtom.create(APredicateSym.create(relation.name, len(abc_vars)), abc_vars)
 
 
@@ -60,7 +61,7 @@ def convert_term(term: Term) -> ATerm:
         else:
             return AVariable.create(term.name)
     else:
-        AConstant.create(str(term))
+        return AConstant.create(str(term))
 
 
 # def convert_query(q: Relation):
@@ -70,15 +71,27 @@ def convert_term(term: Term) -> ATerm:
 #     return PositiveAtom.create(PredicateSym.create(predSym, len(args)), array)
 
 def convert_query(q: Rule):
-    return convert([q])
+    return list(convert([q]))[0].getHead()
 
 def q(engine, query):
     rs: Set[PositiveAtom] = engine.query(convert_query(query))
-    return {dict(name=r.getPred().getSym(), terms=r.getArgs()) for r in rs}
+    # return [dict(name=r.getPred().getSym(), terms=r.getArgs()) for r in rs]
+    return [rconvert_patom(r) for r in rs]
 
-def rconvert_patom(r: PositiveAtom) -> Rule:
+def rconvert_patom(r: PositiveAtom) -> Relation:
+    return Relation(r.getPred().getSym(), tuple(rconvert_terms(r.getArgs())))
 
-    pass
+def rconvert_terms(aterms: Iterable[ATerm]) -> Iterable[Term]:
+    result = []
+    for aterm in aterms:
+        if isinstance(aterm, AVariable):
+            result.append(Variable(aterm.getName()))
+        elif isinstance(aterm, AConstant):
+            result.append(aterm.getName())
+        else:
+            assert f"Invalid Term:{type(aterm)}"
+    return result
+
 '''
 
 class Relation:

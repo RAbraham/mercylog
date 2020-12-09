@@ -6,7 +6,7 @@ from mercylog.abcdatalog.ast.validation.datalog_validation_exception import Data
 # import abcdatalog.engine.DatalogEngine;
 from mercylog.abcdatalog.engine.bottomup.sequential.semi_naive_eval_manager import SemiNaiveEvalManager
 from mercylog.abcdatalog.engine.datalog_engine import DatalogEngine
-from mercylog.types import relation, Variable, _
+from mercylog.types import relation, Variable, variables, _
 from mercylog.abcdatalog.ast.validation.unstratified_program import UnstratifiedProgram
 from mercylog.abcdatalog.ast.validation.datalog_validator import DatalogValidator
 from mercylog.abcdatalog.ast.validation.stratified_negation_graph import StratifiedNegationGraph
@@ -32,29 +32,42 @@ def test_queryUndefinedPredicate(initEngine):
     p = relation("p")
     q = relation("q")
     program = [p()]
-    engine: DatalogEngine = initEngine(program)
-    rs = do_query(engine, q())
+    # engine = initEngine(program)
+    # rs = do_query(engine, q())
+    rs = _run(initEngine, program, q())
     assert not rs
-#
+
 # 	@Test
 # 	public void queryEDBPredicate() {
-# 		String program = "p. q(a,b,c,d,e). q(e,d,c,b,a).";
-# 		DatalogEngine engine = initEngine(program);
-#
-# 		Set<PositiveAtom> rs = engine.query(parseQuery("p?"));
-# 		assertEquals(rs.size(), 1);
-# 		assertTrue(rs.containsAll(parseFacts("p.")));
-#
-# 		rs = engine.query(parseQuery("q(V,W,X,Y,Z)?"));
-# 		assertEquals(rs.size(), 2);
-# 		assertTrue(rs.containsAll(parseFacts("q(a,b,c,d,e). q(e,d,c,b,a).")));
-#
-# 		rs = engine.query(parseQuery("q(W,b,X,Y,Z)?"));
-# 		assertEquals(rs.size(), 1);
-# 		assertTrue(rs.containsAll(parseFacts("q(a,b,c,d,e).")));
-#
-# 		rs = engine.query(parseQuery("q(W,X,d,Y,Z)?"));
-# 		assertTrue(rs.isEmpty());
+def test_queryEDBPredicate(initEngine):
+    _V, _W, _X, _Y, _Z = variables("V", "W", "X", "Y", "Z")
+
+    p = relation("p")
+    q = relation("q")
+    a_q = q("a", "b", "c", "d", "e")
+    program = [p(), a_q, q("e", "d", "c", "b", "a")]
+    engine = initEngine(program)
+    rs = do_query(engine, p())
+    assert len(rs) == 1
+    assert p() in rs
+    # rs = engine.query(parseQuery("q(V,W,X,Y,Z)?"));
+    rs = do_query(engine, q(_V, _W, _X, _Y, _Z))
+    # assertEquals(rs.size(), 2);
+    assert len(rs) == 2
+    # assertTrue(rs.containsAll(parseFacts("q(a,b,c,d,e). q(e,d,c,b,a).")));
+    #
+    # rs = engine.query(parseQuery("q(W,b,X,Y,Z)?"));
+    # assertEquals(rs.size(), 1);
+    # assertTrue(rs.containsAll(parseFacts("q(a,b,c,d,e).")));
+    #
+    # rs = engine.query(parseQuery("q(W,X,d,Y,Z)?"));
+    # assertTrue(rs.isEmpty());
+
+
+def _run(initEngine, program, query):
+    engine = initEngine(program)
+    rs = do_query(engine, query)
+    return rs
 # 	}
 #
 # 	@Test

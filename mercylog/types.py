@@ -106,6 +106,16 @@ class Variable(Term):
 # v = Variable
 
 _ = Variable("_")
+def variables(*names: str) -> Union[Variable, List[Variable]]:
+    if len(names) == 0:
+        return ValueError("Atleast one name required")
+    elif len(names) == 1:
+        return Variable(names[0])
+    else:
+        return [Variable(n) for n in names]
+
+
+
 # def __init__(self, name, *variables):
 #     self.name = name
 #     self._variables = variables
