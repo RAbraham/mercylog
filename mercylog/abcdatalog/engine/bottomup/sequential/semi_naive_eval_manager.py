@@ -97,7 +97,7 @@ class StratumEvaluator:
         self.deltaNew: ConcurrentFactIndexer = FactIndexerFactory.createConcurrentSetFactIndexer()
         self.deltaOld: ConcurrentFactIndexer = FactIndexerFactory.createConcurrentSetFactIndexer()
         self.idbsPrev: ConcurrentFactIndexer = FactIndexerFactory.createConcurrentSetFactIndexer()
-        self.allFacts = allFacts
+        self.allFacts: ConcurrentFactIndexer = allFacts
 # }
 #
 #     public void eval() {
@@ -107,7 +107,7 @@ class StratumEvaluator:
 #         while (evalOneRound(deltaOld, laterRoundEvals)) {
 #             // Loop...
 #         }
-        self.deltaNew.addAll(self.initialIdbFacts)
+        self.deltaNew.addAll_facts(self.initialIdbFacts)
         self.evalOneRound(self.allFacts, self.firstRoundEvals)
         while self.evalOneRound(self.deltaOld, self.laterRoundEvals):
             pass
@@ -146,8 +146,8 @@ class StratumEvaluator:
 #         deltaNew = FactIndexerFactory.createConcurrentSetFactIndexer();
 #         return true;
 
-        self.idbsPrev.addAll(self.deltaOld)
-        self.allFacts.addAll(self.deltaNew)
+        self.idbsPrev.addAll_indexable_fact_collection(self.deltaOld)
+        self.allFacts.addAll_indexable_fact_collection(self.deltaNew)
         self.deltaOld = self.deltaNew
         self.deltaNew = FactIndexerFactory.createConcurrentSetFactIndexer()
         return True
@@ -165,7 +165,7 @@ class StratumEvaluator:
 #
     def addFact(self, fact: PositiveAtom, subst: ClauseSubstitution) -> bool:
         fact = fact.applySubst(subst)
-        a_set: Set[PositiveAtom] = self.allFacts.indexInto(fact)
+        a_set: Set[PositiveAtom] = self.allFacts.indexInto_patom(fact)
         if fact not in a_set:
             self.deltaNew.add(fact)
             return True
@@ -194,8 +194,8 @@ class StratumEvaluator:
         r: Optional[Set[PositiveAtom]] = None
         unannotated: PositiveAtom = atom.asUnannotatedAtom()
         annotation = atom.getAnnotation()
-        if annotation == Annotation.IDB:
-            r = self.allFacts.indexInto(unannotated, subst)
+        if annotation == Annotation.IDB or annotation == Annotation.EDB:
+            r = self.allFacts.indexInto_patom_with_substitution(unannotated, subst)
         elif annotation == Annotation.IDB_PREV:
             r = self.idbsPrev.indexInto_patom_with_substitution(unannotated, subst)
         elif annotation == Annotation.DELTA:
@@ -225,8 +225,9 @@ class SemiNaiveEvalManager(EvalManager):
 # 	private final List<StratumEvaluator> stratumEvals = new ArrayList<>();
 #
     def __init__(self):
-        self.allFacts: ConcurrentFactIndexer[Set[PositiveAtom]] = FactIndexerFactory.createConcurrentSetFactIndexer()
+        self.allFacts: ConcurrentFactIndexer = FactIndexerFactory.createConcurrentSetFactIndexer()
         self.stratumEvals: List[StratumEvaluator] = []
+        super(SemiNaiveEvalManager, self).__init__()
 
 # 	@SuppressWarnings("unchecked")
 # 	@Override
@@ -251,11 +252,11 @@ class SemiNaiveEvalManager(EvalManager):
 # 		for (int i = 0; i < nstrata; ++i) {
         for i in range(nstrata):
 # 			firstRoundRules[i] = new HashMap<>();
-            firstRoundRules[i] = dict()
+            firstRoundRules.append(dict())
 # 			laterRoundRules[i] = new HashMap<>();
-            laterRoundRules[i] = dict()
+            laterRoundRules.append(dict())
 # 			initialIdbFacts[i] = new HashSet<>();
-            self.initialIdbFacts[i] = set()
+            self.initialIdbFacts.append(set())
 # 		}
 # 		Map<PredicateSym, Integer> predToStratumMap = stratProg.getPredToStratumMap();
         predToStratumMap: Dict[PredicateSym, int] = stratProg.getPredToStratumMap()

@@ -121,7 +121,7 @@ class SimpleConstSubstitution(ConstOnlySubstitution):
         r = SimpleConstSubstitution()
         z = zip(xs, ys)
         for x, y in z:
-            if not TermHelpers.unify(x, y, r):
+            if not TermHelpers.unify_const_only_substitution(x, y, r):
                 return None
 
         return r
