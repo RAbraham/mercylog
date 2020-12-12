@@ -17,7 +17,3 @@ def initEngine_engine(engine: DatalogEngine, program: List[Rule]):
     return engine
 
 
-def _run(initEngine, program, query):
-    engine = initEngine(program)
-    rs = do_query(engine, query)
-    return rs

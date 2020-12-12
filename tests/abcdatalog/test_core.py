@@ -23,7 +23,7 @@ from mercylog.abcdatalog.ast.validation.stratified_negation_graph import (
 from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import convert, q as do_query
 import pytest
 
-from tests.abcdatalog.helper import initEngine_engine, seminaive_engine, _run
+from tests.abcdatalog.helper import initEngine_engine, seminaive_engine
 from functools import partial
 
 p = relation("p")
@@ -33,10 +33,18 @@ s = relation("s")
 
 V, W, X, Y, Z = variables("V", "W", "X", "Y", "Z")
 
+
 @toolz.curry
 def is_result(engine, a_query, exp_result):
     rs = do_query(engine, a_query)
     return _equals(rs, exp_result)
+
+
+def _equals(act, exp):
+    assert len(act) == len(exp), f"Act:{act} is not of same size as Exp:{exp}"
+    for e in exp:
+        assert e in act, f"Fact:{e} was not present in Actual:{act}"
+    return True
 
 
 @toolz.curry
@@ -47,47 +55,24 @@ def match(program, query, result):
     return is_result(engine, query, result)
 
 
-@pytest.fixture
-def initEngine():
-    semi_engine = seminaive_engine()
-    return partial(initEngine_engine, semi_engine)
-
-
-def test_queryUndefinedPredicate(initEngine):
+def test_queryUndefinedPredicate():
     program = [p()]
-    rs = _run(initEngine, program, q())
-    assert not rs
+    ans = match(program)
+    assert ans(q(), [])
 
 
-def test_queryEDBPredicate(initEngine):
-
+def test_queryEDBPredicate():
     a_q1 = q("a", "b", "c", "d", "e")
     a_q2 = q("e", "d", "c", "b", "a")
     program = [p(), a_q1, a_q2]
-    engine = initEngine(program)
-    rs = do_query(engine, p())
-    assert len(rs) == 1
-    assert p() in rs
-    rs = do_query(engine, q(V, W, X, Y, Z))
-    assert len(rs) == 2
-    assert a_q1 in rs
-    assert a_q2 in rs
-
-    rs = do_query(engine, q(W, "b", X, Y, Z))
-    assert len(rs) == 1
-    assert a_q1 in rs
-    rs = do_query(engine, q(W, X, "d", Y, Z))
-    assert not rs
+    ans = match(program)
+    assert ans(p(), [p()])
+    assert ans(q(V, W, X, Y, Z), [a_q1, a_q2])
+    assert ans(q(W, "b", X, Y, Z), [a_q1])
+    assert ans(q(W, X, "d", Y, Z), [])
 
 
-def _equals(act, exp):
-    assert len(act) == len(exp), f"Act:{act} is not of same size as Exp:{exp}"
-    for e in exp:
-        assert e in act, f"Fact:{e} was not present in Actual:{act}"
-    return True
-
-
-def test_queryNonRecursiveIDBPredicate(initEngine):
+def test_queryNonRecursiveIDBPredicate():
     program = [
         p("a", "b"),
         p("b", "c"),
@@ -97,17 +82,17 @@ def test_queryNonRecursiveIDBPredicate(initEngine):
     ans = match(program)
     assert ans(q(X, Y), [q("a", "c"), q("b", "d")])
     assert ans(q(X, "c"), [q("a", "c")])
-    assert ans(q("x", "b"),[])
+    assert ans(q("x", "b"), [])
 
 
-def test_queryLinearlyRecursiveIDBPredicate(initEngine):
+def test_queryLinearlyRecursiveIDBPredicate():
     # 		// Acyclic transitive closure.
     program = [
         p("a", "b"),
         p("b", "c"),
         p("c", "d"),
         q(X, Y) <= p(X, Y),
-        q(X, Y) <= [p(X, Z), q(Z, Y)],
+        q(X, Y) <= [p(X, Z), q(Z, Y)]
     ]
     ans = match(program)
     assert ans(
@@ -118,7 +103,7 @@ def test_queryLinearlyRecursiveIDBPredicate(initEngine):
     assert ans(q("a", X), [q("a", "b"), q("a", "c"), q("a", "d")])
 
 
-def test_transitive_closure_with_a_cycle(initEngine):
+def test_transitive_closure_with_a_cycle():
     # 		// Transitive closure with a cycle.
 
     program = [
@@ -127,7 +112,7 @@ def test_transitive_closure_with_a_cycle(initEngine):
         p("c", "d"),
         q(X, Y) <= p(X, Y),
         q(X, Y) <= [p(X, Z), q(Z, Y)],
-        p("d", "c")
+        p("d", "c"),
     ]
     ans = match(program)
     assert ans(
@@ -145,7 +130,8 @@ def test_transitive_closure_with_a_cycle(initEngine):
         ],
     )
 
-def test_queryNonLinearlyRecursiveIDBPredicate(initEngine):
+
+def test_queryNonLinearlyRecursiveIDBPredicate():
     program = [
         p("a", "b"),
         p("b", "c"),
@@ -162,7 +148,8 @@ def test_queryNonLinearlyRecursiveIDBPredicate(initEngine):
 
     assert ans(q("a", X), [q("a", "b"), q("a", "c"), q("a", "d")])
 
-def test_queryNonLinearlyRecursiveIDBPredicate_withCycle(initEngine):
+
+def test_queryNonLinearlyRecursiveIDBPredicate_withCycle():
     #     // Transitive closure with a cycle.
     program = [
         p("a", "b"),
@@ -170,7 +157,7 @@ def test_queryNonLinearlyRecursiveIDBPredicate_withCycle(initEngine):
         p("c", "d"),
         q(X, Y) <= p(X, Y),
         q(X, Y) <= [q(X, Z), q(Z, Y)],
-        p("d", "c")
+        p("d", "c"),
     ]
     ans = match(program)
     assert ans(
@@ -188,19 +175,21 @@ def test_queryNonLinearlyRecursiveIDBPredicate_withCycle(initEngine):
         ],
     )
 
-def test_queryIDBPredicateWithUndefinedEDB(initEngine):
+
+def test_queryIDBPredicateWithUndefinedEDB():
     program = [q(X, Y) <= p(X, Y), r("a", "b")]
     ans = match(program)
-    assert ans(q(X,Y), [])
+    assert ans(q(X, Y), [])
 
 
-def test_queryIDBPredicateWithExplicitIDBFact(initEngine):
+def test_queryIDBPredicateWithExplicitIDBFact():
     # // Note that q is defined by a rule, but we also give an explicit fact.
     program = [q(X, Y) <= r(X, Y), r("a", "b"), q("b", "c")]
     ans = match(program)
     assert ans(q(X, Y), [q("a", "b"), q("b", "c")])
 
-def test_queryZeroAryPredicates(initEngine):
+
+def test_queryZeroAryPredicates():
     program = [p() <= q(), r() <= [p(), s()], q(), s()]
     ans = match(program)
     assert ans(q(), [q()])
@@ -208,7 +197,8 @@ def test_queryZeroAryPredicates(initEngine):
     assert ans(s(), [s()])
     assert ans(r(), [r()])
 
-def test_querymutuallyrecursivepredicates(initEngine):
+
+def test_querymutuallyrecursivepredicates():
     program = [
         p(X, Y, Z) <= q(X, Y, Z),
         q(X, Y, Z) <= p(Z, Y, X),
@@ -223,7 +213,7 @@ def test_querymutuallyrecursivepredicates(initEngine):
     assert ans(p(X, "c", Y), [])
 
 
-def test_querymutuallyrecursivepredicates_no_facts(initEngine):
+def test_querymutuallyrecursivepredicates_no_facts():
     program = [p(X, Y, Z) <= q(X, Y, Z), q(X, Y, Z) <= p(X, Y, Z)]
     ans = match(program)
     assert ans(p(X, Y, Z), [])
