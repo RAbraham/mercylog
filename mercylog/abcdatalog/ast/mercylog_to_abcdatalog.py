@@ -53,6 +53,16 @@ def make_positive_relation(relation):
     return APositiveAtom.create(APredicateSym.create(relation.name, len(abc_vars)), abc_vars)
 
 
+# def convert_term(term: Term) -> ATerm:
+#
+#     if isinstance(term, Variable):
+#         if str(term) == "_":
+#             return AVariable.createFreshVariable()
+#         else:
+#             return AVariable.create(term.name)
+#     else:
+#         return AConstant.create(str(term))
+
 def convert_term(term: Term) -> ATerm:
 
     if isinstance(term, Variable):
@@ -61,8 +71,7 @@ def convert_term(term: Term) -> ATerm:
         else:
             return AVariable.create(term.name)
     else:
-        return AConstant.create(str(term))
-
+        return AConstant.create(term)
 
 # def convert_query(q: Relation):
 #     predSym = q.name

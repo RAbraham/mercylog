@@ -14,52 +14,46 @@ O = TypeVar("O")
 #  *
 #  */
 
-# public class Constant implements Term {
+# @dataclass(frozen=True)
+# class Constant(Term):
+#     name: str
+#
+#     @staticmethod
+#     def create(name: str) -> "Constant":
+#         return Constant(name)
+#
+#
+#     def getName(self)-> str:
+#         return self.name
+#
+#
+#     def __str__(self):
+#         return self.getName()
+#
+#     def __repr__(self):
+#         return self.__str__()
+#
+#     def accept_term_visitor(self, visitor: TermVisitor[I, O], state: I):
+#         return visitor.visit_constant(self, state)
+#
+#     def applySubst(self, subst: Substitution) -> "Term":
+#         return self
+
 @dataclass(frozen=True)
 class Constant(Term):
-    name: str
-# 	/**
-# 	 * Identifier of the constant.
-# 	 */
-# 	private final String name;
-#
-# 	/**
-# 	 * A map for memoization.
-# 	 */
-# 	private static final ConcurrentMap<String, Constant> memo = new ConcurrentHashMap<>();
-#
-# 	/**
-# 	 * Returns a constant with the given string identifier.
-# 	 *
-# 	 * @param name
-# 	 *            the string identifier
-# 	 * @return the constant
-# 	 */
-# 	public static Constant create(String name) {
-# 		Constant c = memo.get(name);
-# 		if (c != null) {
-# 			return c;
-# 		}
-# 		// try creating it
-# 		c = new Constant(name);
-# 		Constant existing = memo.putIfAbsent(name, c);
-# 		if (existing != null) {
-# 			return existing;
-# 		}
-# 		return c;
-# 	}
+    name: Any
 
     @staticmethod
-    def create(name: str) -> "Constant":
+    def create(name) -> "Constant":
         return Constant(name)
 
 
-    def getName(self)-> str:
+    def getName(self):
         return self.name
 
 
     def __str__(self):
-        return self.getName()
+        return str(self.getName())
 
     def __repr__(self):
         return self.__str__()
@@ -69,9 +63,6 @@ class Constant(Term):
 
     def applySubst(self, subst: Substitution) -> "Term":
         return self
-#
-# }
-    pass
 # /*******************************************************************************
 #  * This file is part of the AbcDatalog project.
 #  *

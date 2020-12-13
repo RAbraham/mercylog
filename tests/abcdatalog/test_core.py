@@ -92,7 +92,7 @@ def test_queryLinearlyRecursiveIDBPredicate():
         p("b", "c"),
         p("c", "d"),
         q(X, Y) <= p(X, Y),
-        q(X, Y) <= [p(X, Z), q(Z, Y)]
+        q(X, Y) <= [p(X, Z), q(Z, Y)],
     ]
     ans = match(program)
     assert ans(
@@ -292,70 +292,115 @@ def test_testRuleThatEndsInAGroundAtom():
 
     ans = match(program)
     # aaa. below fails if using pure numbers
-    # assert ans(tc(X, Y), [tc(0, 1), tc(1, 2), tc(2, 3)])
+    assert ans(tc(X, Y), [tc(0, 1), tc(1, 2), tc(2, 3)])
+
+    # 		program += "trigger.";
+    program = program + [trigger()]
+    # 		engine = initEngine(program);
+    ans = match(program)
+    # 		rs = engine.query(parseQuery("tc(X,Y)?"));
+    assert ans(tc(X, Y), [tc(0, 1), tc(0, 2), tc(0, 3), tc(1, 2), tc(1, 3), tc(2, 3)])
 
 
-# 		program += "trigger.";
-# 		engine = initEngine(program);
-# 		rs = engine.query(parseQuery("tc(X,Y)?"));
-# 		assertEquals(rs.size(), 6);
-# 		assertTrue(rs.containsAll(parseFacts("tc(0,1). tc(0,2). tc(0,3)."
-# 				+ "tc(1,2). tc(1,3). tc(2,3).")));
-# 	}
 #
 # 	/**
 # 	 * This test is primarily for exercising a corner case for engines that use
 # 	 * a RuleBasedSubstitution. We want to make sure that variables are
 # 	 * consistently bound while an individual atom is being processed.
 # 	 */
-# 	@Test
 # 	public void testRulesWithRepeatedVariablesInAnAtom() {
-# 		String program = "p(X) :- q(X,X). q(a,a). q(a,b). q(b,b).";
-# 		DatalogEngine engine = initEngine(program);
-# 		Set<PositiveAtom> rs = engine.query(parseQuery("p(X)?"));
-# 		assertEquals(rs.size(), 2);
-# 		assertTrue(rs.containsAll(parseFacts("p(a). p(b).")));
-#
-# 		program = "p(X,Y) :- q(Y,X,Y,X). q(a,a,a,a). q(a,a,a,b)."
-# 				+ "q(a,a,b,b). q(a,b,b,b). q(b,b,b,b).";
-# 		engine = initEngine(program);
-# 		rs = engine.query(parseQuery("p(X,Y)?"));
-# 		assertEquals(rs.size(), 2);
-# 		assertTrue(rs.containsAll(parseFacts("p(a,a). p(b,b).")));
-# 	}
-#
-# 	@Test
-# 	public void testRulesWithLongBodies() {
-# 		String program = "p(A,B,C,D,E,F,G) :- a(A), b(B), c(C), d(D), e(E), f(F), g(G)."
-# 				+ "a(1). b(1). c(1). d(1). d(2). e(1). f(1). g(1).";
-# 		DatalogEngine engine = initEngine(program);
-# 		Set<PositiveAtom> rs = engine.query(parseQuery("p(A,B,C,D,E,F,G)?"));
-# 		assertEquals(rs.size(), 2);
-# 		assertTrue(rs.containsAll(parseFacts("p(1,1,1,1,1,1,1). p(1,1,1,2,1,1,1).")));
-#
-# 		program = "p(A,B,C,D,E) :- a(A,X1,X2,X3,X5), b(X6,B,X7,X8,X9),"
-# 				+ " c(X10,X11,C,X12,X13), d(X14,X15,X16,D,X17), e(X18,X19,X20,X21,E)."
-# 				+ "a(foo1,2,3,4,5). b(6,foo2,8,9,10). c(11,12,foo3,14,15). "
-# 				+ "d(16,17,18,foo4,20). e(21,22,23,24,foo5). c(foo1,foo2,bar,foo4,foo5).";
-# 		engine = initEngine(program);
-# 		rs = engine.query(parseQuery("p(A,B,C,D,E)?"));
-# 		assertEquals(rs.size(), 2);
-# 		assertTrue(rs
-# 				.containsAll(parseFacts("p(foo1,foo2,foo3,foo4,foo5). p(foo1,foo2,bar,foo4,foo5).")));
-# 	}
-#
-# 	@Test
-# 	public void testRulesWithUnusedVariables1() {
-# 		String program = "on(L) :- or(L,L1,X), on(L1). or(a,b,c). on(b).";
-# 		DatalogEngine engine = initEngine(program);
-# 		Set<PositiveAtom> rs = engine.query(parseQuery("on(a)?"));
-# 		assertEquals(rs.size(), 1);
-# 		assertTrue(rs.containsAll(parseFacts("on(a).")));
-# 		rs = engine.query(parseQuery("on(X)?"));
-# 		assertEquals(rs.size(), 2);
-# 		assertTrue(rs.containsAll(parseFacts("on(a). on(b).")));
-# 	}
-#
+def test_testRulesWithRepeatedVariablesInAnAtom():
+    # 		String program = "p(X) :- q(X,X). q(a,a). q(a,b). q(b,b).";
+    program = [
+        p(X) <= q(X, X),
+        q("a", "a"),
+        q("a", "b"),
+        q("b", "b"),
+    ]
+    ans = match(program)
+    assert ans(p(X), [p("a"), p("b")])
+    program = [
+        p(X, Y) <= q(Y, X, Y, X),
+        q("a", "a", "a", "a"),
+        q("a", "a", "a", "b"),
+        q("a", "a", "b", "b"),
+        q("a", "b", "b", "b"),
+        q("b", "b", "b", "b"),
+    ]
+
+    ans = match(program)
+
+    assert ans(p(X, Y), [p("a", "a"), p("b", "b")])
+
+
+def test_testRulesWithLongBodies():
+    a = relation("a")
+    b = relation("b")
+    c = relation("c")
+    d = relation("d")
+    e = relation("e")
+    f = relation("f")
+    g = relation("g")
+    A, B, C, D, E, F, G = variables("A", "B", "C", "D", "E", "F", "G")
+    X = variables(*["X" + str(r) for r in range(1, 23)])
+
+    program = [
+        p(A, B, C, D, E, F, G) <= [a(A), b(B), c(C), d(D), e(E), f(F), g(G)],
+        a(1),
+        b(1),
+        c(1),
+        d(1),
+        d(2),
+        e(1),
+        f(1),
+        g(1),
+    ]
+
+    ans = match(program)
+    assert ans(p(A, B, C, D, E, F, G), [p(1, 1, 1, 1, 1, 1, 1), p(1, 1, 1, 2, 1, 1, 1)])
+
+    foo1 = "foo1"
+    foo2 = "foo2"
+    foo3 = "foo3"
+    foo4 = "foo4"
+    foo5 = "foo5"
+    bar = "bar"
+    program = [
+        p(A, B, C, D, E)
+        <= [
+            a(A, X[1], X[2], X[3], X[5]),
+            b(X[6], B, X[7], X[8], X[9]),
+            c(X[10], X[11], C, X[12], X[13]),
+            d(X[14], X[15], X[16], D, X[17]),
+            e(X[18], X[19], X[20], X[21], E),
+        ],
+        a(foo1, 2, 3, 4, 5),
+        b(6, foo2, 8, 9, 10),
+        c(11, 12, foo3, 14, 15),
+        d(16, 17, 18, foo4, 20),
+        e(21, 22, 23, 24, foo5),
+        c(foo1, foo2, bar, foo4, foo5),
+    ]
+    ans = match(program)
+    assert ans(
+        p(A, B, C, D, E),
+        [p(foo1, foo2, foo3, foo4, foo5), p(foo1, foo2, bar, foo4, foo5)],
+    )
+
+
+def test_testRulesWithUnusedVariables1():
+    or_ = relation("or")
+    on = relation("on")
+    L, L1 = variables("L", "L1")
+    a = "a"
+    b = "b"
+    c = "c"
+    program = [on(L) <= [or_(L, L1, X), on(L1)], or_(a, b, c), on(b)]
+    ans = match(program)
+    assert ans(on(a), [on(a)])
+    assert ans(on(X), [on(a), on(b)])
+
+
 # 	@Test
 # 	public void testRulesWithUnusedVariables2() {
 # 		String program = "on(L) :- or(L,L1,X), on(L1). on(L) :- or(L,X,L1), on(L1). or(a,b,c). on(b).";
