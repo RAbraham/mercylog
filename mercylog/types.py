@@ -5,7 +5,7 @@ from pyrsistent.typing import PVector
 from typing import *
 from returns.result import Result, Success, Failure
 from mercylog.lib import util
-
+from fastcore import all as fc
 """
 Glossary:
 ^^^^^^^^^
@@ -265,6 +265,19 @@ class Fact:
 def relation(predicate: str) -> RelationCreator:
     return RelationCreator(predicate)
 
+class BinaryUnifier:
+    def __init__(self, x, y):
+        # fc.store_attr()
+        self.x = x
+        self.y = y
+    pass
+
+class BinaryDisunifier:
+    def __init__(self, x, y):
+        # fc.store_attr()
+        self.x = x
+        self.y = y
+
 
 # def run(data_source: DataSource, program: Program, query: Query):
 
@@ -299,3 +312,13 @@ class KnowledgeBase:
 #         return error_message
 #     else:
 #         return False
+
+def eq(x, y) -> BinaryUnifier:
+    return BinaryUnifier(x, y)
+
+def not_eq(x, y) -> BinaryDisunifier:
+    return BinaryDisunifier(x, y)
+
+if __name__ == '__main__':
+    b = BinaryUnifier("r", "x")
+    print(b.x)

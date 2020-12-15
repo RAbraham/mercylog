@@ -1,55 +1,11 @@
-from typing import *
-import toolz
-
 from mercylog.abcdatalog.ast.validation.datalog_validation_exception import (
     DatalogValidationException,
 )
 
 from mercylog.types import relation, variables, _
-from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import q as do_query
 import pytest
 
-from tests.abcdatalog.helper import initEngine_engine, seminaive_engine
-from functools import partial
-
-p = relation("p")
-q = relation("q")
-r = relation("r")
-s = relation("s")
-
-V, W, X, Y, Z = variables("V", "W", "X", "Y", "Z")
-
-
-@toolz.curry
-def is_result(engine, a_query, exp_result):
-    rs = do_query(engine, a_query)
-    return _equals(rs, exp_result)
-
-
-def list_set(a_list: List) -> List:
-    result = []
-    for a in a_list:
-        if a not in result:
-            result.append(a)
-    return result
-
-
-def _equals(act, exp):
-    _act = list_set(act)
-    _exp = list_set(exp)
-
-    assert len(_act) == len(_exp), f"Act:{act} is not of same size as Exp:{exp}"
-    for e in _exp:
-        assert e in _act, f"Fact:{e} was not present in Actual:{act}"
-    return True
-
-
-@toolz.curry
-def match(program, query, result):
-    semi_engine = seminaive_engine()
-    initEngine = partial(initEngine_engine, semi_engine)
-    engine = initEngine(program)
-    return is_result(engine, query, result)
+from tests.abcdatalog.helper import match, p,q,r, s,  X, Y, Z, V, W
 
 
 def test_queryUndefinedPredicate():

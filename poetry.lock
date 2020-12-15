@@ -199,6 +199,21 @@ python-versions = ">=2.7"
 version = "0.3"
 
 [[package]]
+category = "main"
+description = "Python supercharged for fastai development"
+name = "fastcore"
+optional = false
+python-versions = ">=3.6"
+version = "1.3.12"
+
+[package.dependencies]
+packaging = "*"
+pip = "*"
+
+[package.extras]
+dev = ["numpy", "nbdev (>=0.2.39)", "matplotlib", "pillow", "torch", "pandas"]
+
+[[package]]
 category = "dev"
 description = "Copy your docs directly to the gh-pages branch."
 name = "ghp-import"
@@ -1584,7 +1599,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "7d31cb45541c528d7b77bf57d72ed184208f5ac9956cc37eba84efabe4399fa5"
+content-hash = "2e14321129615213e91a6220b50a9e3ccaf9e0a15c8d18bc5b2d9ade9729900a"
 lock-version = "1.0"
 python-versions = "^3.8"
 
@@ -1709,6 +1724,10 @@ docutils = [
 entrypoints = [
     {file = "entrypoints-0.3-py2.py3-none-any.whl", hash = "sha256:589f874b313739ad35be6e0cd7efde2a4e9b6fea91edcc34e58ecbb8dbe56d19"},
     {file = "entrypoints-0.3.tar.gz", hash = "sha256:c70dd71abe5a8c85e55e12c19bd91ccfeec11a6e99044204511f9ed547d48451"},
+]
+fastcore = [
+    {file = "fastcore-1.3.12-py3-none-any.whl", hash = "sha256:3d3cfe04f4df412abbd88ffcc0a90c2499eabd6bc6a24552d00238104ec7801b"},
+    {file = "fastcore-1.3.12.tar.gz", hash = "sha256:5657087c05915ff4882f20d933d5e1772de85976128d29820c2a834ef1c63fae"},
 ]
 ghp-import = [
     {file = "ghp-import-1.0.0.tar.gz", hash = "sha256:65e4d854dd0980096fd950a323d699daad4ff8007b8daa7e7ca60d57dfa00e1b"},

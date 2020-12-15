@@ -1,5 +1,5 @@
 from typing import *
-from mercylog.types import Rule, Relation, InvertedRelationInstance, Term, Variable
+from mercylog.types import Rule, Relation, InvertedRelationInstance, Term, Variable, BinaryUnifier, BinaryDisunifier
 from mercylog.abcdatalog.ast.variable import Variable as AVariable
 from mercylog.abcdatalog.ast.term import Term as ATerm
 from mercylog.abcdatalog.ast.constant import Constant as AConstant
@@ -7,11 +7,11 @@ from mercylog.abcdatalog.ast.positive_atom import PositiveAtom as APositiveAtom,
 from mercylog.abcdatalog.ast.predicate_sym import PredicateSym as APredicateSym, PredicateSym
 from mercylog.abcdatalog.ast.negated_atom import NegatedAtom as ANegatedAtom
 from mercylog.abcdatalog.ast.clause import Clause as AClause
+from mercylog.abcdatalog.ast.binary_unifier import BinaryUnifier as ABinaryUnifier
+from mercylog.abcdatalog.ast.binary_disunifier import BinaryDisunifier as ABinaryDisunifier
 
 def convert(program: List[Rule]) -> Set:
     converts = list(map(_convert, program))
-    from pprint import pprint
-
     return set(converts)
 
 # def _convert(r: Rule):
@@ -26,6 +26,7 @@ def convert(program: List[Rule]) -> Set:
 
 
 def _convert(r):
+
     if isinstance(r, Rule):
         abc_head = convert_relation(r.head)
         abc_body = tuple([convert_relation(b) for b in r.body])
