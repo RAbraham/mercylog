@@ -22,8 +22,6 @@ def seminaive_engine():
 
 def initEngine_engine(engine: DatalogEngine, program: List[Rule]):
     converted = convert(list(program))
-    print(">> RA: Converted")
-    print(converted)
     engine.init(converted)
     return engine
 

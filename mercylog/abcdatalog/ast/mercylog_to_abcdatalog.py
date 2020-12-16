@@ -36,22 +36,38 @@ def _convert(r):
         abc_body = tuple([])
         return AClause(abc_head, abc_body)
     else:
-
         raise ValueError(f"Unexpected Argument:{r} of type: {type(r)}")
     pass
 
 def convert_relation(relation: Union[Relation, InvertedRelationInstance]):
-    if isinstance(relation, Relation):
+    if isinstance(relation, BinaryUnifier):
+        return make_binary_unifier(relation)
+    elif isinstance(relation, BinaryDisunifier):
+        return make_binary_disunifier(relation)
+    elif isinstance(relation, Relation):
         return make_positive_relation(relation)
     elif isinstance(relation, InvertedRelationInstance):
         positive_relation = relation.relation_instance
         return ANegatedAtom(make_positive_relation(positive_relation))
+    else:
+        raise ValueError(f"Unexpected argument: {relation} of type: {type(relation)}")
 
+def make_binary_disunifier(relation):
+    terms = convert_terms(relation)
+    return ABinaryDisunifier(terms[0], terms[1])
+
+def make_binary_unifier(relation):
+    terms = convert_terms(relation)
+    return ABinaryUnifier(terms[0], terms[1])
 
 def make_positive_relation(relation):
-    abc_vars = list(map(convert_term, relation.terms))
+    abc_vars = convert_terms(relation)
 
     return APositiveAtom.create(APredicateSym.create(relation.name, len(abc_vars)), abc_vars)
+
+
+def convert_terms(relation):
+    return list(map(convert_term, relation.terms))
 
 
 # def convert_term(term: Term) -> ATerm:

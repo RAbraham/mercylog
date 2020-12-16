@@ -1,98 +1,110 @@
 import pytest
-from mercylog.abcdatalog.ast.validation.datalog_validation_exception import DatalogValidationException
-# import abcdatalog.engine.DatalogEngine;
 from mercylog.abcdatalog.ast.validation.datalog_validation_exception import (
     DatalogValidationException,
 )
 
-from mercylog.types import relation, variables, _, eq
-from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import q as do_query
-import pytest
 
-from tests.abcdatalog.helper import initEngine_engine, seminaive_engine
-from functools import partial
-from tests.abcdatalog.helper import match, X, Y, Z
+from mercylog.types import relation, _, eq, not_eq
+
+from tests.abcdatalog.helper import match, X, Y, Z, p, q
 
 a = "a"
 b = "b"
 c = "c"
 d = "d"
+e = "e"
+tc = relation("tc")
+edge = relation("edge")
+cycle = relation("cycle")
+noncycle = relation("noncycle")
+beginsAtC = relation("beginsAtC")
+beginsNotAtC = relation("beginsNotAtC ")
+noC = relation("noC")
+
 
 def test_testRulesWithBinaryUnifiers():
-#     String program = "tc(X,Y) :- edge(X,Y). tc(X,Y) :- edge(X,Z), tc(Z,Y)."
-#             + "edge(a,b). edge(b,c). edge(c,c). edge(c,d)."
-#             + "cycle(X) :- X = Y, tc(X,Y)."
-#             + "beginsAtC(X,Y) :- tc(X,Y), c = X.";
-    tc = relation("tc")
-    edge = relation("edge")
-    cycle = relation("cycle")
-    beginsAtC = relation("beginsAtC")
 
     program = [
-        tc(X,Y) <= edge(X,Y),
-        tc(X,Y) <= [edge(X,Z), tc(Z,Y)],
-        edge(a,b), edge(b,c), edge(c,c), edge(c,d),
-        cycle(X) <= [eq(X, Y), tc(X,Y)],
-        beginsAtC(X,Y) <= [tc(X,Y), eq(c, X)]
-
-
+        tc(X, Y) <= edge(X, Y),
+        tc(X, Y) <= [edge(X, Z), tc(Z, Y)],
+        edge(a, b),
+        edge(b, c),
+        edge(c, c),
+        edge(c, d),
+        cycle(X) <= [eq(X, Y), tc(X, Y)],
+        beginsAtC(X, Y) <= [tc(X, Y), eq(c, X)],
     ]
-#     DatalogEngine engine = initEngine(program);
     ans = match(program)
-#     Set<PositiveAtom> rs = engine.query(parseQuery("cycle(X)?"));
-#     assertEquals(rs.size(), 1);
-#     assertTrue(rs.containsAll(parseFacts("cycle(c).")));
-#
     assert ans(cycle(X), [cycle(c)])
-#     rs = engine.query(parseQuery("beginsAtC(X,Y)?"));
-#     assertEquals(rs.size(), 2);
-#     assertTrue(rs.containsAll(parseFacts("beginsAtC(c,c). beginsAtC(c,d).")));
-# }
-#
-# @Test
-# public void testRulesWithBinaryDisunifiers() {
-#     String program = "tc(X,Y) :- edge(X,Y). tc(X,Y) :- edge(X,Z), tc(Z,Y)."
-#             + "edge(a,b). edge(b,c). edge(c,c). edge(c,d)."
-#             + "noncycle(X,Y) :- X != Y, tc(X,Y)."
-#             + "beginsNotAtC(X,Y) :- tc(X,Y), c != X."
-#             + "noC(X,Y) :- edge(X,Y), X != c, Y != c."
-#             + "noC(X,Y) :- noC(X,Z), noC(Z,Y).";
-#     DatalogEngine engine = initEngine(program);
-#     Set<PositiveAtom> rs = engine.query(parseQuery("noncycle(X,Y)?"));
-#     assertEquals(rs.size(), 6);
-#     assertTrue(rs.containsAll(parseFacts("noncycle(a,b). noncycle(a,c)."
-#             + "noncycle(a,d). noncycle(b,c). noncycle(b,d). noncycle(c,d).")));
-#
-#     rs = engine.query(parseQuery("beginsNotAtC(X,Y)?"));
-#     assertEquals(rs.size(), 5);
-#     assertTrue(rs.containsAll(parseFacts("beginsNotAtC(a,b). beginsNotAtC(a,c)."
-#             + "beginsNotAtC(a,d). beginsNotAtC(b,c). beginsNotAtC(b,d).")));
-#
-#     rs = engine.query(parseQuery("noC(X,Y)?"));
-#     assertEquals(rs.size(), 1);
-#     assertTrue(rs.containsAll(parseFacts("noC(a,b).")));
-# }
-#
-# @Test
-# public void testBinaryUnificationNoAtom() throws DatalogValidationException {
-#     String program = "p(X,b) :- X=a. p(b,Y) :- Y=a. p(X,Y) :- X=c, Y=d. p(X,X) :- X=c. p(X,Y) :- X=d, Y=X. p(X,Y) :- X=Y, X=e.";
-#     String expected = "p(a,b). p(b,a). p(c,d). p(c,c). p(d,d). p(e,e).";
-#     test(program, "p(X,Y)?", expected);
-#
-#     program += "q(X,Y) :- p(X,Y).";
-#     expected = "q(a,b). q(b,a). q(c,d). q(c,c). q(d,d). q(e,e).";
-#     test(program, "q(X,Y)?", expected);
-# }
-#
-# @Test(expected = DatalogValidationException.class)
-# public void testUselessBinaryUnification() throws DatalogValidationException {
-#     test("p(X) :- q(X), X=Y. q(a). p(b) :- X=_.", "p(X)?", "p(a). p(b).");
-# }
-#
-# public void testImpossibleBinaryUnification1() throws DatalogValidationException {
-#     test("p :- a=b.", "p?", "");
-# }
-#
+    assert ans(beginsAtC(X, Y), [beginsAtC(c, c), beginsAtC(c, d)])
+
+
+def test_testRulesWithBinaryDisunifiers():
+    program = [
+        tc(X, Y) <= edge(X, Y),
+        tc(X, Y) <= [edge(X, Z), tc(Z, Y)],
+        edge(a, b),
+        edge(b, c),
+        edge(c, c),
+        edge(c, d),
+        noncycle(X, Y) <= [not_eq(X, Y), tc(X, Y)],
+        beginsNotAtC(X, Y) <= [tc(X, Y), not_eq(c, X)],
+        noC(X, Y) <= [edge(X, Y), not_eq(X, c), not_eq(Y, c)],
+        noC(X, Y) <= [noC(X, Z), noC(Z, Y)],
+    ]
+
+    ans = match(program)
+    assert ans(
+        noncycle(X, Y),
+        [
+            noncycle(a, b),
+            noncycle(a, c),
+            noncycle(a, d),
+            noncycle(b, c),
+            noncycle(b, d),
+            noncycle(c, d),
+        ],
+    )
+    assert ans(
+        beginsNotAtC(X, Y),
+        [
+            beginsNotAtC(a, b),
+            beginsNotAtC(a, c),
+            beginsNotAtC(a, d),
+            beginsNotAtC(b, c),
+            beginsNotAtC(b, d),
+        ],
+    )
+    assert ans(noC(X, Y), [noC(a, b)])
+
+
+def test_testBinaryUnificationNoAtom():
+    program = [
+        p(X, b) <= eq(X, a),
+        p(b, Y) <= eq(Y, a),
+        p(X, Y) <= [eq(X, c), eq(Y, d)],
+        p(X, X) <= eq(X, c),
+        p(X, Y) <= [eq(X, d), eq(Y, X)],
+        p(X, Y) <= [eq(X, Y), eq(X, e)],
+    ]
+
+    ans = match(program)
+    assert ans(p(X, Y), [p(a, b), p(b, a), p(c, d), p(c, c), p(d, d), p(e, e)])
+    program = program + [q(X, Y) <= p(X, Y)]
+    ans = match(program)
+    assert ans(q(X, Y), [q(a, b), q(b, a), q(c, d), q(c, c), q(d, d), q(e, e)])
+
+
+def testUselessBinaryUnification():
+    program = [p(X) <= [q(X), eq(X, Y)], q(a), p(b) <= eq(X, _)]
+    ans = match(program)
+    with pytest.raises(DatalogValidationException):
+        ans(p(X), [])
+
+
+def testImpossibleBinaryUnification1():
+    assert match([p() <= eq(a, b)], p(), [])
+
 # public void testImpossibleBinaryUnification2() throws DatalogValidationException {
 #     test("p :- Z=b, X=Y, a=X, Z=Y.", "p?", "");
 # }

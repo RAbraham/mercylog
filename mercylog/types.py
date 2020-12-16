@@ -265,18 +265,16 @@ class Fact:
 def relation(predicate: str) -> RelationCreator:
     return RelationCreator(predicate)
 
-class BinaryUnifier:
+class BinaryUnifier(Relation):
     def __init__(self, x, y):
         # fc.store_attr()
-        self.x = x
-        self.y = y
+        super(BinaryUnifier, self).__init__("BinaryUnifier", (x, y))
     pass
 
-class BinaryDisunifier:
+class BinaryDisunifier(Relation):
     def __init__(self, x, y):
         # fc.store_attr()
-        self.x = x
-        self.y = y
+        super(BinaryDisunifier, self).__init__("BinaryDisunifier", (x, y))
 
 
 # def run(data_source: DataSource, program: Program, query: Query):
