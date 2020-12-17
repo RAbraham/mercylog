@@ -106,23 +106,29 @@ def testImpossibleBinaryUnification1():
     assert match([p() <= eq(a, b)], p(), [])
 
 # public void testImpossibleBinaryUnification2() throws DatalogValidationException {
-#     test("p :- Z=b, X=Y, a=X, Z=Y.", "p?", "");
-# }
-#
-# @Test
-# public void testBinaryDisunificationNoAtom() throws DatalogValidationException {
-#     String program = "p :- a!=b. q :- X!=Y, X=a, Y=b.";
-#     test(program, "p?", "p.");
-#     test(program, "q?", "q.");
-# }
-#
-# public void testImpossibleBinaryDisunification1() throws DatalogValidationException {
-#     test("p :- a!=a.", "p?", "");
-# }
-#
+def test_testImpossibleBinaryUnification2():
+    assert match([p() <= [eq(Z, b), eq(X, Y), eq(a, X), eq(Z, Y)]], p(), [])
+
+def test_testBinaryDisunificationNoAtom():
+    program = [
+        p() <= not_eq(a, b),
+        q() <= [not_eq(X, Y), eq(X, a), eq(Y, b)]
+    ]
+    ans = match(program)
+    assert ans(p(), [p()])
+    assert ans(q(), [q()])
+
+def test_testImpossibleBinaryDisunification1():
+    assert match([p() <= not_eq(a, a)], p(), [])
+
 # public void testImpossibleBinaryDisunification2() throws DatalogValidationException {
 #     test("p :- Z=a, X!=Y, a=X, Z=Y.", "p?", "");
 # }
+def test_testImpossibleBinaryDisunification2():
+    program = [
+        p() <= [eq(Z,a), not_eq(X, Y), eq(a,X), eq(Z,Y)]
+    ]
+    assert match(program, p(), [])
 #
 # public void testImpossibleBinaryDisunification3() throws DatalogValidationException {
 #     test("p :- q(X), X!=X.", "p?", "");
