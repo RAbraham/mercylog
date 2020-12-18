@@ -1,7 +1,8 @@
 from fastcore.utils import *
+from pprint import pprint
 from typing import *
 import toolz
-from toolz import pipe
+from toolz.curried import *
 from functools import partial
 from mercylog.abcdatalog.engine.bottomup.bottom_up_engine_frame import (
     BottomUpEngineFrame,
@@ -13,12 +14,26 @@ from mercylog.types import Rule, relation, variables
 from mercylog.abcdatalog.engine.datalog_engine import DatalogEngine
 from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import convert, q as do_query
 
-NOT_TOKEN = "__mercylog__not_token__"
-
+# NOT_TOKEN = "__mercylog__not_token__"
+NOT_TOKEN = "~"
 p = relation("p")
 q = relation("q")
 r = relation("r")
 s = relation("s")
+a = "a"
+b = "b"
+c = "c"
+d = "d"
+e = "e"
+tc = relation("tc")
+not_tc = relation("not_tc")
+edge = relation("edge")
+node = relation("node")
+cycle = relation("cycle")
+noncycle = relation("noncycle")
+beginsAtC = relation("beginsAtC")
+beginsNotAtC = relation("beginsNotAtC ")
+noC = relation("noC")
 
 V, W, X, Y, Z = variables("V", "W", "X", "Y", "Z")
 
@@ -67,76 +82,135 @@ def match(program, query, result):
 
 def strip_whitespace(p: str):
     import re
-    return re.sub('[\s+]', '', p)
+
+    return re.sub("[\s+]", "", p)
+
 
 def parse_atom(atom: str) -> str:
-    # print(">> RA: Atom")
-    # print(atom)
     _result = ""
     _result = atom.split("(")
+    if not atom:
+        return ""
     if len(_result) == 1:
         result = _result[0] + "()"
     else:
-        _terms = _result[1].split(")")[0].split(',')
-        _terms = ', '.join(_terms)
-        result = _result[0] + '(' + _terms + ')'
+        _terms = _result[1].split(")")[0].split(",")
+        _terms = ", ".join(_terms)
+        result = _result[0] + "(" + _terms + ")"
     return result
 
 
 def parse_body(body: str) -> str:
-    print(">> Body")
-    print(body)
-    atoms = body.split(',')
-    if len(atoms) == 1:
-       return parse_atom(atoms[0])
+    sp = body.split("),")
+    if len(sp) == 1:
+        return body
     else:
-        return '[' + ', '.join(map(parse_atom, atoms)) + ']'
+        return "[" + body + "]"
 
-def parse_clause(clauses) -> List:
-    result = []
-    for clause in clauses:
-        splitted= clause.split(":-")
-        head = splitted[0]
-        if len(splitted) == 1:
-            body = ""
-        else:
-            body = splitted[1]
-        parsed_head = parse_atom(head)
-        if body:
-            parsed_body = parse_body(body)
-            parsed_clause = ' <= '.join([parsed_head, parsed_body])
-        else:
-            parsed_clause = parsed_head
 
-        result.append(parsed_clause)
-    return result
+# def parse_clause(clauses) -> List:
+#     result = []
+#     for clause in clauses:
+#         splitted = clause.split(":-")
+#         head = splitted[0]
+#         if len(splitted) == 1:
+#             body = ""
+#         else:
+#             body = splitted[1]
+#         parsed_head = parse_atom(head)
+#         if body:
+#             parsed_body = parse_body(body)
+#             parsed_clause = " <= ".join([parsed_head, parsed_body])
+#         else:
+#             parsed_clause = parsed_head
+#
+#         result.append(parsed_clause)
+#     return result
+
+
+def parse_clause(clause) -> str:
+    splitted = clause.split(":-")
+    head = splitted[0]
+    if len(splitted) == 1:
+        body = ""
+    else:
+        body = splitted[1]
+    parsed_head = parse_atom(head)
+    if body:
+        parsed_body = parse_body(body)
+        parsed_clause = " <= ".join([parsed_head, parsed_body])
+    else:
+        parsed_clause = parsed_head
+    return parsed_clause
+
+
+def parse_clauses(clauses) -> List:
+    return toolz.map(parse_clause, clauses)
+
 
 def mark_nots(program: str) -> str:
-    '''
+    """
     We want to remove spaces but there is a space after not which should be kept. So we replace "note<space>" with "__mercylog__not_token__"
     which will be replaced by "not<space" after the general spaces are removed
-    '''
+    """
     return program.replace("not ", NOT_TOKEN)
+
 
 def unmark_nots(program: str) -> str:
     return program.replace(NOT_TOKEN, "not ")
 
+
+# def parse(program: str):
+#     r = pipe(
+#         program,
+#         mark_nots,
+#         strip_whitespace,
+#         unmark_nots,
+#         Self.split("."),
+#         map(parse_clause),
+#         interpose(",\n")
+#
+#     )
+#
+#     result = reduce(lambda x ,y : x + y, r)
+#     print("\n>>>>>>>>>>>>>>>>>>>>>>>>>> Parsed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+#     print(result)
+#     print("\n>>>>>>>>>>>>>>>>>>>>>>>>>> Parsed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+#     return result
 def parse(program: str):
-    # result = pipe(program, lambda p: re.sub('[\s+]', '', p))  # try Self.strip()
-    result = pipe(program, mark_nots, strip_whitespace, unmark_nots, Self.split("."), parse_clause)  # try Self.strip()
-    # split at period
+    r = pipe(
+        program,
+        mark_nots,
+        strip_whitespace,
+        # unmark_nots,
+        Self.split("."),
+        map(parse_clause),
+        interpose(",\n")
+
+    )
+
+    result = reduce(lambda x ,y : x + y, r)
+    print("\n>>>>>>>>>>>>>>>>>>>>>>>>>> Parsed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    print(result)
+    print("\n>>>>>>>>>>>>>>>>>>>>>>>>>> Parsed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     return result
-    pass
 
 
 if __name__ == "__main__":
-    from pprint import pprint
     program = (
         "edge(a,b). edge(b,c). tc(a,c). tc(X,Y) :- edge(X,Y). tc(X,Y) :- tc(X,Z), tc(Z,Y)."
         + "node(X) :- edge(X,_). node(X) :- edge(_,X). not_tc(X,Y) :- node(X), node(Y), not tc(X,Y)."
     )
+
     pprint(parse(program))
-    # print("tc(X,Y) :- tc(X,Z), tc(Z,Y)".split(':-'))
-
-
-    pass
+    act = (
+        "edge(a, b),\n"
+        "edge(b, c),\n"
+        "tc(a, c),\n"
+        "tc(X, Y) <= edge(X,Y),\n"
+        "tc(X, Y) <= [tc(X,Z),tc(Z,Y)],\n"
+        "node(X) <= edge(X,_),\n"
+        "node(X) <= edge(_,X),\n"
+        "not_tc(X, Y) <= [node(X),node(Y),~tc(X,Y)],\n"
+    )
+    assert parse(program) == act
