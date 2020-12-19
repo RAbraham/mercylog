@@ -36,5 +36,7 @@ Inspiration
 * Read and played with PyDatalog. Considered building Dedalus over pyDatalog. However, it hasn't been maintained for years and the author said he may have introduced bugs with his last significant modification. I went to a version below that and tried out a simple piece of code and it did not work. At that point, I just decided to write my own. I have to understand the internals of Datalog
 * Tried to port over an excellent example of a toy Datalog in Haskell. Spent a few days debugging why it wasn't working and got confused in the recursive calls. I got frustrated and decided to build my own from scratch :). It came out so well(.. to me).
 
-* Aug - Sept: Spent around 25 hours building my first [naive implementation](https://rabraham.github.io/mercylog/teaching/essence.html) of Datalog and writing about it :). 
+* Aug - Sept: Spent around 25 hours building my first [naive implementation](https://rabraham.github.io/mercylog/teaching/essence.html) of Datalog and writing about it :).
+
+* Sept to Dec: Ported SemiNaive AbcDatalog :). All tests pass!
 
