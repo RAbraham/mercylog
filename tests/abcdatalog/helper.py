@@ -2,7 +2,9 @@ from fastcore.utils import *
 from pprint import pprint
 from typing import *
 import toolz
+from toolz.curried import reduce as tzreduce
 from toolz.curried import *
+
 from functools import partial
 from mercylog.abcdatalog.engine.bottomup.bottom_up_engine_frame import (
     BottomUpEngineFrame,
@@ -35,7 +37,7 @@ beginsAtC = relation("beginsAtC")
 beginsNotAtC = relation("beginsNotAtC ")
 noC = relation("noC")
 
-V, W, X, Y, Z = variables("V", "W", "X", "Y", "Z")
+U, V, W, X, Y, Z = variables("U", "V", "W", "X", "Y", "Z")
 
 
 def seminaive_engine():
@@ -148,7 +150,7 @@ def parse_clauses(clauses) -> List:
     return toolz.map(parse_clause, clauses)
 
 
-def mark_nots(program: str) -> str:
+def parse_nots(program: str) -> str:
     """
     We want to remove spaces but there is a space after not which should be kept. So we replace "note<space>" with "__mercylog__not_token__"
     which will be replaced by "not<space" after the general spaces are removed
@@ -156,45 +158,24 @@ def mark_nots(program: str) -> str:
     return program.replace("not ", NOT_TOKEN)
 
 
-def unmark_nots(program: str) -> str:
-    return program.replace(NOT_TOKEN, "not ")
 
-
-# def parse(program: str):
-#     r = pipe(
-#         program,
-#         mark_nots,
-#         strip_whitespace,
-#         unmark_nots,
-#         Self.split("."),
-#         map(parse_clause),
-#         interpose(",\n")
-#
-#     )
-#
-#     result = reduce(lambda x ,y : x + y, r)
-#     print("\n>>>>>>>>>>>>>>>>>>>>>>>>>> Parsed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-#     print(result)
-#     print("\n>>>>>>>>>>>>>>>>>>>>>>>>>> Parsed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-#     return result
 def parse(program: str):
+    from operator import add
     r = pipe(
         program,
-        mark_nots,
+        parse_nots,
         strip_whitespace,
-        # unmark_nots,
         Self.split("."),
         map(parse_clause),
-        interpose(",\n")
-
+        interpose(",\n"),
+        tzreduce(add)
     )
 
-    result = reduce(lambda x ,y : x + y, r)
+    result = r
     print("\n>>>>>>>>>>>>>>>>>>>>>>>>>> Parsed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     print(result)
     print("\n>>>>>>>>>>>>>>>>>>>>>>>>>> Parsed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     return result
-
 
 if __name__ == "__main__":
     program = (
@@ -202,7 +183,7 @@ if __name__ == "__main__":
         + "node(X) :- edge(X,_). node(X) :- edge(_,X). not_tc(X,Y) :- node(X), node(Y), not tc(X,Y)."
     )
 
-    pprint(parse(program))
+    # parse(program)
     act = (
         "edge(a, b),\n"
         "edge(b, c),\n"

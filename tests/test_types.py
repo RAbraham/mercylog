@@ -1,6 +1,6 @@
 import pytest
-from mercylog.types import is_safe, v, relation
-
+from mercylog.types import is_safe, relation, variables
+v = variables
 def test_safety():
     X = v('X')
     Y = v('Y')
