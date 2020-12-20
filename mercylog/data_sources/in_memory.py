@@ -105,42 +105,12 @@ def iterate_until_no_change(transform: Callable, initial_value: List) -> List:
         a_input = a_output
 
 
-def run(
-    database: List[Relation],
-    rules: List[Rule],
-    query: List[Relation],
-    variables: List[Variable] = None,
-) -> pd.DataFrame:
-
-    assert isinstance(database, List)
-    assert isinstance(query, List)
-    query_vars = variables or list(query_variables(query))
-    main_query_rule = relation("main_query_rule")
-    head = main_query_rule(*query_vars)
-    m = head <= query
-
-    _rules = rules + [m]
+def run_simple(database,_rules, head):
     transformer = lambda a_knowledgebase: generate_knowledgebase(
         evaluate_logical_operators_in_rule, a_knowledgebase, _rules
     )
     knowledgebase = iterate_until_no_change(transformer, database)
     facts = filter_facts(knowledgebase, head, query_variable_match)
-    result = {}
-    for ix, variable in enumerate(query_vars):
-        result[variable] = []
-        for f in facts:
-            result[variable].append(f.terms[ix])
-        result[variable] = result[variable]
-
-    return pd.DataFrame(result)
+    return facts
 
 
-def query_variables(query: List[Relation]) -> Set[Variable]:
-    q = query
-    vn = [
-        v
-        for ri in q
-        for v in ri.variables()
-        if str(v) != "_" and isinstance(v, Variable)
-    ]
-    return set(vn)

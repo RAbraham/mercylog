@@ -50,7 +50,6 @@ def test_pq():
     ]
     abc_program = convert(program)
     strata_str = validate(abc_program)
-    pprint(strata_str)
     assert strata_str[-1] == '{p}'
 
 
@@ -88,45 +87,6 @@ def test_simple_negated():
 
     pass
 
-
-
-# 	public static void main(String[] args) throws DatalogParseException {
-# 		Consumer<String> test = program -> {
-# 			DatalogTokenizer t = new DatalogTokenizer(new StringReader(program));
-# 			Set<Clause> ast = null;
-# 			try {
-# 				ast = DatalogParser.parseProgram(t);
-# 			} catch (DatalogParseException e1) {
-# 				// TODO Auto-generated catch block
-# 				e1.printStackTrace();
-# 			}
-#
-# 			System.out.println("Program: ");
-# 			for (Clause cl : ast) {
-# 				System.out.println("\t" + cl);
-# 			}
-# 			try {
-# 				UnstratifiedProgram v = (new DatalogValidator()).withAtomNegationInRuleBody().validate(ast);
-#
-# 				StratifiedNegationGraph g = StratifiedNegationGraph.create(v);
-# 				System.out.print("Stratification:\n\t" + g);
-# 			} catch (DatalogValidationException e) {
-# 				System.out.println("No stratification possible.");
-# 			}
-#
-# 			System.out.println();
-# 		};
-#
-# 		String program = "reachable(X,Y) :- edge(X,Y)." + "reachable(X,Y) :- edge(X,Z), reachable(Z,Y)."
-# 				+ "not_reachable(X,Y) :- node(X), node(Y), not reachable(X,Y)."
-# 				+ "node(X) :- edge(X,_). node(X) :- edge(_,X).";
-# 		test.accept(program);
-# 		test.accept("p :- q, not r. q :- r. r :- q.");
-# 		test.accept("p :- not q. q :- not p.");
-# 		test.accept("tc :- edge.");
-# 		test.accept("p :- not q.");
-# 	}
-#
 
 if __name__ == '__main__':
     unittest.main()

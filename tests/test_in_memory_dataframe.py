@@ -1,9 +1,10 @@
 import pytest
 from mercylog.data_sources.in_memory import (
-    run,
+    run_simple,
     query_variable_match,
-    query_variables,
 )
+
+from mercylog.core import make_run
 from mercylog.types import relation, Variable
 import pandas as pd
 
@@ -11,21 +12,10 @@ X = Variable("X")
 Y = Variable("Y")
 Z = Variable("Z")
 
+run = make_run(run_simple)
 
 def a_df(a_dict):
     return pd.DataFrame(a_dict)
-
-
-def test_query_variables():
-    query = [man(X)]
-    assert query_variables(query) == {X}
-    query = [parent(X, "Carl")]
-    assert query_variables(query) == {X}
-    query = [man(X), parent(X, Z), parent(Z, Y)]
-    assert query_variables(query) == {X, Y, Z}
-    # TODO: we have to check if vars is passed, it is a valid subset of the query?
-    # TODO: What about don't care variable i.e. m._
-
 
 def assert_df(df1, df2):
     df1_dicts = df1.to_dict("records")
@@ -37,13 +27,14 @@ def assert_df(df1, df2):
         if item not in df1_dicts:
             assert False, f"{item} not in df1"
 
-
 def test_relation_filter():
     abe = man("Abe")
     bob = man("Bob")
     database = [abe, bob, woman("Abby")]
 
     assert_df(run(database, [], [man(X)]), a_df({X: ["Abe", "Bob"]}))
+
+
 
 
 def test_query_variable_match():
@@ -202,15 +193,6 @@ def test_variables():
 
     rules = [ancestor_rule_base, ancestor_rule_recursive, intermediate_rule]
     query = [intermediate(Z, X, Y)]
-    print(">>Test Var")
-    """
-    Y   Z   X
-0   D   B   A
-1   C   B   A
-2   D   C   B
-3   D   C   A
-4  CC  BB  AA
-    """
     from functools import partial
 
     run_var = partial(run, database, rules, query)
