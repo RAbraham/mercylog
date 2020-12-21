@@ -9,6 +9,32 @@ from mercylog.abcdatalog.ast.negated_atom import NegatedAtom as ANegatedAtom
 from mercylog.abcdatalog.ast.clause import Clause as AClause
 from mercylog.abcdatalog.ast.binary_unifier import BinaryUnifier as ABinaryUnifier
 from mercylog.abcdatalog.ast.binary_disunifier import BinaryDisunifier as ABinaryDisunifier
+from mercylog.abcdatalog.engine.bottomup.bottom_up_engine_frame import (
+    BottomUpEngineFrame,
+)
+from mercylog.abcdatalog.engine.bottomup.sequential.semi_naive_eval_manager import (
+    SemiNaiveEvalManager,
+)
+
+from functools import partial
+from mercylog.abcdatalog.engine.datalog_engine import DatalogEngine
+def seminaive_engine():
+    return BottomUpEngineFrame(SemiNaiveEvalManager())
+
+
+def initEngine_engine(engine: DatalogEngine, program: List[Rule]):
+    converted = convert(list(program))
+    engine.init(converted)
+    return engine
+
+def run_abcdatalog(database, rules, head):
+    semi_engine = seminaive_engine()
+    initEngine = partial(initEngine_engine, semi_engine)
+    program = database + rules
+    engine = initEngine(program)
+    do_query = q
+    rs = do_query(engine, head)
+    return rs
 
 def convert(program: List[Rule]) -> Set:
     converts = list(map(_convert, program))

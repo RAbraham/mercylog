@@ -5,24 +5,65 @@ from mercylog.abcdatalog.ast.validation.datalog_validation_exception import (
 from mercylog.types import relation, variables, _
 import pytest
 
-from tests.abcdatalog.helper import match, p,q,r, s,  X, Y, Z, V, W
+from tests.abcdatalog.helper import (
+    match,
+    match1,
+    a,
+    b,
+    c,
+    d,
+    e,
+    p,
+    q,
+    r,
+    s,
+    X,
+    Y,
+    Z,
+    V,
+    W
+)
+from tests.util import a_df
+
+
+# def test_queryUndefinedPredicate():
+#     program = [p()]
+#     ans = match(program)
+#     assert ans(q(), [])
 
 
 def test_queryUndefinedPredicate():
-    program = [p()]
-    ans = match(program)
-    assert ans(q(), [])
+    db = [p()]
+    match1(db, [], [q()], a_df({}))
+
+
+# def test_queryEDBPredicate():
+#     a_q1 = q("a", "b", "c", "d", "e")
+#     a_q2 = q("e", "d", "c", "b", "a")
+#     program = [p(), a_q1, a_q2]
+#     ans = match(program)
+#     assert ans(p(), [p()])
+#     assert ans(q(V, W, X, Y, Z), [a_q1, a_q2])
+#     assert ans(q(W, "b", X, Y, Z), [a_q1])
+#     assert ans(q(W, X, "d", Y, Z), [])
+#
 
 
 def test_queryEDBPredicate():
     a_q1 = q("a", "b", "c", "d", "e")
     a_q2 = q("e", "d", "c", "b", "a")
-    program = [p(), a_q1, a_q2]
-    ans = match(program)
-    assert ans(p(), [p()])
-    assert ans(q(V, W, X, Y, Z), [a_q1, a_q2])
-    assert ans(q(W, "b", X, Y, Z), [a_q1])
-    assert ans(q(W, X, "d", Y, Z), [])
+    db = [p(), a_q1, a_q2]
+    ans = match1(db, [])
+    # ans = match(db)
+    assert match(db, p(), [p()])
+    # assert ans(q(V, W, X, Y, Z), [a_q1, a_q2])
+    ans(
+        [q(V, W, X, Y, Z)],
+        a_df({V: [a, e], W: [b, d], X: [c, c], Y: [d, b], Z: [e, a]})
+    )
+    # assert ans(q(W, "b", X, Y, Z), [a_q1])
+    assert ans([q(W, "b", X, Y, Z)], a_df({V: [a], W: [b], X: [c], Y: [d], Z: [e]}))
+    # assert ans(q(W, X, "d", Y, Z), [])
 
 
 def test_queryNonRecursiveIDBPredicate():
@@ -386,12 +427,14 @@ def testRulesWithAnonymousVariables():
     ans = match(program)
     assert ans(p(), [p()])
 
+
 def test_testUnboundVariable1():
     a = "a"
     b = "b"
     with pytest.raises(DatalogValidationException):
         match([p(X, b)], p(X, Y), [])
-        match([q(X,Y) <= p(X,b), p(a,b)], q(X,Y), [])
+        match([q(X, Y) <= p(X, b), p(a, b)], q(X, Y), [])
+
 
 def test_testRulesWithTrue():
     a = "a"

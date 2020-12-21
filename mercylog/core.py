@@ -3,10 +3,11 @@ import pandas as pd
 from mercylog.types import Relation, Variable, Rule, relation
 from fastcore.utils import *
 from toolz.curried import *
+from placeholder import _
 
 
 def make_run(run_func: Callable) -> Callable:
-    return toolz.curry(run, run_func)
+    return curry(run, run_func)
 
 
 def facts_to_dict(facts, query_vars):
@@ -19,6 +20,30 @@ def facts_to_dict(facts, query_vars):
     return result
 
 
+# def run(
+#     run_func: Callable,
+#     database: List[Relation],
+#     rules: List[Rule],
+#     query: List[Relation],
+#     variables: List[Variable] = None,
+# ) -> pd.DataFrame:
+#
+#     assert isinstance(database, List)
+#     assert isinstance(query, List)
+#     main_query_rule = relation("main_query_rule")
+#
+#     query_vars = variables or list(query_variables(query))
+#     head = main_query_rule(*query_vars)
+#
+#     m = head <= query
+#
+#     _rules = rules + [m]
+#     facts = run_func(database, _rules, head)
+#     result = facts_to_dict(facts, query_vars)
+#
+#     return pd.DataFrame(result)
+
+
 def run(
     run_func: Callable,
     database: List[Relation],
@@ -29,10 +54,8 @@ def run(
 
     assert isinstance(database, List)
     assert isinstance(query, List)
-    main_query_rule = relation("main_query_rule")
+    head, query_vars = get_head(query, variables)
 
-    query_vars = variables or list(query_variables(query))
-    head = main_query_rule(*query_vars)
     m = head <= query
 
     _rules = rules + [m]
@@ -42,12 +65,21 @@ def run(
     return pd.DataFrame(result)
 
 
+def get_head(query, variables):
+    main_query_rule = relation("main_query_rule")
+    query_vars = variables or list(query_variables(query))
+    head = main_query_rule(*query_vars)
+    return head, query_vars
+
+
 def query_variables(query: List[Relation]) -> Set[Variable]:
     r = pipe(
         query,
         map(Self.variables()),
         concat,
         filter(lambda v: str(v) != "_" and isinstance(v, Variable)),
+        # filter(),
         set
     )
     return r
+

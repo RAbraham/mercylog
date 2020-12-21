@@ -108,7 +108,7 @@ class PositiveAtom(Premise, Head):
         if self.getPred() != fact.getPred():
             return None
 
-        return SimpleConstSubstitution.unify(self.args, fact.args)
+        return SimpleConstSubstitution.unify(list(self.args), list(fact.args))
 
 # 	/**
 # 	 * Apply a substitution to the terms in this atom.

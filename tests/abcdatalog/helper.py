@@ -6,17 +6,13 @@ from toolz.curried import reduce as tzreduce
 from toolz.curried import *
 
 from functools import partial
-from mercylog.abcdatalog.engine.bottomup.bottom_up_engine_frame import (
-    BottomUpEngineFrame,
-)
-from mercylog.abcdatalog.engine.bottomup.sequential.semi_naive_eval_manager import (
-    SemiNaiveEvalManager,
-)
-from mercylog.types import Rule, relation, variables
-from mercylog.abcdatalog.engine.datalog_engine import DatalogEngine
-from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import convert, q as do_query
 
-# NOT_TOKEN = "__mercylog__not_token__"
+from tests.util import assert_df,a_df
+from mercylog.core import run as run_df, query_variables
+from mercylog.types import  relation, variables, Relation
+from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import  q as do_query, run_abcdatalog, initEngine_engine, seminaive_engine
+import pandas as pd
+
 NOT_TOKEN = "~"
 p = relation("p")
 q = relation("q")
@@ -40,14 +36,6 @@ noC = relation("noC")
 U, V, W, X, Y, Z = variables("U", "V", "W", "X", "Y", "Z")
 
 
-def seminaive_engine():
-    return BottomUpEngineFrame(SemiNaiveEvalManager())
-
-
-def initEngine_engine(engine: DatalogEngine, program: List[Rule]):
-    converted = convert(list(program))
-    engine.init(converted)
-    return engine
 
 
 @toolz.curry
@@ -80,6 +68,13 @@ def match(program, query, result):
     initEngine = partial(initEngine_engine, semi_engine)
     engine = initEngine(program)
     return is_result(engine, query, result)
+
+@toolz.curry
+def match1(database, rules, query: List[Relation], result: pd.DataFrame):
+    print(">> RS DF")
+    rs_df = run_df(run_abcdatalog, database, rules, query)
+    print(type(rs_df))
+    return assert_df(rs_df, result)
 
 
 def strip_whitespace(p: str):
