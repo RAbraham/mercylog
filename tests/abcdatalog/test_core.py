@@ -21,32 +21,13 @@ from tests.abcdatalog.helper import (
     Y,
     Z,
     V,
-    W
+    W,
 )
-from tests.util import a_df
-
-
-# def test_queryUndefinedPredicate():
-#     program = [p()]
-#     ans = match(program)
-#     assert ans(q(), [])
 
 
 def test_queryUndefinedPredicate():
     db = [p()]
-    match1(db, [], [q()], a_df({}))
-
-
-# def test_queryEDBPredicate():
-#     a_q1 = q("a", "b", "c", "d", "e")
-#     a_q2 = q("e", "d", "c", "b", "a")
-#     program = [p(), a_q1, a_q2]
-#     ans = match(program)
-#     assert ans(p(), [p()])
-#     assert ans(q(V, W, X, Y, Z), [a_q1, a_q2])
-#     assert ans(q(W, "b", X, Y, Z), [a_q1])
-#     assert ans(q(W, X, "d", Y, Z), [])
-#
+    match1(db, [], q(), {})
 
 
 def test_queryEDBPredicate():
@@ -54,134 +35,109 @@ def test_queryEDBPredicate():
     a_q2 = q("e", "d", "c", "b", "a")
     db = [p(), a_q1, a_q2]
     ans = match1(db, [])
-    # ans = match(db)
     assert match(db, p(), [p()])
-    # assert ans(q(V, W, X, Y, Z), [a_q1, a_q2])
-    ans(
-        [q(V, W, X, Y, Z)],
-        a_df({V: [a, e], W: [b, d], X: [c, c], Y: [d, b], Z: [e, a]})
-    )
-    # assert ans(q(W, "b", X, Y, Z), [a_q1])
-    assert ans([q(W, "b", X, Y, Z)], a_df({V: [a], W: [b], X: [c], Y: [d], Z: [e]}))
-    # assert ans(q(W, X, "d", Y, Z), [])
+    ans(q(V, W, X, Y, Z), {V: [a, e], W: [b, d], X: [c, c], Y: [d, b], Z: [e, a]})
+    ans(q(W, "b", X, Y, Z), {W: [a], X: [c], Y: [d], Z: [e]})
+    ans(q(W, X, "d", Y, Z), {})
 
 
 def test_queryNonRecursiveIDBPredicate():
-    program = [
-        p("a", "b"),
-        p("b", "c"),
-        p("c", "d"),
-        q(X, Y) <= [p(X, Z), p(Z, Y)],
-    ]
-    ans = match(program)
-    assert ans(q(X, Y), [q("a", "c"), q("b", "d")])
-    assert ans(q(X, "c"), [q("a", "c")])
-    assert ans(q("x", "b"), [])
+    db = [p("a", "b"), p("b", "c"), p("c", "d")]
+
+    rules = [q(X, Y) <= [p(X, Z), p(Z, Y)]]
+    ans = match1(db, rules)
+    ans(q(X, Y), {X: [a, b], Y: [c, d]})
+    ans(q(X, c), {X: [a]})
+    ans(q("x", b), {})
 
 
 def test_queryLinearlyRecursiveIDBPredicate():
     # 		// Acyclic transitive closure.
-    program = [
+    db = [
         p("a", "b"),
         p("b", "c"),
         p("c", "d"),
+    ]
+    rules = [
         q(X, Y) <= p(X, Y),
         q(X, Y) <= [p(X, Z), q(Z, Y)],
     ]
-    ans = match(program)
-    assert ans(
-        q(X, Y),
-        [q("a", "b"), q("a", "c"), q("a", "d"), q("b", "c"), q("b", "d"), q("c", "d")],
-    )
+    ans = match1(db, rules)
+    ans(q(X, Y), {X: [a, a, a, b, b, c], Y: [b, c, d, c, d, d]})
 
-    assert ans(q("a", X), [q("a", "b"), q("a", "c"), q("a", "d")])
+    ans(q("a", X), {X: [b, c, d]})
 
 
 def test_transitive_closure_with_a_cycle():
     # 		// Transitive closure with a cycle.
 
-    program = [
+    db = [
         p("a", "b"),
         p("b", "c"),
         p("c", "d"),
-        q(X, Y) <= p(X, Y),
-        q(X, Y) <= [p(X, Z), q(Z, Y)],
         p("d", "c"),
     ]
-    ans = match(program)
-    assert ans(
-        q(X, Y),
-        [
-            q("a", "b"),
-            q("a", "c"),
-            q("a", "d"),
-            q("b", "c"),
-            q("b", "d"),
-            q("c", "c"),
-            q("c", "d"),
-            q("d", "c"),
-            q("d", "d"),
-        ],
-    )
+    rules = [
+        q(X, Y) <= p(X, Y),
+        q(X, Y) <= [p(X, Z), q(Z, Y)],
+    ]
+    ans = match1(db, rules)
+    ans(q(X, Y), {X: [a, a, a, b, b, c, c, d, d], Y: [b, c, d, c, d, c, d, c, d]})
 
 
 def test_queryNonLinearlyRecursiveIDBPredicate():
-    program = [
+    db = [
         p("a", "b"),
         p("b", "c"),
         p("c", "d"),
+
+    ]
+    rules = [
         q(X, Y) <= p(X, Y),
         q(X, Y) <= [q(X, Z), q(Z, Y)],
     ]
 
-    ans = match(program)
-    assert ans(
+    ans = match1(db, rules)
+    ans(
         q(X, Y),
-        [q("a", "b"), q("a", "c"), q("a", "d"), q("b", "c"), q("b", "d"), q("c", "d")],
+        {X: [a, a, a, b, b, c],
+         Y: [b, c, d, c, d, d]})
+    ans(
+        q(a, X),
+        {X: [b, c, d]}
     )
-
-    assert ans(q("a", X), [q("a", "b"), q("a", "c"), q("a", "d")])
-
 
 def test_queryNonLinearlyRecursiveIDBPredicate_withCycle():
     #     // Transitive closure with a cycle.
-    program = [
+    db = [
         p("a", "b"),
         p("b", "c"),
         p("c", "d"),
-        q(X, Y) <= p(X, Y),
-        q(X, Y) <= [q(X, Z), q(Z, Y)],
+
         p("d", "c"),
     ]
-    ans = match(program)
-    assert ans(
+    rules = [
+        q(X, Y) <= p(X, Y),
+        q(X, Y) <= [q(X, Z), q(Z, Y)],
+    ]
+    ans = match1(db, rules)
+    ans(
         q(X, Y),
-        [
-            q("a", "b"),
-            q("a", "c"),
-            q("a", "d"),
-            q("b", "c"),
-            q("b", "d"),
-            q("c", "c"),
-            q("c", "d"),
-            q("d", "c"),
-            q("d", "d"),
-        ],
-    )
-
+        {X: [a, a, a, b, b, c, c, d, d],
+         Y: [b, c, d, c, d, c, d, c, d]})
 
 def test_queryIDBPredicateWithUndefinedEDB():
-    program = [q(X, Y) <= p(X, Y), r("a", "b")]
-    ans = match(program)
-    assert ans(q(X, Y), [])
-
+    db = [r("a", "b")]
+    rules = [q(X, Y) <= p(X, Y)]
+    ans = match1(db, rules)
+    ans(q(X, Y), {})
 
 def test_queryIDBPredicateWithExplicitIDBFact():
     # // Note that q is defined by a rule, but we also give an explicit fact.
-    program = [q(X, Y) <= r(X, Y), r("a", "b"), q("b", "c")]
-    ans = match(program)
-    assert ans(q(X, Y), [q("a", "b"), q("b", "c")])
-
+    db = [r("a", "b"), q("b", "c")]
+    rules = [q(X, Y) <= r(X, Y)]
+    ans = match1(db, rules)
+    ans(q(X, Y), {X: [a, b], Y: [b, c]})
 
 def test_queryZeroAryPredicates():
     program = [p() <= q(), r() <= [p(), s()], q(), s()]
@@ -191,7 +147,7 @@ def test_queryZeroAryPredicates():
     assert ans(s(), [s()])
     assert ans(r(), [r()])
 
-
+# aaa
 def test_querymutuallyrecursivepredicates():
     program = [
         p(X, Y, Z) <= q(X, Y, Z),
@@ -448,3 +404,18 @@ def test_testRulesWithTrue():
 def testEmptyProgram():
     anything = relation("anything")
     assert match([], anything(), [])
+
+
+def test_fact_to_dicts():
+    rel = relation("rel")
+    facts = [rel(a, b, c), rel(d, e, d)]
+    query_vars = [Z, Y, X]
+    from mercylog.core import facts_to_dict
+
+    print("\nDict")
+    print(facts_to_dict(facts, query_vars))
+    assert facts_to_dict(facts, query_vars) == {
+        Z: ["a", "d"],
+        Y: ["b", "e"],
+        X: ["c", "d"],
+    }

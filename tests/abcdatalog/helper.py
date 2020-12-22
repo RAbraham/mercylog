@@ -7,10 +7,15 @@ from toolz.curried import *
 
 from functools import partial
 
-from tests.util import assert_df,a_df
+from tests.util import assert_df, a_df
 from mercylog.core import run as run_df, query_variables
-from mercylog.types import  relation, variables, Relation
-from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import  q as do_query, run_abcdatalog, initEngine_engine, seminaive_engine
+from mercylog.types import relation, variables, Relation
+from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import (
+    q as do_query,
+    run_abcdatalog,
+    initEngine_engine,
+    seminaive_engine,
+)
 import pandas as pd
 
 NOT_TOKEN = "~"
@@ -34,8 +39,6 @@ beginsNotAtC = relation("beginsNotAtC ")
 noC = relation("noC")
 
 U, V, W, X, Y, Z = variables("U", "V", "W", "X", "Y", "Z")
-
-
 
 
 @toolz.curry
@@ -64,17 +67,22 @@ def _equals(act, exp):
 
 @toolz.curry
 def match(program, query, result):
+    """
+    Keeping match though we have match1 because sometime we want to test zero arity relations.
+    I don't want to remove it right now. We can't do that for match1 as we have to have some
+    values in a dataframe.
+
+    """
     semi_engine = seminaive_engine()
     initEngine = partial(initEngine_engine, semi_engine)
     engine = initEngine(program)
     return is_result(engine, query, result)
 
+
 @toolz.curry
-def match1(database, rules, query: List[Relation], result: pd.DataFrame):
-    print(">> RS DF")
-    rs_df = run_df(run_abcdatalog, database, rules, query)
-    print(type(rs_df))
-    return assert_df(rs_df, result)
+def match1(database, rules, query: Relation, result: Dict):
+    rs_df = run_df(run_abcdatalog, database, rules, [query])
+    return assert_df(rs_df, a_df(result))
 
 
 def strip_whitespace(p: str):
@@ -153,9 +161,9 @@ def parse_nots(program: str) -> str:
     return program.replace("not ", NOT_TOKEN)
 
 
-
 def parse(program: str):
     from operator import add
+
     r = pipe(
         program,
         parse_nots,
@@ -163,7 +171,7 @@ def parse(program: str):
         Self.split("."),
         map(parse_clause),
         interpose(",\n"),
-        tzreduce(add)
+        tzreduce(add),
     )
 
     result = r
@@ -171,6 +179,7 @@ def parse(program: str):
     print(result)
     print("\n>>>>>>>>>>>>>>>>>>>>>>>>>> Parsed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     return result
+
 
 if __name__ == "__main__":
     program = (
