@@ -30,6 +30,7 @@ Mercylog will be a Datalog based library which investigates the benefits of Data
 Check out the [tutorial/introduction](https://github.com/RAbraham/mercylog_tutorial) to Mercylog
 
 # Short Introduction
+
 ```python
 import mercylog
 
