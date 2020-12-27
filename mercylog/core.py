@@ -33,7 +33,7 @@ def run(
     variables: List[Variable] = None,
 ) -> pd.DataFrame:
 
-    assert isinstance(database, List)
+    # assert isinstance(database, List)
     assert isinstance(query, List)
     head, query_vars = get_head(query, variables)
 

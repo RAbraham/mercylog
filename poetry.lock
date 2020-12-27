@@ -1156,7 +1156,7 @@ python-versions = "*"
 version = "0.5.7"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "YAML parser and emitter for Python"
 name = "pyyaml"
 optional = false
@@ -1218,6 +1218,20 @@ name = "send2trash"
 optional = false
 python-versions = "*"
 version = "1.5.0"
+
+[[package]]
+category = "main"
+description = "A package for quick, scrappy analyses with pandas and SQL"
+name = "siuba"
+optional = false
+python-versions = ">=3.6"
+version = "0.0.24"
+
+[package.dependencies]
+PyYAML = ">=3.0.0"
+SQLAlchemy = ">=1.1.18"
+numpy = ">=1.12.0"
+pandas = ">=0.24.0"
 
 [[package]]
 category = "main"
@@ -1471,7 +1485,7 @@ lint = ["flake8", "mypy", "docutils-stubs"]
 test = ["pytest"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Database Abstraction Library"
 name = "sqlalchemy"
 optional = false
@@ -1642,7 +1656,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "2bf0f89dfe43cd706ee617eba641d19ede0af3992d2e4879ae30f3fe94b4e72e"
+content-hash = "a029f04ea5fed7eed3a772f9264dd1c0dcd1357f0f7971542e242d2e13209266"
 lock-version = "1.0"
 python-versions = "^3.8"
 
@@ -2237,6 +2251,10 @@ rope = [
 send2trash = [
     {file = "Send2Trash-1.5.0-py3-none-any.whl", hash = "sha256:f1691922577b6fa12821234aeb57599d887c4900b9ca537948d2dac34aea888b"},
     {file = "Send2Trash-1.5.0.tar.gz", hash = "sha256:60001cc07d707fe247c94f74ca6ac0d3255aabcb930529690897ca2a39db28b2"},
+]
+siuba = [
+    {file = "siuba-0.0.24-py3-none-any.whl", hash = "sha256:6f596d220f5c58b4bf107c89987fb7a17fbdefcba3abb0049a8c07d13cf94711"},
+    {file = "siuba-0.0.24.tar.gz", hash = "sha256:d6df6079890c0b52f60018189a8ee00af43399ad8264ecc85e7f0e28413f2e1d"},
 ]
 six = [
     {file = "six-1.12.0-py2.py3-none-any.whl", hash = "sha256:3350809f0555b11f552448330d0b52d5f24c91a322ea4a15ef22629740f3761c"},

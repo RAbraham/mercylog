@@ -1,13 +1,14 @@
 from mercylog.abcdatalog.ast.validation.datalog_validation_exception import (
     DatalogValidationException,
 )
-
+from mercylog.db import facts
 from mercylog.types import relation, variables, _
 import pytest
 
 from tests.abcdatalog.helper import (
     match,
     match1,
+    match2,
     a,
     b,
     c,
@@ -65,6 +66,22 @@ def test_queryLinearlyRecursiveIDBPredicate():
     ans = match1(db, rules)
     ans(q(X, Y), {X: [a, a, a, b, b, c], Y: [b, c, d, c, d, d]})
 
+    ans(q("a", X), {X: [b, c, d]})
+
+def test_queryLinearlyRecursiveIDBPredicate_user_api():
+    # 		// Acyclic transitive closure.
+    db = facts([
+        p("a", "b"),
+        p("b", "c"),
+        p("c", "d"),
+    ])
+
+    rules = [
+        q(X, Y) <= p(X, Y),
+        q(X, Y) <= [p(X, Z), q(Z, Y)],
+    ]
+    ans = match2(db, rules)
+    ans(q(X, Y), {X: [a, a, a, b, b, c], Y: [b, c, d, c, d, d]})
     ans(q("a", X), {X: [b, c, d]})
 
 

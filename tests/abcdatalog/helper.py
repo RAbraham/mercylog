@@ -84,6 +84,11 @@ def match1(database, rules, query: Relation, result: Dict):
     rs_df = run_df(run_abcdatalog, database, rules, [query])
     return assert_df(rs_df, a_df(result))
 
+@toolz.curry
+def match2(database, rules, query: Relation, result: Dict):
+    rs_df = database(rules + [query])
+    return assert_df(rs_df, a_df(result))
+
 
 def strip_whitespace(p: str):
     import re
