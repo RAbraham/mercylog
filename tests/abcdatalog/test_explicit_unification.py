@@ -6,7 +6,7 @@ from mercylog.abcdatalog.ast.validation.datalog_validation_exception import (
 
 from mercylog.types import relation, _, eq, not_eq
 
-from tests.abcdatalog.helper import match, X, Y, Z, p, q, parse, tc, edge, cycle, beginsNotAtC, beginsAtC, noncycle, noC, a, b, c, d, e
+from tests.abcdatalog.helper import match_relations, X, Y, Z, p, q, parse, tc, edge, cycle, beginsNotAtC, beginsAtC, noncycle, noC, a, b, c, d, e
 
 
 
@@ -22,7 +22,7 @@ def test_testRulesWithBinaryUnifiers():
         cycle(X) <= [eq(X, Y), tc(X, Y)],
         beginsAtC(X, Y) <= [tc(X, Y), eq(c, X)],
     ]
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(cycle(X), [cycle(c)])
     assert ans(beginsAtC(X, Y), [beginsAtC(c, c), beginsAtC(c, d)])
 
@@ -41,7 +41,7 @@ def test_testRulesWithBinaryDisunifiers():
         noC(X, Y) <= [noC(X, Z), noC(Z, Y)],
     ]
 
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(
         noncycle(X, Y),
         [
@@ -76,58 +76,58 @@ def test_testBinaryUnificationNoAtom():
         p(X, Y) <= [eq(X, Y), eq(X, e)],
     ]
 
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(p(X, Y), [p(a, b), p(b, a), p(c, d), p(c, c), p(d, d), p(e, e)])
     program = program + [q(X, Y) <= p(X, Y)]
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(q(X, Y), [q(a, b), q(b, a), q(c, d), q(c, c), q(d, d), q(e, e)])
 
 
 def testUselessBinaryUnification():
     program = [p(X) <= [q(X), eq(X, Y)], q(a), p(b) <= eq(X, _)]
-    ans = match(program)
+    ans = match_relations(program)
     with pytest.raises(DatalogValidationException):
         ans(p(X), [])
 
 
 def testImpossibleBinaryUnification1():
-    assert match([p() <= eq(a, b)], p(), [])
+    assert match_relations([p() <= eq(a, b)], p(), [])
 
 
 # public void testImpossibleBinaryUnification2() throws DatalogValidationException {
 def test_testImpossibleBinaryUnification2():
-    assert match([p() <= [eq(Z, b), eq(X, Y), eq(a, X), eq(Z, Y)]], p(), [])
+    assert match_relations([p() <= [eq(Z, b), eq(X, Y), eq(a, X), eq(Z, Y)]], p(), [])
 
 
 def test_testBinaryDisunificationNoAtom():
     program = [p() <= not_eq(a, b), q() <= [not_eq(X, Y), eq(X, a), eq(Y, b)]]
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(p(), [p()])
     assert ans(q(), [q()])
 
 
 def test_testImpossibleBinaryDisunification1():
-    assert match([p() <= not_eq(a, a)], p(), [])
+    assert match_relations([p() <= not_eq(a, a)], p(), [])
 
 
 def test_testImpossibleBinaryDisunification2():
     program = [p() <= [eq(Z, a), not_eq(X, Y), eq(a, X), eq(Z, Y)]]
-    assert match(program, p(), [])
+    assert match_relations(program, p(), [])
 
 
 def test_testImpossibleBinaryDisunification3():
     program = [p() <= [q(X), eq(X, X)]]
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(p(), [])
 
 
 def test_testBinaryDisunificationFail1():
     program = [p() <= [~q(a, b), not_eq(X, _)]]
     with pytest.raises(DatalogValidationException):
-        match(program, p(), [])
+        match_relations(program, p(), [])
 
 
 def test_testBinaryDisunificationFail2():
     program = [p(X) <= [q(X), not_eq(Y, _)], q(a)]
     with pytest.raises(DatalogValidationException):
-        match(program, p(X), [])
+        match_relations(program, p(X), [])

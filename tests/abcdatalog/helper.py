@@ -8,7 +8,7 @@ from toolz.curried import *
 from functools import partial
 
 from tests.util import assert_df, a_df
-from mercylog.core import run as run_df, query_variables
+from mercylog.core import run as run_df, query_variables_list, list_to_dict
 from mercylog.types import relation, variables, Relation
 from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import (
     q as do_query,
@@ -66,7 +66,7 @@ def _equals(act, exp):
 
 
 @toolz.curry
-def match(program, query, result):
+def match_relations(program, query, result):
     """
     Keeping match though we have match1 because sometime we want to test zero arity relations.
     I don't want to remove it right now. We can't do that for match1 as we have to have some
@@ -84,11 +84,20 @@ def match1(database, rules, query: Relation, result: Dict):
     rs_df = run_df(run_abcdatalog, database, rules, [query])
     return assert_df(rs_df, a_df(result))
 
-@toolz.curry
-def match2(database, rules, query: Relation, result: Dict):
-    rs_df = database(rules + [query])
-    return assert_df(rs_df, a_df(result))
 
+@toolz.curry
+def match3(database, rules, query: Relation, result: List[Tuple]):
+    rs_df = database(rules + [query])
+    return assert_df(rs_df, _df(result, [query]))
+
+
+def _df(facts: List[Tuple], query: List[Relation]):
+    '''
+    first, get the query vars.
+
+    '''
+    _vars = query_variables_list(query)
+    return pd.DataFrame(list_to_dict(facts, _vars))
 
 def strip_whitespace(p: str):
     import re

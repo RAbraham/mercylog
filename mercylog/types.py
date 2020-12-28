@@ -94,7 +94,7 @@ class Term(ABC):
     pass
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, order=True)
 class Variable(Term):
     # Also called term
     name: str

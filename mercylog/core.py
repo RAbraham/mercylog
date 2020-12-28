@@ -10,20 +10,71 @@ from placeholder import _
 def make_run(run_func: Callable) -> Callable:
     return curry(run, run_func)
 
+
 group_by_position = compose_left(
-    map(_.terms), map(enumerate), concat, groupby(0)  # 0th in tuple is the index
+    map(enumerate), concat, groupby(0)  # 0th in tuple is the index
 )
+# group_relation_terms_by_position = compose_left(group_by_position)
+
+
+# def facts_to_dict(facts, query_vars):
+#     r = pipe(
+#         facts,
+#         map(_.terms),
+#         group_by_position,
+#         valmap(lambda t: list(pluck(1, t))),  # drop the index from the values
+#         keymap(lambda k: query_vars[k]),  # replace the index with vars
+#     )
+#     return r
+
+
+def list_to_dict(a_list, query_vars):
+    return pipe(
+        a_list,
+        group_by_position,
+        valmap(lambda t: list(pluck(1, t))),  # drop the index from the values
+        keymap(lambda k: query_vars[k]),  # replace the index with vars
+    )
+
+
 
 
 def facts_to_dict(facts, query_vars):
-    r = pipe(
-        facts,
-        group_by_position,
-        valmap(lambda t: list(pluck(1, t))),  # drop the index from the values
-        keymap(lambda k: query_vars[k]), # replace the index with vars
-    )
-    return r
+    r = pipe(facts, map(_.terms))
 
+    return list_to_dict(r, query_vars)
+
+# def facts_to_dict(facts, query_vars):
+#     r = pipe(facts, map(_.terms), map(enumerate), concat,
+#              map(lambda t: (query_vars[t[0]], t[1])))
+#     from siuba import group_by as s_group_by, summarize, _ as s_
+#     df = pd.DataFrame(r, columns=["var", "value"])
+#     print(">> RA: Facts To Dict")
+#     grouped = df >> s_group_by(s_.var)
+#     result = grouped >> summarize(values= [s_.value.tolist()])
+#     print(result)
+#     return result
+#
+#     '''
+#        var value
+# 0    X     a
+# 1    Y     c
+# 2    X     c
+# 3    Y     d
+# 4    X     b
+# 5    Y     c
+# 6    X     a
+# 7    Y     b
+# 8    X     b
+# 9    Y     d
+# 10   X     a
+# 11   Y     d
+#
+#     '''
+#
+
+
+    # return list_to_dict(r, query_vars)
 
 def run(
     run_func: Callable,
@@ -62,5 +113,19 @@ def query_variables(query: List[Relation]) -> Set[Variable]:
         concat,
         filter(lambda v: str(v) != "_" and isinstance(v, Variable)),
         set,
+
+    )
+    return r
+
+def query_variables_list(query: List[Relation]) -> List[Variable]:
+    from placeholder import m
+
+    r = pipe(
+        query,
+        map(m.variables()),
+        concat,
+        filter(lambda v: str(v) != "_" and isinstance(v, Variable)),
+        unique,
+        list
     )
     return r

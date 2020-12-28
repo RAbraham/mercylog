@@ -6,9 +6,8 @@ from mercylog.types import relation, variables, _
 import pytest
 
 from tests.abcdatalog.helper import (
-    match,
-    match1,
-    match2,
+    match_relations,
+    match3,
     a,
     b,
     c,
@@ -27,142 +26,141 @@ from tests.abcdatalog.helper import (
 
 
 def test_queryUndefinedPredicate():
-    db = [p()]
-    match1(db, [], q(), {})
+    db = facts([p()])
+    match3(db, [], q(), [])
 
 
 def test_queryEDBPredicate():
     a_q1 = q("a", "b", "c", "d", "e")
     a_q2 = q("e", "d", "c", "b", "a")
     db = [p(), a_q1, a_q2]
-    ans = match1(db, [])
-    assert match(db, p(), [p()])
-    ans(q(V, W, X, Y, Z), {V: [a, e], W: [b, d], X: [c, c], Y: [d, b], Z: [e, a]})
-    ans(q(W, "b", X, Y, Z), {W: [a], X: [c], Y: [d], Z: [e]})
-    ans(q(W, X, "d", Y, Z), {})
+    assert match_relations(db, p(), [p()])
+
+    ans = match3(facts(db), [])
+    ans(q(V, W, X, Y, Z), [(a, b, c, d, e), (e, d, c, b, a)])
+    ans(q(W, "b", X, Y, Z), [(a, c, d, e)])
+    ans(q(W, X, "d", Y, Z), [])
 
 
 def test_queryNonRecursiveIDBPredicate():
-    db = [p("a", "b"), p("b", "c"), p("c", "d")]
+    db = facts([p("a", "b"), p("b", "c"), p("c", "d")])
 
     rules = [q(X, Y) <= [p(X, Z), p(Z, Y)]]
-    ans = match1(db, rules)
-    ans(q(X, Y), {X: [a, b], Y: [c, d]})
-    ans(q(X, c), {X: [a]})
-    ans(q("x", b), {})
+    ans = match3(db, rules)
+    ans(q(X, Y), [(a, c), (b, d)])
+    ans(q(X, c), [(a,)])
+    ans(q("x", b), [])
 
 
 def test_queryLinearlyRecursiveIDBPredicate():
-    # 		// Acyclic transitive closure.
-    db = [
-        p("a", "b"),
-        p("b", "c"),
-        p("c", "d"),
-    ]
-    rules = [
-        q(X, Y) <= p(X, Y),
-        q(X, Y) <= [p(X, Z), q(Z, Y)],
-    ]
-    ans = match1(db, rules)
-    ans(q(X, Y), {X: [a, a, a, b, b, c], Y: [b, c, d, c, d, d]})
-
-    ans(q("a", X), {X: [b, c, d]})
-
-def test_queryLinearlyRecursiveIDBPredicate_user_api():
     # 		// Acyclic transitive closure.
     db = facts([
         p("a", "b"),
         p("b", "c"),
         p("c", "d"),
     ])
+    rules = [
+        q(X, Y) <= p(X, Y),
+        q(X, Y) <= [p(X, Z), q(Z, Y)],
+    ]
+    ans = match3(db, rules)
+
+    ans(q(X, Y), [(a,b), (a,c), (a,d), (b,c), (b,d), (c,d)])
+    ans(q("a", X), [(b,), (c, ), (d,)])
+
+
+def test_queryLinearlyRecursiveIDBPredicate_user_api():
+    # 		// Acyclic transitive closure.
+    db = facts(
+        [
+            p("a", "b"),
+            p("b", "c"),
+            p("c", "d"),
+        ]
+    )
 
     rules = [
         q(X, Y) <= p(X, Y),
         q(X, Y) <= [p(X, Z), q(Z, Y)],
     ]
-    ans = match2(db, rules)
-    ans(q(X, Y), {X: [a, a, a, b, b, c], Y: [b, c, d, c, d, d]})
-    ans(q("a", X), {X: [b, c, d]})
+
+    ans = match3(db, rules)
+    ans(q(X, Y), [(a, b), (a, c), (a, d), (b, c), (b, d), (c, d)])
+    ans(q("a", X), [(b,), (c,), (d,)])
 
 
 def test_transitive_closure_with_a_cycle():
     # 		// Transitive closure with a cycle.
 
-    db = [
+    db = facts([
         p("a", "b"),
         p("b", "c"),
         p("c", "d"),
         p("d", "c"),
-    ]
+    ])
     rules = [
         q(X, Y) <= p(X, Y),
-        q(X, Y) <= [p(X, Z), q(Z, Y)],
+        q(X, Y) <= [p(X, Z), q(Z, Y)]
     ]
-    ans = match1(db, rules)
-    ans(q(X, Y), {X: [a, a, a, b, b, c, c, d, d], Y: [b, c, d, c, d, c, d, c, d]})
+    ans = match3(db, rules)
+    ans(q(X, Y), [(a,b), (a,c), (a,d), (b,c), (b,d), (c,c), (c,d), (d,c ), (d,d )])
 
 
 def test_queryNonLinearlyRecursiveIDBPredicate():
-    db = [
+    db = facts([
         p("a", "b"),
         p("b", "c"),
         p("c", "d"),
-
-    ]
+    ])
     rules = [
         q(X, Y) <= p(X, Y),
         q(X, Y) <= [q(X, Z), q(Z, Y)],
     ]
 
-    ans = match1(db, rules)
-    ans(
-        q(X, Y),
-        {X: [a, a, a, b, b, c],
-         Y: [b, c, d, c, d, d]})
-    ans(
-        q(a, X),
-        {X: [b, c, d]}
-    )
+    ans = match3(db, rules)
+    ans(q(X, Y), [(a,b), (a,c), (a,d), (b,c), (b,d), (c,d)])
+    ans(q(a,X), [(b,), (c, ), (d,)])
+
 
 def test_queryNonLinearlyRecursiveIDBPredicate_withCycle():
     #     // Transitive closure with a cycle.
-    db = [
+    db = facts([
         p("a", "b"),
         p("b", "c"),
         p("c", "d"),
-
         p("d", "c"),
-    ]
+    ])
     rules = [
         q(X, Y) <= p(X, Y),
         q(X, Y) <= [q(X, Z), q(Z, Y)],
     ]
-    ans = match1(db, rules)
-    ans(
-        q(X, Y),
-        {X: [a, a, a, b, b, c, c, d, d],
-         Y: [b, c, d, c, d, c, d, c, d]})
+    ans = match3(db, rules)
+    ans(q(X, Y), [(a,b), (a,c), (a,d), (b,c), (b,d), (c,c), (c,d), (d,c), (d,d)])
+
 
 def test_queryIDBPredicateWithUndefinedEDB():
-    db = [r("a", "b")]
+    db = facts([r("a", "b")])
     rules = [q(X, Y) <= p(X, Y)]
-    ans = match1(db, rules)
-    ans(q(X, Y), {})
+    ans = match3(db, rules)
+    ans(q(X, Y), [])
+
 
 def test_queryIDBPredicateWithExplicitIDBFact():
     # // Note that q is defined by a rule, but we also give an explicit fact.
-    db = [r("a", "b"), q("b", "c")]
+    db = facts([r("a", "b"), q("b", "c")])
     rules = [q(X, Y) <= r(X, Y)]
-    ans = match1(db, rules)
-    ans(q(X, Y), {X: [a, b], Y: [b, c]})
+    ans = match3(db, rules)
+    ans(q(X, Y), [(a,b), (b, c)])
+
 
 def test_queryZeroAryPredicates():
     program = [p() <= q(), r() <= [p(), s()], q(), s()]
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(q(), [q()])
     assert ans(p(), [p()])
     assert ans(s(), [s()])
     assert ans(r(), [r()])
+
 
 # aaa
 def test_querymutuallyrecursivepredicates():
@@ -173,7 +171,7 @@ def test_querymutuallyrecursivepredicates():
         r("a", "b", "c"),
     ]
 
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(p(X, Y, Z), [p("a", "b", "c"), p("c", "b", "a")])
     assert ans(p(X, "b", Y), [p("a", "b", "c"), p("c", "b", "a")])
     assert ans(p("a", X, "c"), [p("a", "b", "c")])
@@ -182,7 +180,7 @@ def test_querymutuallyrecursivepredicates():
 
 def test_querymutuallyrecursivepredicates_no_facts():
     program = [p(X, Y, Z) <= q(X, Y, Z), q(X, Y, Z) <= p(X, Y, Z)]
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(p(X, Y, Z), [])
     assert ans(q(X, Y, Z), [])
 
@@ -201,18 +199,18 @@ def test_queryNestedPredicates():
         five("a", "b", "c"),
     ]
 
-    assert match(program, one(X, Y, Z), [one("a", "b", "c")])
+    assert match_relations(program, one(X, Y, Z), [one("a", "b", "c")])
 
 
 def test_queryIDBPredicatesWithConstants():
     program = [p("a", X) <= q(X, X), q("a", "a"), q("b", "b"), q("c", "d")]
 
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(p(Z, W), [p("a", "a"), p("a", "b")])
     assert ans(p("a", X), [p("a", "a"), p("a", "b")])
 
     program = [p(X, X) <= q(X, "a"), q("a", "a"), q("b", "b"), q("c", "d")]
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(p("a", X), [p("a", "a")])
     assert ans(p(X, "a"), [p("a", "a")])
 
@@ -225,11 +223,11 @@ def test_queryIDBPredicatesWithConstants():
 # 	 */
 def test_testRulesWithNoVariables():
     program = [p() <= q("a", "b"), q("a", "b")]
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(p(), [p()])
 
     program = [p() <= [q("a", "b"), r("c", "d")], q("a", "b"), r("c", "d")]
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(p(), [p()])
 
 
@@ -255,11 +253,11 @@ def test_testRuleThatEndsInAGroundAtom():
         tc(X, Y) <= [edge(X, Z), tc(Z, Y), trigger()],
     ]
 
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(tc(X, Y), [tc(0, 1), tc(1, 2), tc(2, 3)])
 
     program = program + [trigger()]
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(tc(X, Y), [tc(0, 1), tc(0, 2), tc(0, 3), tc(1, 2), tc(1, 3), tc(2, 3)])
 
 
@@ -276,7 +274,7 @@ def test_testRulesWithRepeatedVariablesInAnAtom():
         q("a", "b"),
         q("b", "b"),
     ]
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(p(X), [p("a"), p("b")])
     program = [
         p(X, Y) <= q(Y, X, Y, X),
@@ -287,7 +285,7 @@ def test_testRulesWithRepeatedVariablesInAnAtom():
         q("b", "b", "b", "b"),
     ]
 
-    ans = match(program)
+    ans = match_relations(program)
 
     assert ans(p(X, Y), [p("a", "a"), p("b", "b")])
 
@@ -315,7 +313,7 @@ def test_testRulesWithLongBodies():
         g(1),
     ]
 
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(p(A, B, C, D, E, F, G), [p(1, 1, 1, 1, 1, 1, 1), p(1, 1, 1, 2, 1, 1, 1)])
 
     foo1 = "foo1"
@@ -340,7 +338,7 @@ def test_testRulesWithLongBodies():
         e(21, 22, 23, 24, foo5),
         c(foo1, foo2, bar, foo4, foo5),
     ]
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(
         p(A, B, C, D, E),
         [p(foo1, foo2, foo3, foo4, foo5), p(foo1, foo2, bar, foo4, foo5)],
@@ -355,7 +353,7 @@ def test_testRulesWithUnusedVariables1():
     b = "b"
     c = "c"
     program = [on(L) <= [or_(L, L1, X), on(L1)], or_(a, b, c), on(b)]
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(on(a), [on(a)])
     assert ans(on(X), [on(a), on(b)])
 
@@ -374,7 +372,7 @@ def test_testRulesWithUnusedVariables2():
         on(b),
     ]
 
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(on(a), [on(a)])
     assert ans(on(X), [on(a), on(b)])
 
@@ -393,11 +391,11 @@ def testRulesWithAnonymousVariables():
         or_(a, b, c),
         on(b),
     ]
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(on(a), [on(a)])
     assert ans(on(_), [on(a), on(b)])
     program = [p() <= [q(_, _), r(_, _)], q(a, b), r(c, d)]
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(p(), [p()])
 
 
@@ -405,8 +403,8 @@ def test_testUnboundVariable1():
     a = "a"
     b = "b"
     with pytest.raises(DatalogValidationException):
-        match([p(X, b)], p(X, Y), [])
-        match([q(X, Y) <= p(X, b), p(a, b)], q(X, Y), [])
+        match_relations([p(X, b)], p(X, Y), [])
+        match_relations([q(X, Y) <= p(X, b), p(a, b)], q(X, Y), [])
 
 
 def test_testRulesWithTrue():
@@ -414,13 +412,13 @@ def test_testRulesWithTrue():
     true = relation("true")
     false = relation("false")
 
-    assert match([false()], true(), [])
-    assert match([p(X) <= q(X), q(a)], true(), [])
+    assert match_relations([false()], true(), [])
+    assert match_relations([p(X) <= q(X), q(a)], true(), [])
 
 
 def testEmptyProgram():
     anything = relation("anything")
-    assert match([], anything(), [])
+    assert match_relations([], anything(), [])
 
 
 def test_fact_to_dicts():
@@ -429,8 +427,6 @@ def test_fact_to_dicts():
     query_vars = [Z, Y, X]
     from mercylog.core import facts_to_dict
 
-    print("\nDict")
-    print(facts_to_dict(facts, query_vars))
     assert facts_to_dict(facts, query_vars) == {
         Z: ["a", "d"],
         Y: ["b", "e"],

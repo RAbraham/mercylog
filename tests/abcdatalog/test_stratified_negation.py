@@ -6,7 +6,7 @@ from mercylog.abcdatalog.ast.validation.datalog_validation_exception import (
 from mercylog.types import relation, _, eq, not_eq
 
 from tests.abcdatalog.helper import (
-    match,
+    match_relations,
     X,
     Y,
     Z,
@@ -55,14 +55,14 @@ def test_TestUnstratifiable1():
         q() <= ~p(),
     ]
     with pytest.raises(DatalogValidationException):
-        match(program, None, None)
+        match_relations(program, None, None)
 
 
 def test_TestUnstratifiable2():
     edb = relation("edb")
     program = [p(X) <= [~q(X), edb(X)], q(X) <= [~p(X), edb(X)], edb(a)]
     with pytest.raises(DatalogValidationException):
-        match(program, None, None)
+        match_relations(program, None, None)
 
 
 def test_TestStratifiable():
@@ -76,7 +76,7 @@ def test_TestStratifiable():
         node(X) <= edge(_, X),
         not_tc(X, Y) <= [node(X), node(Y), ~tc(X, Y)],
     ]
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(tc(X, Y), [tc(a, b), tc(b, c), tc(a, c)])
     assert ans(
         not_tc(X, Y),
@@ -93,17 +93,17 @@ def test_TestStratifiable():
 
 def test_testNegatedUnboundVariable1():
     with pytest.raises(DatalogValidationException):
-        match([p() <= ~q(X, a)], p(), [])
+        match_relations([p() <= ~q(X, a)], p(), [])
 
 
 def test_testNegatedUnboundVariable2():
     with pytest.raises(DatalogValidationException):
-        match([p(X) <= ~q(X, a)], p(), [])
+        match_relations([p(X) <= ~q(X, a)], p(), [])
 
 
 def test_testNegatedUnboundVariable3():
     with pytest.raises(DatalogValidationException):
-        match([p() <= [~q(X, a), ~r(X)]], p(), [])
+        match_relations([p() <= [~q(X, a), ~r(X)]], p(), [])
 
 
 def test_testMultiLayeredNegation():
@@ -112,25 +112,25 @@ def test_testMultiLayeredNegation():
         q() <= ~r(),
         r() <= ~s(),
     ]
-    assert match(program, p(), [p()])
+    assert match_relations(program, p(), [p()])
 
 
 # // These next three tests assume that the engine being tested also supports
 # // explicit unification.
 def test_testExplicitUnification1():
     program = [p() <= [~q(X, b), eq(X, a)]]
-    assert match(program, p(), [p()])
+    assert match_relations(program, p(), [p()])
 
 
 def test_testExplicitUnification2():
     program = [p() <= [~q(X, b), not_eq(X, a)]]
     with pytest.raises(DatalogValidationException):
-        match(program, p(), [])
+        match_relations(program, p(), [])
 
 
 def test_testNegatedNoPositiveAtom():
     program = [p(a) <= ~q(a), p(b) <= [~q(X), eq(X, b)]]
-    assert match(program, p(X), [p(a), p(b)])
+    assert match_relations(program, p(X), [p(a), p(b)])
 
 
 def test_testNegatedAtomFirst():
@@ -147,7 +147,7 @@ def test_testNegatedAtomFirst():
         r(X, Y) <= [e(X, Z), r(Z, Y)],
         unreach(X, Y) <= [~r(X, Y), n(X), n(Y)],
     ]
-    assert match(
+    assert match_relations(
         program,
         unreach(X, Y),
         [
@@ -184,7 +184,7 @@ def test_testRelated():
     )
 
     program = related_data
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(check(X, Y), [])
     assert ans(siblings(X, Y), _exp_data_siblings)
     assert ans(ancestor(X, Y), _exp_data_ancestors)
@@ -241,7 +241,7 @@ def test_testRelated():
 def test_testRelated2():
     from tests.data.abcdatalog.related2 import related_data as program, _exp_ancestors
 
-    ans = match(program)
+    ans = match_relations(program)
     assert ans(check(X, Y), [])
     assert ans(
         siblings(X, Y),

@@ -7,8 +7,9 @@ from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import (
     initEngine_engine,
     seminaive_engine,
 )
-def facts(relations: List[Relation]) -> DataSource:
-    return SimpleDataSource(relations)
+import pandas as pd
+DF = pd.DataFrame
+
 
 
 class SimpleDataSource(DataSource):
@@ -17,12 +18,24 @@ class SimpleDataSource(DataSource):
         super(SimpleDataSource, self).__init__()
 
     def __call__(self, *args, **kwargs):
-        # rules = list(filter(lambda a: isinstance(a, Rule), args[0]))
         rules = [a for a in args[0] if isinstance(a, Rule)]
-        # query = filter(lambda a: isinstance(a, Relation), args[0])
         query = [a for a in args[0] if isinstance(a, Relation)]
         rs_df = run_df(run_abcdatalog, self.relations, rules, query)
         return rs_df
+
+class DataFrameDataSource(DataSource):
+    def __init__(self, dataframe: DF):
+        self.dataframe = dataframe
+
+    def df(self) -> DF:
+        return self.dataframe
+
+
+def facts(relations: List[Relation]) -> DataSource:
+    return SimpleDataSource(relations)
+
+def df(df: DF) -> DataFrameDataSource:
+    return DataFrameDataSource(df)
 
 if __name__ == '__main__':
     s = SimpleDataSource([11, 22])
