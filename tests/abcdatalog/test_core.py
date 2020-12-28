@@ -54,23 +54,6 @@ def test_queryNonRecursiveIDBPredicate():
 
 def test_queryLinearlyRecursiveIDBPredicate():
     # 		// Acyclic transitive closure.
-    db = facts([
-        p("a", "b"),
-        p("b", "c"),
-        p("c", "d"),
-    ])
-    rules = [
-        q(X, Y) <= p(X, Y),
-        q(X, Y) <= [p(X, Z), q(Z, Y)],
-    ]
-    ans = match3(db, rules)
-
-    ans(q(X, Y), [(a,b), (a,c), (a,d), (b,c), (b,d), (c,d)])
-    ans(q("a", X), [(b,), (c, ), (d,)])
-
-
-def test_queryLinearlyRecursiveIDBPredicate_user_api():
-    # 		// Acyclic transitive closure.
     db = facts(
         [
             p("a", "b"),
@@ -78,64 +61,73 @@ def test_queryLinearlyRecursiveIDBPredicate_user_api():
             p("c", "d"),
         ]
     )
-
     rules = [
         q(X, Y) <= p(X, Y),
         q(X, Y) <= [p(X, Z), q(Z, Y)],
     ]
-
     ans = match3(db, rules)
+
     ans(q(X, Y), [(a, b), (a, c), (a, d), (b, c), (b, d), (c, d)])
     ans(q("a", X), [(b,), (c,), (d,)])
+
 
 
 def test_transitive_closure_with_a_cycle():
     # 		// Transitive closure with a cycle.
 
-    db = facts([
-        p("a", "b"),
-        p("b", "c"),
-        p("c", "d"),
-        p("d", "c"),
-    ])
-    rules = [
-        q(X, Y) <= p(X, Y),
-        q(X, Y) <= [p(X, Z), q(Z, Y)]
-    ]
+    db = facts(
+        [
+            p("a", "b"),
+            p("b", "c"),
+            p("c", "d"),
+            p("d", "c"),
+        ]
+    )
+    rules = [q(X, Y) <= p(X, Y), q(X, Y) <= [p(X, Z), q(Z, Y)]]
     ans = match3(db, rules)
-    ans(q(X, Y), [(a,b), (a,c), (a,d), (b,c), (b,d), (c,c), (c,d), (d,c ), (d,d )])
+    ans(
+        q(X, Y),
+        [(a, b), (a, c), (a, d), (b, c), (b, d), (c, c), (c, d), (d, c), (d, d)],
+    )
 
 
 def test_queryNonLinearlyRecursiveIDBPredicate():
-    db = facts([
-        p("a", "b"),
-        p("b", "c"),
-        p("c", "d"),
-    ])
+    db = facts(
+        [
+            p("a", "b"),
+            p("b", "c"),
+            p("c", "d"),
+        ]
+    )
     rules = [
         q(X, Y) <= p(X, Y),
         q(X, Y) <= [q(X, Z), q(Z, Y)],
     ]
 
     ans = match3(db, rules)
-    ans(q(X, Y), [(a,b), (a,c), (a,d), (b,c), (b,d), (c,d)])
-    ans(q(a,X), [(b,), (c, ), (d,)])
+    ans(q(X, Y), [(a, b), (a, c), (a, d), (b, c), (b, d), (c, d)])
+    ans(q(a, X), [(b,), (c,), (d,)])
 
 
 def test_queryNonLinearlyRecursiveIDBPredicate_withCycle():
     #     // Transitive closure with a cycle.
-    db = facts([
-        p("a", "b"),
-        p("b", "c"),
-        p("c", "d"),
-        p("d", "c"),
-    ])
+    db = facts(
+        [
+            p("a", "b"),
+            p("b", "c"),
+            p("c", "d"),
+            p("d", "c"),
+        ]
+    )
     rules = [
         q(X, Y) <= p(X, Y),
         q(X, Y) <= [q(X, Z), q(Z, Y)],
     ]
     ans = match3(db, rules)
-    ans(q(X, Y), [(a,b), (a,c), (a,d), (b,c), (b,d), (c,c), (c,d), (d,c), (d,d)])
+    ans(
+        q(X, Y),
+        [(a, b), (a, c), (a, d), (b, c), (b, d), (c, c), (c, d), (d, c), (d, d)],
+    )
 
 
 def test_queryIDBPredicateWithUndefinedEDB():
@@ -150,7 +142,7 @@ def test_queryIDBPredicateWithExplicitIDBFact():
     db = facts([r("a", "b"), q("b", "c")])
     rules = [q(X, Y) <= r(X, Y)]
     ans = match3(db, rules)
-    ans(q(X, Y), [(a,b), (b, c)])
+    ans(q(X, Y), [(a, b), (b, c)])
 
 
 def test_queryZeroAryPredicates():
