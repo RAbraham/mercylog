@@ -8,7 +8,7 @@ from placeholder import _
 
 
 def make_run(run_func: Callable) -> Callable:
-    return curry(run, run_func)
+    return curry(run_df, run_func)
 
 
 group_by_position = compose_left(
@@ -76,7 +76,7 @@ def facts_to_dict(facts, query_vars):
 
     # return list_to_dict(r, query_vars)
 
-def run(
+def run_df(
     run_func: Callable,
     database: List[Relation],
     rules: List[Rule],
@@ -84,20 +84,26 @@ def run(
     variables: List[Variable] = None,
 ) -> pd.DataFrame:
 
-    # assert isinstance(database, List)
-    assert isinstance(query, List)
-    head, query_vars = get_head(query, variables)
+    facts, query_vars = run_relations(database, query, rules, run_func, variables)
+    return relations_to_df(facts, query_vars)
 
-    m = head <= query
 
-    _rules = rules + [m]
-    facts = run_func(database, _rules, head)
+def relations_to_df(facts, query_vars):
     result = facts_to_dict(facts, query_vars)
-
     return pd.DataFrame(result)
 
 
-def get_head(query, variables):
+def run_relations(database, query, rules, run_func, variables=None):
+    # assert isinstance(database, List)
+    assert isinstance(query, List)
+    head, query_vars = get_head(query, variables)
+    m = head <= query
+    _rules = rules + [m]
+    facts = run_func(database, _rules, head)
+    return facts, query_vars
+
+
+def get_head(query, variables=None):
     main_query_rule = relation("main_query_rule")
     query_vars = variables or list(query_variables(query))
     head = main_query_rule(*query_vars)

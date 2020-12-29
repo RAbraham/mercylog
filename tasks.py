@@ -21,6 +21,6 @@ def publish(c):
     
 def run_commands(c, commands):
     for command in commands:
-        c.run(command)
+        c.run_df(command)
 
     

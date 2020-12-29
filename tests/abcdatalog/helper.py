@@ -8,7 +8,7 @@ from toolz.curried import *
 from functools import partial
 
 from tests.util import assert_df, a_df
-from mercylog.core import run as run_df, query_variables_list, list_to_dict
+from mercylog.core import run_df as run_df, query_variables_list, list_to_dict
 from mercylog.types import relation, variables, Relation
 from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import (
     q as do_query,
@@ -87,7 +87,7 @@ def match1(database, rules, query: Relation, result: Dict):
 
 @toolz.curry
 def match3(database, rules, query: Relation, result: List[Tuple]):
-    rs_df = database(rules + [query])
+    rs_df = database(rules + [query]).df()
     return assert_df(rs_df, _df(result, [query]))
 
 
