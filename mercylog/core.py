@@ -4,7 +4,7 @@ from mercylog.types import Relation, Variable, Rule, relation
 
 # from fastcore.utils import *
 from toolz.curried import *
-from placeholder import _
+from placeholder import _, m
 
 
 def make_run(run_func: Callable) -> Callable:
@@ -37,12 +37,11 @@ def list_to_dict(a_list, query_vars):
     )
 
 
-
-
 def facts_to_dict(facts, query_vars):
     r = pipe(facts, map(_.terms))
 
     return list_to_dict(r, query_vars)
+
 
 # def facts_to_dict(facts, query_vars):
 #     r = pipe(facts, map(_.terms), map(enumerate), concat,
@@ -74,7 +73,8 @@ def facts_to_dict(facts, query_vars):
 #
 
 
-    # return list_to_dict(r, query_vars)
+# return list_to_dict(r, query_vars)
+
 
 def run_df(
     run_func: Callable,
@@ -111,27 +111,21 @@ def get_head(query, variables=None):
 
 
 def query_variables(query: List[Relation]) -> Set[Variable]:
-    from placeholder import m
-
     r = pipe(
         query,
-        map(m.variables()),
-        concat,
-        filter(lambda v: str(v) != "_" and isinstance(v, Variable)),
-        set,
-
+        _query_vars,
+        set
     )
     return r
 
-def query_variables_list(query: List[Relation]) -> List[Variable]:
-    from placeholder import m
 
-    r = pipe(
-        query,
-        map(m.variables()),
-        concat,
-        filter(lambda v: str(v) != "_" and isinstance(v, Variable)),
-        unique,
-        list
-    )
+_query_vars = compose_left(
+    map(m.variables()),
+    concat,
+    filter(lambda v: str(v) != "_" and isinstance(v, Variable))
+)
+
+
+def query_variables_list(query: List[Relation]) -> List[Variable]:
+    r = pipe(query, _query_vars, unique, list)
     return r

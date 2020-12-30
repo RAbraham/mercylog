@@ -1,23 +1,25 @@
 import pytest
 import pandas as pd
-# from mercylog import df
+from mercylog import df, relation, _, Variable
+from tests.abcdatalog.helper import assert_df
 def test_user_api():
-    #     df = pd.DataFrame(r, columns=["var", "value"])
     rows = [
         ["Abe", "M"],
         ["Bob", "M"],
         ["Abby", "F"]
     ]
+    _rows = relation("_rows")
+    X = Variable("X")
     a_df = pd.DataFrame(rows, columns=["name", "gender"])
-    # print(">> Name")
-    # a_df.name = "person"
-    # print(a_df.name)
     # select males
-    # db = df(a_df)
-    # males = db([
-    #
-    # ])
+    ds = df(a_df)
+    males = ds([_rows(X, "M")])
+    exp_df = pd.DataFrame(["Abe", "Bob"], columns=[X])
+    assert_df(males.df(), exp_df)
+
+    print(males.df())
 
 
 
-    pass
+
+

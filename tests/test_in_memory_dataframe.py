@@ -6,7 +6,7 @@ from mercylog.data_sources.in_memory import (
 )
 
 from mercylog.core import make_run
-from mercylog.types import relation, Variable
+from mercylog.types import relation, Variable, _
 import pandas as pd
 
 X = Variable("X")
@@ -45,6 +45,11 @@ def test_filter():
 
     children_bob = run(database, [], [parent("Bob", X)])
     assert_df(children_bob, a_df({X: ["Carl", "Connor"]}))
+
+    # # check wildcard
+    # parents_carl_wildcard = run(database, [], [parent(_, "Carl")])
+    # assert_df(parents_carl_wildcard, a_df({X: ["Bob", "Beatrice"]}))
+
 
 
 def test_single_body_rule():

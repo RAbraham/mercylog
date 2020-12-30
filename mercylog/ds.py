@@ -38,8 +38,18 @@ class DataFrameDataSource(DataSource):
 
 def df_to_relations(a_df: pd.DataFrame) -> List[Relation]:
     rel = relation("_rows")
+    c_list = []
+    for c in a_df.columns:
+        c_list.append(a_df[c])
 
-    pass
+    zipped = zip(*c_list)
+    result = []
+    for t in zipped:
+        result.append(rel(*t))
+
+    return result
+        
+
 
 def split_rules_query(args):
     rules = [a for a in args[0] if isinstance(a, Rule)]
