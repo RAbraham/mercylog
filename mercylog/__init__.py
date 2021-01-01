@@ -7,5 +7,5 @@ __email__ = 'rajiv.abraham@gmail.com'
 __version__ = '0.1.0'
 
 from .bashlog import BashlogV1
-from mercylog.ds import df
-from mercylog.types import relation, _, variables, Variable
+from mercylog.ds import df_ds
+from mercylog.types import relation, _,  Variable,V, R

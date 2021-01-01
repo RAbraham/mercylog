@@ -6,6 +6,7 @@ from typing import *
 from returns.result import Result, Success, Failure
 from mercylog.lib import util
 from fastcore import all as fc
+
 """
 Glossary:
 ^^^^^^^^^
@@ -103,9 +104,19 @@ class Variable(Term):
         return self.name
 
 
-# v = Variable
+v = Variable
 
 _ = Variable("_")
+
+
+class VariableSugar:
+    def __getattr__(self, name):
+        return Variable(name)
+
+
+V = VariableSugar()
+
+
 def variables(*names: str) -> Union[Variable, List[Variable]]:
     if len(names) == 0:
         return ValueError("Atleast one name required")
@@ -113,7 +124,6 @@ def variables(*names: str) -> Union[Variable, List[Variable]]:
         return Variable(names[0])
     else:
         return [Variable(n) for n in names]
-
 
 
 # def __init__(self, name, *variables):
@@ -204,6 +214,7 @@ class InvertedRelationInstance(object):
     def variables(self):
         return self.relation_instance.variables()
 
+
 @dataclass(frozen=True)
 class RelationCreator:
     """
@@ -244,9 +255,9 @@ class Rule:
 
 def is_safe(head: Relation, body: Sequence[Relation]) -> bool:
     """
-      Every variable appearing in the head should also appear in at least one of the atoms in the body.
-        This requirement is called the safety requirement and is used to avoid rules yielding infinite relations from
-        finite ones.
+    Every variable appearing in the head should also appear in at least one of the atoms in the body.
+      This requirement is called the safety requirement and is used to avoid rules yielding infinite relations from
+      finite ones.
 
     """
     head_vars = head.variables()
@@ -265,11 +276,22 @@ class Fact:
 def relation(predicate: str) -> RelationCreator:
     return RelationCreator(predicate)
 
+
+class RelationSugar:
+    def __getattr__(self, name):
+        return relation(name)
+
+
+R = RelationSugar()
+
+
 class BinaryUnifier(Relation):
     def __init__(self, x, y):
         # fc.store_attr()
         super(BinaryUnifier, self).__init__("BinaryUnifier", (x, y))
+
     pass
+
 
 class BinaryDisunifier(Relation):
     def __init__(self, x, y):
@@ -298,7 +320,7 @@ class KnowledgeBase:
     as the database D and the IDB as the program P
 
     Checks to make:
-    - Base predicate symbols can appear in the body of rules in P but not in the head. 
+    - Base predicate symbols can appear in the body of rules in P but not in the head.
     - Derived predicate symbols cannot appear in D and their definition is in P .
     """
 
@@ -311,12 +333,15 @@ class KnowledgeBase:
 #     else:
 #         return False
 
+
 def eq(x, y) -> BinaryUnifier:
     return BinaryUnifier(x, y)
+
 
 def not_eq(x, y) -> BinaryDisunifier:
     return BinaryDisunifier(x, y)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     b = BinaryUnifier("r", "x")
     print(b.x)
