@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 from pprint import pprint
-from mercylog.ds import df_to_relations, _row, prow
+from mercylog.db import df_to_relations, _row, prow
 from mercylog.types import relation, _
 # _rows = relation("_rows")
 _rows = prow

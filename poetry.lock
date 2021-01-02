@@ -640,6 +640,17 @@ version = "8.4.0"
 
 [[package]]
 category = "main"
+description = "Multiple argument dispatching."
+name = "multimethod"
+optional = false
+python-versions = ">=3.6"
+version = "1.4"
+
+[package.extras]
+docs = ["recommonmark", "nbsphinx", "jupyter", "sphinx"]
+
+[[package]]
+category = "main"
 description = "Multiple dispatch"
 name = "multipledispatch"
 optional = false
@@ -1656,7 +1667,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "a029f04ea5fed7eed3a772f9264dd1c0dcd1357f0f7971542e242d2e13209266"
+content-hash = "4577b072bcbdad7332e68d1174144f6970697ad2e8563e4a7236c4b025d7b10c"
 lock-version = "1.0"
 python-versions = "^3.8"
 
@@ -1965,6 +1976,10 @@ mistune = [
 more-itertools = [
     {file = "more-itertools-8.4.0.tar.gz", hash = "sha256:68c70cc7167bdf5c7c9d8f6954a7837089c6a36bf565383919bb595efb8a17e5"},
     {file = "more_itertools-8.4.0-py3-none-any.whl", hash = "sha256:b78134b2063dd214000685165d81c154522c3ee0a1c0d4d113c80361c234c5a2"},
+]
+multimethod = [
+    {file = "multimethod-1.4-py2.py3-none-any.whl", hash = "sha256:2746500793c64cbd84a6ccda0043f4b58af3fcf8d6cd44b2232d5b9455b31d73"},
+    {file = "multimethod-1.4.tar.gz", hash = "sha256:8b315d6c965a797899a699913cdc391ded51dca22db5d11bda3399ce24ffed76"},
 ]
 multipledispatch = [
     {file = "multipledispatch-0.6.0-py2-none-any.whl", hash = "sha256:407e6d8c5fa27075968ba07c4db3ef5f02bea4e871e959570eeb69ee39a6565b"},

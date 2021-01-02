@@ -4,7 +4,7 @@ from mercylog.types import Relation, Variable, Rule, relation
 
 # from fastcore.utils import *
 from toolz.curried import *
-from placeholder import _, m
+# from placeholder import _, m
 
 
 def make_run(run_func: Callable) -> Callable:
@@ -38,7 +38,7 @@ def list_to_dict(a_list, query_vars):
 
 
 def facts_to_dict(facts, query_vars):
-    r = pipe(facts, map(_.terms))
+    r = pipe(facts, map(lambda x: x.terms))
 
     return list_to_dict(r, query_vars)
 
@@ -120,7 +120,7 @@ def query_variables(query: List[Relation]) -> Set[Variable]:
 
 
 _query_vars = compose_left(
-    map(m.variables()),
+    map(lambda m: m.variables()),
     concat,
     filter(lambda v: str(v) != "_" and isinstance(v, Variable))
 )

@@ -1,8 +1,10 @@
-from toolz.curried import *
+# from fastcore.dispatch import typedispatch
+# from multimethod import multimethod
+# from toolz.curried import *
 from typing import *
 
-from mercylog.types import DataSource, Relation, Rule, relation
-from mercylog.core import run_df as run_df, _
+from mercylog.types import Database, Relation, Rule, relation, _ as m_
+from mercylog.core import run_df as run_df
 # from mercylog.core import run_relations, relations_to_df, run_df
 from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import (
     q as do_query,
@@ -17,22 +19,22 @@ rel = relation("_row")
 prow = rel
 
 
-class SimpleDataSource(DataSource):
+class SimpleDB(Database):
     def __init__(self, relations: List[Relation]):
         self.relations = relations
-        super(SimpleDataSource, self).__init__()
+        super(SimpleDB, self).__init__()
 
     def __call__(self, *args, **kwargs):
         query, rules = split_rules_query(args)
         rs_df = run_df(run_abcdatalog, self.relations, rules, query)
-        return df_ds(rs_df)
+        return db(rs_df)
 
 
 
-class DataFrameDataSource(DataSource):
+class DataFrameDB(Database):
     def __init__(self, dataframe: DF):
         self.dataframe = dataframe
-        self.simple_ds = SimpleDataSource(df_to_relations(dataframe))
+        self.simple_ds = SimpleDB(df_to_relations(dataframe))
 
     def df(self) -> DF:
         return self.dataframe
@@ -41,19 +43,7 @@ class DataFrameDataSource(DataSource):
         return self.simple_ds(*args, **kwargs)
 
     def row(self, *args, **kwargs):
-        r = pipe(kwargs.items(),
-                 )
-
-        '''
-        [k,v]
-        if columns = [id, name, age, gender], then relation is _row(_, X, _, "M") for row(name=X, gender='M') 
-        
-        [("name", X), (gender, "M")]
-        [(1, X), (3, "M")]
-        [(0, _), (1, X), (2, _), (3, "M")]
-        (_, X, _, "M")
-
-        '''
+        # TODO: Assert kwargs are vars or constants. not relations for e.g.
         return _row(list(self.dataframe.columns), kwargs)
 
 
@@ -64,7 +54,7 @@ def _row(columns: List[str], vars_dict: Dict[str, Any]) -> Relation:
         if c in vars:
             r.append(vars_dict[c])
         else:
-            r.append(_)
+            r.append(m_)
 
     return prow(*r)
 
@@ -87,16 +77,17 @@ def split_rules_query(args):
     query = [a for a in args[0] if isinstance(a, Relation)]
     return query, rules
 
-def facts(relations: List[Relation]) -> DataSource:
-    return SimpleDataSource(relations)
 
-def df_ds(df: DF) -> DataFrameDataSource:
-    return DataFrameDataSource(df)
-# def df(df: DF) -> DataSource:
-#     relations = df_to_relations(df)
-#     return SimpleDataSource(relations)
+
+# @multimethod
+def db(df: DF) -> DataFrameDB:
+    return DataFrameDB(df)
+
+# @multimethod
+def facts(relations: List[Relation]) -> Database:
+    return SimpleDB(relations)
 
 
 if __name__ == '__main__':
-    s = SimpleDataSource([11, 22])
+    s = SimpleDB([11, 22])
     print(s())

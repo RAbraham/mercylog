@@ -1,7 +1,7 @@
 from mercylog.abcdatalog.ast.validation.datalog_validation_exception import (
     DatalogValidationException,
 )
-from mercylog.ds import facts
+from mercylog.db import db, facts
 from mercylog.types import relation, variables, _
 import pytest
 
@@ -24,10 +24,11 @@ from tests.abcdatalog.helper import (
     W,
 )
 
+# facts = db
 
 def test_queryUndefinedPredicate():
-    db = facts([p()])
-    match3(db, [], q(), [])
+    db1 = facts([p()])
+    match3(db1, [], q(), [])
 
 
 def test_queryEDBPredicate():

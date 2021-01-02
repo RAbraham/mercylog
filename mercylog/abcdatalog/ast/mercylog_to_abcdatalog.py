@@ -1,5 +1,7 @@
 from typing import *
 from toolz.curried import *
+
+from mercylog.operations import OrRelationGroup
 from mercylog.types import (
     Rule,
     Relation,
@@ -55,10 +57,27 @@ def run_abcdatalog(database, rules, head):
     rs = do_query(engine, head)
     return rs
 
+# def convert(program: List[Rule]) -> Set:
+#     return pipe(program,
+#                 map(_convert))
+
 def convert(program: List[Rule]) -> Set:
     return pipe(program,
+                map(flatten),
                 map(_convert))
 
+def flatten(rule: Rule):
+    aaa
+    if not isinstance(rule.body, OrRelationGroup):
+        return [rule]
+    else:
+        result = []
+        for b in rule.body.relations:
+            result.append(Rule(rule.head, b))
+        return result
+
+
+    pass
 def _convert(r):
     if isinstance(r, Rule):
         abc_head = convert_relation(r.head)

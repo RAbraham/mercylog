@@ -126,43 +126,6 @@ def variables(*names: str) -> Union[Variable, List[Variable]]:
         return [Variable(n) for n in names]
 
 
-# def __init__(self, name, *variables):
-#     self.name = name
-#     self._variables = variables
-
-# def __le__(self, body: Union[List, Any]):
-#     if isinstance(body, List):
-#         b = Facts(*body)
-#     else:
-#         b = body
-#     return Rule(self, b)
-
-# def variables(self):
-#     return self._variables
-
-# def get_clause(self):
-#     return self.relation_x()
-
-# def relation_x(self):
-#     var_strs = []
-#     # TODO: Duplicate isinstance check
-#     for v in self.variables():
-#         if isinstance(v, str):
-#             x = f'"{v}"'
-#         else:
-#             x = str(v)
-
-#         var_strs.append(x)
-#     a_str = ','.join(var_strs)
-#     return self.name + '(' + a_str + ')'
-
-# def relation(self):
-#     return self.relation_x()
-
-# def __invert__(self):
-#     return InvertedRelationInstance(self)
-#     pass
-
 
 @dataclass(frozen=True)
 class Relation:
@@ -176,12 +139,16 @@ class Relation:
     name: str
     terms: Tuple[Term]
 
-    def __le__(self, body: Union[List, "Relation"]):
+    def __le__(self, body: Union[List, "Relation", "OrRelationGroup"]):
         if isinstance(body, List):
             _b = body
             pass
-        else:
+        elif isinstance(body, Relation):
             _b = [body]
+        elif isinstance(body, OrRelationGroup):
+            _b = body
+        else:
+            raise ValueError(f"Invalid body: {body}")
 
         head_relation = Relation(self.name, self.terms)
         return Rule(head_relation, set(_b))
@@ -199,6 +166,13 @@ class Relation:
         return InvertedRelationInstance(self)
         pass
 
+@dataclass(frozen=True)
+class OrRelationGroup:
+    relations: List[Relation]
+    pass
+
+def or_(*relations) -> OrRelationGroup:
+    return OrRelationGroup(list(relations))
 
 class InvertedRelationInstance(object):
     def __init__(self, relation_instance):
@@ -231,7 +205,7 @@ class RelationCreator:
         _terms = tuple([t for t in terms])
         return Relation(self.name, _terms)
 
-
+Body = Union[Relation, List[Relation], OrRelationGroup]
 @dataclass(frozen=True)
 class Rule:
     """
@@ -283,6 +257,7 @@ class RelationSugar:
 
 
 R = RelationSugar()
+Q = RelationSugar()
 
 
 class BinaryUnifier(Relation):
@@ -301,6 +276,8 @@ class BinaryDisunifier(Relation):
 
 # def run(data_source: DataSource, program: Program, query: Query):
 
+class Database:
+    pass
 
 class DataSource:
     pass
