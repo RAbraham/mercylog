@@ -1,8 +1,8 @@
 from typing import *
 from toolz.curried import *
 
-from mercylog.operations import OrRelationGroup
 from mercylog.types import (
+    MercylogRule,
     Rule,
     Relation,
     InvertedRelationInstance,
@@ -10,6 +10,8 @@ from mercylog.types import (
     Variable,
     BinaryUnifier,
     BinaryDisunifier,
+    Body,
+    OrRelationGroup
 )
 from mercylog.abcdatalog.ast.variable import Variable as AVariable
 from mercylog.abcdatalog.ast.term import Term as ATerm
@@ -61,23 +63,34 @@ def run_abcdatalog(database, rules, head):
 #     return pipe(program,
 #                 map(_convert))
 
-def convert(program: List[Rule]) -> Set:
+def convert(program: List[Union[MercylogRule, Relation]]) -> Set:
     return pipe(program,
                 map(flatten),
+                concat,
                 map(_convert))
 
-def flatten(rule: Rule):
-    aaa
-    if not isinstance(rule.body, OrRelationGroup):
-        return [rule]
+def flatten(clause: Union[MercylogRule, Relation]):
+    if isinstance(clause, Relation):
+        return [clause]
+    elif isinstance(clause, MercylogRule):
+        rule = clause
+        body = rule.body
+        if not isinstance(body, OrRelationGroup):
+            if isinstance(body, list):
+                _b = body
+            else:
+                _b = [body]
+            return [Rule(rule.head, set(_b))]
+        else:
+            result = []
+            for b in rule.body.relations:
+                assert isinstance(b, Relation), "For now we don't allow nested relations. Just or_ at the highest level"
+                result.append(Rule(rule.head, set([b])))
+            return result
     else:
-        result = []
-        for b in rule.body.relations:
-            result.append(Rule(rule.head, b))
-        return result
+        raise ValueError(f"Invalid type: {clause}")
 
 
-    pass
 def _convert(r):
     if isinstance(r, Rule):
         abc_head = convert_relation(r.head)
@@ -89,6 +102,8 @@ def _convert(r):
         return AClause(abc_head, abc_body)
     else:
         raise ValueError(f"Unexpected Argument:{r} of type: {type(r)}")
+
+
 
 
 def convert_relation(relation: Union[Relation, InvertedRelationInstance]):
@@ -137,7 +152,7 @@ def convert_term(term: Term) -> ATerm:
         return AConstant.create(term)
 
 
-def convert_query(a_query: Rule):
+def convert_query(a_query: MercylogRule):
     return pipe([a_query], convert, list, first, lambda x: x.getHead())
 
 

@@ -1,7 +1,7 @@
 from mercylog.abcdatalog.ast.validation.datalog_validation_exception import (
     DatalogValidationException,
 )
-from mercylog.db import db, facts
+from mercylog.db import  facts
 from mercylog.types import relation, variables, _
 import pytest
 

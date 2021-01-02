@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-from mercylog import db, R, V, Q
+from mercylog import db, R, V,  or_, and_
 from tests.abcdatalog.helper import assert_df
 
 # API
@@ -32,7 +32,7 @@ def test_single_body_rule():
     # Then
     ds = db(a_df)
     man = R.man(X) <= ds.row(name=X, species="man")
-    human = ds([man, Q.man(X)])
+    human = ds([man, R.man(X)])
 
     assert_df(human.df(), exp_df)
 
@@ -66,14 +66,14 @@ def test_conjunction():
     rules = [
         R.man(X) <= d.row(name=X, rel="man"),
         R.parent(X, Y) <= d.row(name=X, name2=Y, rel="parent"),
-        R.father(X, Y) <= [R.man(X), R.parent(X, Y)],
+        R.father(X, Y) <= and_(R.man(X), R.parent(X, Y)),
     ]
-    queries = rules + [Q.father(X, Y)]
+    queries = rules + [R.father(X, Y)]
     fathers = d(queries)
     assert_df(fathers.df(), exp_df)
 
     # Test n-ary conjunction
-    grandfather_rule = R.grandfather(X, Y) <= [R.man(X), R.parent(X, Z), R.parent(Z, Y)]
+    grandfather_rule = R.grandfather(X, Y) <= and_(R.man(X), R.parent(X, Z), R.parent(Z, Y))
     rules = rules + [grandfather_rule]
     gf_d = d(rules + [R.grandfather(X, Y)])
     gf_rows = [["Abe", "Carl"], ["Abe", "Connor"]]
@@ -99,19 +99,18 @@ def test_disjunction():
         R.man(X) <= d.row(name=X, species="man"),
         R.woman(X) <= d.row(name=X, species="woman"),
     ]
-    queries = base_rules + [
+    rules = [
         R.human(X) <= R.man(X),
         R.human(X) <= R.woman(X),
     ]
-    humans = d(queries + [R.human(X)])
+    query = [R.human(X)]
+    humans = d(base_rules + rules + query)
     assert_df(humans.df(), exp_df)
 
     # Or Clause
-    or_queries = [
-        R.human(X) <= or_(R.man(X), R.woman(X))
-    ]
-
-    pass
+    or_rules = [R.human(X) <= or_(R.man(X), R.woman(X))]
+    humans_or = d(base_rules + or_rules + query)
+    assert_df(humans_or.df(), exp_df)
 
 
 # TODO: query composition. df_ds(a_df)(query1)(query2)

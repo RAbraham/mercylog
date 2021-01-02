@@ -139,19 +139,19 @@ class Relation:
     name: str
     terms: Tuple[Term]
 
-    def __le__(self, body: Union[List, "Relation", "OrRelationGroup"]):
-        if isinstance(body, List):
-            _b = body
-            pass
-        elif isinstance(body, Relation):
-            _b = [body]
-        elif isinstance(body, OrRelationGroup):
-            _b = body
-        else:
-            raise ValueError(f"Invalid body: {body}")
+    def __le__(self, body: "Body"):
+        # if isinstance(body, List):
+        #     _b = body
+        #     pass
+        # elif isinstance(body, Relation):
+        #     _b = [body]
+        # elif isinstance(body, OrRelationGroup):
+        #     _b = body
+        # else:
+        #     raise ValueError(f"Invalid body: {body}")
 
         head_relation = Relation(self.name, self.terms)
-        return Rule(head_relation, set(_b))
+        return MercylogRule(head_relation, body)
 
     def __repr__(self):
         term_str = ", ".join([str(t) for t in self.terms])
@@ -173,6 +173,9 @@ class OrRelationGroup:
 
 def or_(*relations) -> OrRelationGroup:
     return OrRelationGroup(list(relations))
+
+def and_(*relations) -> List[Relation]:
+    return list(relations)
 
 class InvertedRelationInstance(object):
     def __init__(self, relation_instance):
@@ -206,6 +209,7 @@ class RelationCreator:
         return Relation(self.name, _terms)
 
 Body = Union[Relation, List[Relation], OrRelationGroup]
+
 @dataclass(frozen=True)
 class Rule:
     """
@@ -225,6 +229,27 @@ class Rule:
     def __repr__(self):
         body = ",".join([str(b) for b in self.body])
         return f"{self.head} <= {body}"
+
+
+@dataclass(frozen=True)
+class MercylogRule:
+    """
+    A Datalog rule r is a logic program rule of the form:
+    R0 <- R1, R2, ... Rn. where n >= 0
+    Ri are relations where no function symbols appears
+    R0 is called the head
+    R1, R2.. Rn is called the body
+
+    The meaning of the above rule is if R1,R2...Rn is true, then R0 is true.
+
+    """
+
+    head: Relation
+    body: Body
+
+    def __repr__(self):
+        # body = ",".join([str(b) for b in body])
+        return f"{self.head} <= {self.body}"
 
 
 def is_safe(head: Relation, body: Sequence[Relation]) -> bool:
@@ -257,7 +282,6 @@ class RelationSugar:
 
 
 R = RelationSugar()
-Q = RelationSugar()
 
 
 class BinaryUnifier(Relation):

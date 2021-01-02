@@ -3,7 +3,7 @@
 # from toolz.curried import *
 from typing import *
 
-from mercylog.types import Database, Relation, Rule, relation, _ as m_
+from mercylog.types import Database, Relation, MercylogRule, relation, _ as m_
 from mercylog.core import run_df as run_df
 # from mercylog.core import run_relations, relations_to_df, run_df
 from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import (
@@ -73,7 +73,7 @@ def df_to_relations(a_df: pd.DataFrame) -> List[Relation]:
 
 
 def split_rules_query(args):
-    rules = [a for a in args[0] if isinstance(a, Rule)]
+    rules = [a for a in args[0] if isinstance(a, MercylogRule)]
     query = [a for a in args[0] if isinstance(a, Relation)]
     return query, rules
 
