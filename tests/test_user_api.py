@@ -1,14 +1,8 @@
 import pytest
 import pandas as pd
 from mercylog import db, R, V,  or_, and_
+from mercylog.df import row
 from tests.abcdatalog.helper import assert_df
-
-# API
-# ds = df(customer_df) # with many columns
-# ds([
-#     R.customer(Id, Name, Age) <= ds.row(customer_id=Id, name=Name, age=Age)
-#     R.customer(Id, _,  Age) # R.customer(Id=Id, Age=Age) # or R.customer({Id, Age})
-# ])
 
 
 def test_user_api_filter():
@@ -19,7 +13,7 @@ def test_user_api_filter():
 
     ds = db(a_df)
     # select males
-    males = ds([ds.row(name=X, gender="M")])
+    males = ds([row(name=X, gender="M")])
     assert_df(males.df(), exp_df)
 
 
@@ -31,7 +25,7 @@ def test_single_body_rule():
 
     # Then
     ds = db(a_df)
-    man = R.man(X) <= ds.row(name=X, species="man")
+    man = R.man(X) <= row(name=X, species="man")
     human = ds([man, R.man(X)])
 
     assert_df(human.df(), exp_df)
@@ -64,8 +58,8 @@ def test_conjunction():
     # Then test binary conjunction
     d = db(a_df)
     rules = [
-        R.man(X) <= d.row(name=X, rel="man"),
-        R.parent(X, Y) <= d.row(name=X, name2=Y, rel="parent"),
+        R.man(X) <= row(name=X, rel="man"),
+        R.parent(X, Y) <= row(name=X, name2=Y, rel="parent"),
         R.father(X, Y) <= and_(R.man(X), R.parent(X, Y)),
     ]
     queries = rules + [R.father(X, Y)]
@@ -96,8 +90,8 @@ def test_disjunction():
     d = db(a_df)
 
     base_rules = [
-        R.man(X) <= d.row(name=X, species="man"),
-        R.woman(X) <= d.row(name=X, species="woman"),
+        R.man(X) <= row(name=X, species="man"),
+        R.woman(X) <= row(name=X, species="woman"),
     ]
     rules = [
         R.human(X) <= R.man(X),

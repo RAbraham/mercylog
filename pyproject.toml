@@ -17,6 +17,7 @@ mypy = "^0.790"
 placeholder = "^1.2"
 siuba = "^0.0.24"
 multimethod = "^1.4"
+algebraic-data-types = "^0.2"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.5.3"

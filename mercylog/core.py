@@ -1,6 +1,7 @@
+from dataclasses import dataclass
 from typing import *
 import pandas as pd
-from mercylog.types import Relation, Variable, Rule, relation
+from mercylog.types import Relation, Variable,MercylogRule, relation, RowRelation
 
 # from fastcore.utils import *
 from toolz.curried import *
@@ -79,7 +80,7 @@ def facts_to_dict(facts, query_vars):
 def run_df(
     run_func: Callable,
     database: List[Relation],
-    rules: List[Rule],
+    rules: List[MercylogRule],
     query: List[Relation],
     variables: List[Variable] = None,
 ) -> pd.DataFrame:
@@ -129,3 +130,5 @@ _query_vars = compose_left(
 def query_variables_list(query: List[Relation]) -> List[Variable]:
     r = pipe(query, _query_vars, unique, list)
     return r
+
+

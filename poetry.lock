@@ -7,6 +7,14 @@ python-versions = "*"
 version = "0.7.12"
 
 [[package]]
+category = "main"
+description = "Algebraic data types for Python"
+name = "algebraic-data-types"
+optional = false
+python-versions = "*"
+version = "0.2"
+
+[[package]]
 category = "dev"
 description = "Disable App Nap on OS X 10.9"
 marker = "sys_platform == \"darwin\" or platform_system == \"Darwin\" or python_version >= \"3.3\" and sys_platform == \"darwin\""
@@ -1667,7 +1675,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "4577b072bcbdad7332e68d1174144f6970697ad2e8563e4a7236c4b025d7b10c"
+content-hash = "5c0d383f6a4f8597c18525ea4d6ba41bdfe5eddb4f0204027fafaf477b5e2430"
 lock-version = "1.0"
 python-versions = "^3.8"
 
@@ -1675,6 +1683,10 @@ python-versions = "^3.8"
 alabaster = [
     {file = "alabaster-0.7.12-py2.py3-none-any.whl", hash = "sha256:446438bdcca0e05bd45ea2de1668c1d9b032e1a9154c2c259092d77031ddd359"},
     {file = "alabaster-0.7.12.tar.gz", hash = "sha256:a661d72d58e6ea8a57f7a86e37d86716863ee5e92788398526d58b26a4e4dc02"},
+]
+algebraic-data-types = [
+    {file = "algebraic-data-types-0.2.tar.gz", hash = "sha256:a97ea44a36f986311b1c7fba7b2beb129f8119ecfd7527c77e4831a00a85e0ba"},
+    {file = "algebraic_data_types-0.2-py3-none-any.whl", hash = "sha256:451d7e64dc874c4b95b23a06cf0d664c5a5bd7e48d5f1e431705377fe2b7efe5"},
 ]
 appnope = [
     {file = "appnope-0.1.0-py2.py3-none-any.whl", hash = "sha256:5b26757dc6f79a3b7dc9fab95359328d5747fcb2409d331ea66d0272b90ab2a0"},

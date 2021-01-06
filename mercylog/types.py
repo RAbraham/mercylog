@@ -126,7 +126,6 @@ def variables(*names: str) -> Union[Variable, List[Variable]]:
         return [Variable(n) for n in names]
 
 
-
 @dataclass(frozen=True)
 class Relation:
     """
@@ -167,15 +166,22 @@ class Relation:
         pass
 
 @dataclass(frozen=True)
+class RowRelation:
+    terms: Dict[str, Any]
+
+@dataclass(frozen=True)
 class OrRelationGroup:
-    relations: List[Relation]
+    relations: List[Union[Relation, RowRelation]]
     pass
+
 
 def or_(*relations) -> OrRelationGroup:
     return OrRelationGroup(list(relations))
 
+
 def and_(*relations) -> List[Relation]:
     return list(relations)
+
 
 class InvertedRelationInstance(object):
     def __init__(self, relation_instance):
@@ -208,7 +214,15 @@ class RelationCreator:
         _terms = tuple([t for t in terms])
         return Relation(self.name, _terms)
 
-Body = Union[Relation, List[Relation], OrRelationGroup]
+
+
+Body = Union[Relation, RowRelation, List[Union[Relation, RowRelation]], OrRelationGroup  ]
+# from adt import adt, Case
+# @adt
+# class Body:
+# # The issue is that I have to take all my OOP objects like Relation etc. and convert them to simple types with functions
+#     pass
+
 
 @dataclass(frozen=True)
 class Rule:
@@ -300,8 +314,10 @@ class BinaryDisunifier(Relation):
 
 # def run(data_source: DataSource, program: Program, query: Query):
 
+
 class Database:
     pass
+
 
 class DataSource:
     pass
@@ -313,6 +329,7 @@ class Program:
 
 class Query:
     pass
+
 
 
 class KnowledgeBase:

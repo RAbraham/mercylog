@@ -1,10 +1,10 @@
 # from fastcore.dispatch import typedispatch
 # from multimethod import multimethod
-# from toolz.curried import *
+from toolz.curried import *
 from typing import *
 
-from mercylog.types import Database, Relation, MercylogRule, relation, _ as m_
-from mercylog.core import run_df as run_df
+from mercylog.types import Database, Relation, MercylogRule, relation, _ as m_, Body, OrRelationGroup
+from mercylog.core import run_df as run_df, RowRelation
 # from mercylog.core import run_relations, relations_to_df, run_df
 from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import (
     q as do_query,
@@ -40,11 +40,13 @@ class DataFrameDB(Database):
         return self.dataframe
 
     def __call__(self, *args, **kwargs):
-        return self.simple_ds(*args, **kwargs)
+        _convert = convert_row(self.dataframe)
+        clauses = [list(map(_convert, args[0]))]
+        return self.simple_ds(*clauses, **kwargs)
 
-    def row(self, *args, **kwargs):
-        # TODO: Assert kwargs are vars or constants. not relations for e.g.
-        return _row(list(self.dataframe.columns), kwargs)
+    # def row(self, *args, **kwargs):
+    #     # TODO: Assert kwargs are vars or constants. not relations for e.g.
+    #     return _row(list(self.dataframe.columns), kwargs)
 
 
 def _row(columns: List[str], vars_dict: Dict[str, Any]) -> Relation:
@@ -57,6 +59,35 @@ def _row(columns: List[str], vars_dict: Dict[str, Any]) -> Relation:
             r.append(m_)
 
     return prow(*r)
+
+@curry
+def convert_row(df, clause):
+    if isinstance(clause, MercylogRule):
+        body = body_to_relation(df, clause.body)
+        return MercylogRule(clause.head, body)
+    elif isinstance(clause, RowRelation):
+        return row_to_relation(df, clause)
+    else:
+        return clause
+
+
+def row_to_relation(df, clause):
+    return _row(list(df.columns), clause.terms)
+
+@curry
+def body_to_relation(df, body: Body) -> Body:
+    if isinstance(body, Relation):
+        return body
+    elif isinstance(body, RowRelation):
+        return row_to_relation(df, body)
+    elif isinstance(body, list):
+        return [body_to_relation(df, b) for b in body]
+    elif isinstance(body, OrRelationGroup):
+        new_relations = [body_to_relation(df, b) for b in body.relations]
+        return OrRelationGroup(new_relations)
+
+
+    pass
 
 def df_to_relations(a_df: pd.DataFrame) -> List[Relation]:
     c_list = []
@@ -78,7 +109,6 @@ def split_rules_query(args):
     return query, rules
 
 
-
 # @multimethod
 def db(df: DF) -> DataFrameDB:
     return DataFrameDB(df)
@@ -86,7 +116,6 @@ def db(df: DF) -> DataFrameDB:
 # @multimethod
 def facts(relations: List[Relation]) -> Database:
     return SimpleDB(relations)
-
 
 if __name__ == '__main__':
     s = SimpleDB([11, 22])
