@@ -34,7 +34,7 @@ def list_to_dict(a_list, query_vars):
         a_list,
         group_by_position,
         valmap(lambda t: list(pluck(1, t))),  # drop the index from the values
-        keymap(lambda k: query_vars[k]),  # replace the index with vars
+        keymap(lambda k: str(query_vars[k])),  # replace the index with vars
     )
 
 

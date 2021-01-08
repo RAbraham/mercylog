@@ -152,6 +152,9 @@ class Relation:
         head_relation = Relation(self.name, self.terms)
         return MercylogRule(head_relation, body)
 
+    __lshift__ = __le__
+
+
     def __repr__(self):
         term_str = ", ".join([str(t) for t in self.terms])
         return f"{self.name}({term_str})"

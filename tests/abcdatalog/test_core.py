@@ -421,7 +421,7 @@ def test_fact_to_dicts():
     from mercylog.core import facts_to_dict
 
     assert facts_to_dict(facts, query_vars) == {
-        Z: ["a", "d"],
-        Y: ["b", "e"],
-        X: ["c", "d"],
+        'Z': ["a", "d"],
+        'Y': ["b", "e"],
+        'X': ["c", "d"],
     }
