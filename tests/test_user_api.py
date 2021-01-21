@@ -130,6 +130,15 @@ def test_recursion():
         R.ancestor(X, Y) << R.parent(X, Y),
         R.ancestor(X, Z) << and_(R.parent(X, Y), R.ancestor(Y, Z)),
     ]
+    '''
+    or 
+    rules = [
+        R.ancestor(X,Y) << or_(R.parent(X,Y),
+                               and_(R.parent(X, Z),
+                                    R.parent(Z, Y)))
+    ]
+    '''
+
 
     query = R.ancestor(X, Y)
 
@@ -172,6 +181,7 @@ def test_recursion():
     ]
     d5 = d(base + rules + [R.intermediate(Z, "A", "D")])
     assert_df(d5.df(), a_df({"Z": ["B", "C"]}))
+
 
 # When you consider variables
 # def test_variables():

@@ -315,6 +315,12 @@ class BinaryDisunifier(Relation):
         super(BinaryDisunifier, self).__init__("BinaryDisunifier", (x, y))
 
 
+class GreaterThanPredicate(Relation):
+    def __init__(self, x, y):
+        # fc.store_attr()
+        super(GreaterThanPredicate, self).__init__("GreaterThanPredicate", (x, y))
+
+
 # def run(data_source: DataSource, program: Program, query: Query):
 
 
@@ -362,6 +368,8 @@ def eq(x, y) -> BinaryUnifier:
 def not_eq(x, y) -> BinaryDisunifier:
     return BinaryDisunifier(x, y)
 
+def gt(x, y) -> GreaterThanPredicate:
+    return GreaterThanPredicate(x,y)
 
 if __name__ == "__main__":
     b = BinaryUnifier("r", "x")

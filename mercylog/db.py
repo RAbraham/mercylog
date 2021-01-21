@@ -3,8 +3,17 @@
 from toolz.curried import *
 from typing import *
 
-from mercylog.types import Database, Relation, MercylogRule, relation, _ as m_, Body, OrRelationGroup
+from mercylog.types import (
+    Database,
+    Relation,
+    MercylogRule,
+    relation,
+    _ as m_,
+    Body,
+    OrRelationGroup,
+)
 from mercylog.core import run_df as run_df, RowRelation
+
 # from mercylog.core import run_relations, relations_to_df, run_df
 from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import (
     q as do_query,
@@ -13,6 +22,7 @@ from mercylog.abcdatalog.ast.mercylog_to_abcdatalog import (
     seminaive_engine,
 )
 import pandas as pd
+
 DF = pd.DataFrame
 
 rel = relation("_row")
@@ -30,7 +40,6 @@ class SimpleDB(Database):
         return db(rs_df)
 
 
-
 class DataFrameDB(Database):
     def __init__(self, dataframe: DF):
         self.dataframe = dataframe
@@ -44,10 +53,6 @@ class DataFrameDB(Database):
         clauses = [list(map(_convert, args[0]))]
         return self.simple_ds(*clauses, **kwargs)
 
-    # def row(self, *args, **kwargs):
-    #     # TODO: Assert kwargs are vars or constants. not relations for e.g.
-    #     return _row(list(self.dataframe.columns), kwargs)
-
 
 def _row(columns: List[str], vars_dict: Dict[str, Any]) -> Relation:
     vars = vars_dict.keys()
@@ -59,6 +64,7 @@ def _row(columns: List[str], vars_dict: Dict[str, Any]) -> Relation:
             r.append(m_)
 
     return prow(*r)
+
 
 @curry
 def convert_row(df, clause):
@@ -74,6 +80,7 @@ def convert_row(df, clause):
 def row_to_relation(df, clause):
     return _row(list(df.columns), clause.terms)
 
+
 @curry
 def body_to_relation(df, body: Body) -> Body:
     if isinstance(body, Relation):
@@ -86,8 +93,8 @@ def body_to_relation(df, body: Body) -> Body:
         new_relations = [body_to_relation(df, b) for b in body.relations]
         return OrRelationGroup(new_relations)
 
-
     pass
+
 
 def df_to_relations(a_df: pd.DataFrame) -> List[Relation]:
     c_list = []
@@ -100,7 +107,6 @@ def df_to_relations(a_df: pd.DataFrame) -> List[Relation]:
         result.append(rel(*t))
 
     return result
-        
 
 
 def split_rules_query(args):
@@ -113,10 +119,12 @@ def split_rules_query(args):
 def db(df: DF) -> DataFrameDB:
     return DataFrameDB(df)
 
+
 # @multimethod
 def facts(relations: List[Relation]) -> Database:
     return SimpleDB(relations)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     s = SimpleDB([11, 22])
     print(s())

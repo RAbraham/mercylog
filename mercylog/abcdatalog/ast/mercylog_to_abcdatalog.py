@@ -10,6 +10,7 @@ from mercylog.types import (
     Variable,
     BinaryUnifier,
     BinaryDisunifier,
+    GreaterThanPredicate,
     Body,
     OrRelationGroup
 )
@@ -26,6 +27,7 @@ from mercylog.abcdatalog.ast.predicate_sym import (
 from mercylog.abcdatalog.ast.negated_atom import NegatedAtom as ANegatedAtom
 from mercylog.abcdatalog.ast.clause import Clause as AClause
 from mercylog.abcdatalog.ast.binary_unifier import BinaryUnifier as ABinaryUnifier
+from mercylog.abcdatalog.ast.greater_than_predicate import GreaterThanPredicate as AGreaterThanPredicate
 from mercylog.abcdatalog.ast.binary_disunifier import (
     BinaryDisunifier as ABinaryDisunifier,
 )
@@ -111,6 +113,8 @@ def convert_relation(relation: Union[Relation, InvertedRelationInstance]):
         return make_binary_unifier(relation)
     elif isinstance(relation, BinaryDisunifier):
         return make_binary_disunifier(relation)
+    elif isinstance(relation, GreaterThanPredicate):
+        return make_greater_than_predicate(relation)
     elif isinstance(relation, Relation):
         return make_positive_relation(relation)
     elif isinstance(relation, InvertedRelationInstance):
@@ -123,6 +127,13 @@ def convert_relation(relation: Union[Relation, InvertedRelationInstance]):
 def make_binary_disunifier(relation):
     terms = convert_terms(relation)
     return ABinaryDisunifier(terms[0], terms[1])
+
+
+def make_greater_than_predicate(relation):
+    # TODO: Duplicate code
+    terms = convert_terms(relation)
+    return AGreaterThanPredicate(terms[0], terms[1])
+
 
 
 def make_binary_unifier(relation):

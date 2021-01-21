@@ -4,7 +4,7 @@ from mercylog.abcdatalog.ast.validation.datalog_validation_exception import (
 )
 
 
-from mercylog.types import relation, _, eq, not_eq
+from mercylog.types import relation, _, eq, not_eq, gt
 
 from tests.abcdatalog.helper import match_relations, X, Y, Z, p, q, parse, tc, edge, cycle, beginsNotAtC, beginsAtC, noncycle, noC, a, b, c, d, e
 
@@ -131,3 +131,16 @@ def test_testBinaryDisunificationFail2():
     program = [p(X) <= [q(X), not_eq(Y, _)], q(a)]
     with pytest.raises(DatalogValidationException):
         match_relations(program, p(X), [])
+
+# def test_gt():
+#     age = relation("age")
+#     senior = relation("senior")
+#     program = [
+#         age("John", 28),
+#         age("Mary", 40),
+#         age("Dad", 60),
+#         age("Mom", 70),
+#         senior(X, Y) <= [age(X, Y), gt(Y, 59)]
+#     ]
+#     ans = match_relations(program)
+#     assert ans(senior(X, Y), [age("Dad", 60), age("Mom", 70)])
