@@ -100,15 +100,6 @@ class LocalCrashPremiseVisitor(CrashPremiseVisitor):
 
 # PremiseVisitor<Set<Variable>, Void> boundVarUpdater = new DefaultConjunctVisitor<Set<Variable>, Void>() {
 class LocalDefaultConjunctVisitor(DefaultConjunctVisitor):
-#     @Override
-#     public Void visit(AnnotatedAtom atom, Set<Variable> boundVars) {
-#         for (Term t : atom.getArgs()) {
-#             if (t instanceof Variable) {
-#                 boundVars.add((Variable) t);
-#             }
-#         }
-#         return null;
-#     }
 
     def visit_annotated_atom(self, atom: AnnotatedAtom, boundVars: Set[Variable]) -> None:
         t: Term
@@ -196,38 +187,13 @@ class SemiNaiveClauseAnnotator:
 # 	 */
 # 	public Set<SemiNaiveClause> annotate(ValidClause original) {
     def annotate_single(self, original: ValidClause) -> List[SemiNaiveClause]:
-# 		List<Premise> body = original.getBody();
         body: Tuple[Premise] = original.getBody()
 
-
-# 		if (body.isEmpty()) {
-# 			throw new IllegalArgumentException("Cannot annotate a bodiless clause.");
-# 		}
         if not body:
             raise ValueError("Cannot annotate a bodiless clause")
-# 		List<Premise> body2 = new ArrayList<>();
         body2: List[Premise] = []
-# 		List<Integer> idbPositions = new ArrayList<>();
         idbPositions: List[int] = []
-# 		Box<Integer> edbPos = new Box<>();
         edbPos: Box[int] = Box()
-# 		PremiseVisitor<Integer, Void> findIdbs = (new PremiseVisitorBuilder<Integer, Void>())
-# 				.onPositiveAtom((atom, pos) -> {
-# 					if (idbPreds.contains(atom.getPred())) {
-# 						idbPositions.add(pos);
-# 						body2.add(atom);
-# 					} else {
-# 						if (edbPos.value == null) {
-# 							edbPos.value = pos;
-# 						}
-# 						body2.add(new AnnotatedAtom(atom, AnnotatedAtom.Annotation.EDB));
-# 					}
-# 					return null;
-# 				}).or((premise, ignore) -> {
-# 					body2.add(premise);
-# 					return null;
-# 				});
-#
         def add_to_body2(atom, pos):
             if atom.getPred() in self.idbPreds:
                 idbPositions.append(pos)

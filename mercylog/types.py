@@ -354,6 +354,7 @@ class KnowledgeBase:
     pass
 
 
+MercylogInput = Union[MercylogRule, Relation]
 # def require(success: bool, error_message: str) -> Union[bool, str]:
 #     if success:
 #         return error_message

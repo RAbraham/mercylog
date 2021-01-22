@@ -2,6 +2,7 @@ from typing import *
 from toolz.curried import *
 
 from mercylog.types import (
+    MercylogInput,
     MercylogRule,
     Rule,
     Relation,
@@ -46,8 +47,8 @@ def seminaive_engine():
     return BottomUpEngineFrame(SemiNaiveEvalManager())
 
 
-def initEngine_engine(engine: DatalogEngine, program: List[Rule]):
-    converted = convert(list(program))
+def initEngine_engine(engine: DatalogEngine, program: List[MercylogInput]):
+    converted = convert(program)
     engine.init(converted)
     return engine
 
@@ -65,7 +66,7 @@ def run_abcdatalog(database, rules, head):
 #     return pipe(program,
 #                 map(_convert))
 
-def convert(program: List[Union[MercylogRule, Relation]]) -> Set:
+def convert(program: List[MercylogInput]) -> Set:
     return pipe(program,
                 map(flatten),
                 concat,

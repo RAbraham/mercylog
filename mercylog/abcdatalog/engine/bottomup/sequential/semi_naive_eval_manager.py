@@ -1,4 +1,5 @@
 from typing import *
+from pprint import pprint
 from mercylog.abcdatalog.ast.clause import Clause
 from mercylog.abcdatalog.ast.positive_atom import PositiveAtom
 from mercylog.abcdatalog.ast.predicate_sym import PredicateSym
@@ -149,18 +150,23 @@ class SemiNaiveEvalManager(EvalManager):
             .withAtomNegationInRuleBody()
             .validate(program)
         )
-        strat_prog: StratifiedProgram = StratifiedNegationValidator.validate(prog)
+        stratified_program: StratifiedProgram = StratifiedNegationValidator.validate(prog)
 
-        strata: List[Set[PredicateSym]] = strat_prog.getStrata()
-        nstrata = len(strata)
+        # E.g.strata. [{node}, {tc}, {not_tc}]
+        strata: List[Set[PredicateSym]] = stratified_program.getStrata()
+
+        strata_number = len(strata)
         first_round_rules: List[Dict[PredicateSym, Set[SemiNaiveClause]]] = []
         later_round_rules: List[Dict[PredicateSym, Set[SemiNaiveClause]]] = []
         self.initial_idb_facts: List[Set[PositiveAtom]] = []
-        for i in range(nstrata):
+        for i in range(strata_number):
             first_round_rules.append(dict())
             later_round_rules.append(dict())
             self.initial_idb_facts.append(set())
-        pred_to_stratum_map: Dict[PredicateSym, int] = strat_prog.getPredToStratumMap()
+
+        # E.g. for pred_to_stratum_map. {not_tc: 2, node: 1, tc: 0}
+        pred_to_stratum_map: Dict[PredicateSym, int] = stratified_program.getPredToStratumMap()
+
         get_head_pred: HeadVisitor = LocalHeadVisitor()
 
         for clause in prog.getRules():
@@ -200,7 +206,7 @@ class SemiNaiveEvalManager(EvalManager):
             else:
                 self.initial_idb_facts[pred_to_stratum_map.get(fact.getPred())].add(fact)
 
-        for i in range(nstrata):
+        for i in range(strata_number):
             self.stratumEvals.append(
                 StratumEvaluator(
                     first_round_rules[i],

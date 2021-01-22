@@ -65,7 +65,7 @@ def test_TestUnstratifiable2():
         match_relations(program, None, None)
 
 
-def test_TestStratifiable():
+def test_TestStratifiable_1():
     program = [
         edge(a, b),
         edge(b, c),
@@ -78,6 +78,20 @@ def test_TestStratifiable():
     ]
     ans = match_relations(program)
     assert ans(tc(X, Y), [tc(a, b), tc(b, c), tc(a, c)])
+
+
+def test_TestStratifiable_2():
+    program = [
+        edge(a, b),
+        edge(b, c),
+        tc(a, c),
+        tc(X, Y) <= edge(X, Y),
+        tc(X, Y) <= [tc(X, Z), tc(Z, Y)],
+        node(X) <= edge(X, _),
+        node(X) <= edge(_, X),
+        not_tc(X, Y) <= [node(X), node(Y), ~tc(X, Y)],
+    ]
+    ans = match_relations(program)
     assert ans(
         not_tc(X, Y),
         [
@@ -89,7 +103,6 @@ def test_TestStratifiable():
             not_tc(c, b),
         ],
     )
-
 
 def test_testNegatedUnboundVariable1():
     with pytest.raises(DatalogValidationException):
