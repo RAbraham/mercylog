@@ -150,7 +150,9 @@ class SemiNaiveEvalManager(EvalManager):
             .withAtomNegationInRuleBody()
             .validate(program)
         )
-        stratified_program: StratifiedProgram = StratifiedNegationValidator.validate(prog)
+        stratified_program: StratifiedProgram = StratifiedNegationValidator.validate(
+            prog
+        )
 
         # E.g.strata. [{node}, {tc}, {not_tc}]
         strata: List[Set[PredicateSym]] = stratified_program.getStrata()
@@ -165,26 +167,21 @@ class SemiNaiveEvalManager(EvalManager):
             self.initial_idb_facts.append(set())
 
         # E.g. for pred_to_stratum_map. {not_tc: 2, node: 1, tc: 0}
-        pred_to_stratum_map: Dict[PredicateSym, int] = stratified_program.getPredToStratumMap()
-
-        get_head_pred: HeadVisitor = LocalHeadVisitor()
+        pred_to_stratum_map: Dict[
+            PredicateSym, int
+        ] = stratified_program.getPredToStratumMap()
 
         for clause in prog.getRules():
-            pred: PredicateSym = clause.getHead().accept_head_visitor(get_head_pred, None)
+            pred: PredicateSym = get_head_predicate(clause)
             stratum: int = pred_to_stratum_map.get(pred)
-            # 			// Treat IDB predicates from earlier strata as EDB predicates.
+            #  Treat IDB predicates from earlier strata as EDB predicates.
             idbs: Set[PredicateSym] = strata[stratum]
-            patom_func = lambda atom, idb: atom.getPred() in idbs or idb
-            check_for_idb_pred: PremiseVisitor[bool, bool] = (
-                PremiseVisitorBuilder()
-                .onPositiveAtom(patom_func)
-                .or_(lambda premise, idb: idb)
-            )
+
             annotator: SemiNaiveClauseAnnotator = SemiNaiveClauseAnnotator(list(idbs))
             has_idb_pred = False
             c: Premise
             for c in clause.getBody():
-                has_idb_pred = c.accept_premise_visitor(check_for_idb_pred, has_idb_pred)
+                has_idb_pred = clause_has_idb_pred(c, idbs, has_idb_pred)
 
             rule: SemiNaiveClause
             for rule in annotator.annotate_single(clause):
@@ -204,7 +201,9 @@ class SemiNaiveEvalManager(EvalManager):
             if fact.getPred() in edbs:
                 self.allFacts.add(fact)
             else:
-                self.initial_idb_facts[pred_to_stratum_map.get(fact.getPred())].add(fact)
+                self.initial_idb_facts[pred_to_stratum_map.get(fact.getPred())].add(
+                    fact
+                )
 
         for i in range(strata_number):
             self.stratumEvals.append(
@@ -222,3 +221,19 @@ class SemiNaiveEvalManager(EvalManager):
             se.eval()
         return self.allFacts
 
+
+def clause_has_idb_pred(c, idbs, has_idb_pred):
+    # aaa. Simplify this next
+    patom_func = lambda atom, idb: atom.getPred() in idbs or idb
+    check_for_idb_pred: PremiseVisitor[bool, bool] = (
+        PremiseVisitorBuilder().onPositiveAtom(patom_func).or_(lambda premise, idb: idb)
+    )
+    return c.accept_premise_visitor(check_for_idb_pred, has_idb_pred)
+
+
+def get_head_predicate(clause: Clause):
+    # OLD AbcDatalog code: Start
+    # get_head_pred: HeadVisitor = LocalHeadVisitor()
+    # return clause.getHead().accept_head_visitor(get_head_pred, None)
+    # OLD AbcDatalog code: End
+    return clause.getHead().getPred()
