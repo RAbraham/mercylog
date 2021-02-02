@@ -178,21 +178,18 @@ class SemiNaiveEvalManager(EvalManager):
             idbs: Set[PredicateSym] = strata[stratum]
 
             annotator: SemiNaiveClauseAnnotator = SemiNaiveClauseAnnotator(list(idbs))
-            has_idb_pred = False
-            c: Premise
-            for c in clause.getBody():
-                has_idb_pred = clause_has_idb_pred(c, idbs, has_idb_pred)
+            has_idb_pred = has_idb_pred_func(clause, idbs)
 
             rule: SemiNaiveClause
             for rule in annotator.annotate_single(clause):
                 body_pred: PredicateSym = rule.getFirstAtom().getPred()
                 if has_idb_pred:
-                    Utilities.getSetFromMap(later_round_rules[stratum], body_pred).add(
-                        rule
+                    later_round_rules[stratum] = Utilities.upsert_collection_in_map(
+                        later_round_rules[stratum], body_pred, rule
                     )
                 else:
-                    Utilities.getSetFromMap(first_round_rules[stratum], body_pred).add(
-                        rule
+                    first_round_rules[stratum] = Utilities.upsert_collection_in_map(
+                        first_round_rules[stratum], body_pred, rule
                     )
 
         edbs: Set[PredicateSym] = prog.getEdbPredicateSyms()
@@ -222,13 +219,27 @@ class SemiNaiveEvalManager(EvalManager):
         return self.allFacts
 
 
-def clause_has_idb_pred(c, idbs, has_idb_pred):
-    # aaa. Simplify this next
-    patom_func = lambda atom, idb: atom.getPred() in idbs or idb
-    check_for_idb_pred: PremiseVisitor[bool, bool] = (
-        PremiseVisitorBuilder().onPositiveAtom(patom_func).or_(lambda premise, idb: idb)
-    )
-    return c.accept_premise_visitor(check_for_idb_pred, has_idb_pred)
+def has_idb_pred_func(clause, idbs):
+    has_idb_pred = False
+    premise: Premise
+    for premise in clause.getBody():
+        has_idb_pred = premise_has_idb_pred(premise, idbs, has_idb_pred)
+    return has_idb_pred
+
+
+def premise_has_idb_pred(a_premise, idbs, has_idb_pred):
+    # OLD AbcDatalog code: Start
+    # patom_func = lambda atom, idb: atom.getPred() in idbs or idb
+    # check_for_idb_pred: PremiseVisitor[bool, bool] = (
+    #     PremiseVisitorBuilder().onPositiveAtom(patom_func).or_(lambda premise, idb: idb)
+    # )
+    # return a_premise.accept_premise_visitor(check_for_idb_pred, has_idb_pred)
+    # OLD AbcDatalog code: End
+
+    if isinstance(a_premise, PositiveAtom):
+        return True if a_premise.getPred() in idbs else has_idb_pred
+    else:
+        return has_idb_pred
 
 
 def get_head_predicate(clause: Clause):

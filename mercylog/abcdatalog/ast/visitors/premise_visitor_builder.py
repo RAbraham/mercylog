@@ -27,6 +27,7 @@ class Visitor(PremiseVisitor):
         self.onBinaryUnifier = onBinaryUnifier
         self.onBinaryDisunifier = onBinaryDisunifier
         self.onAnnotatedAtom = onAnnotatedAtom
+        super(Visitor, self).__init__()
 
     #
     # 		@Override
@@ -149,7 +150,7 @@ class PremiseVisitorBuilder(Generic[I, O]):
     # 		this.onBinaryDisunifier = onBinaryDisunifier;
     # 		return this;
     # 	}
-    def onBinaryDisnifier(self, onBinaryDisunifier) -> "PremiseVisitorBuilder":
+    def onBinaryDisunifier(self, onBinaryDisunifier) -> "PremiseVisitorBuilder":
         self._onBinaryDisunifier = onBinaryDisunifier
         return self
 
