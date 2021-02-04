@@ -37,7 +37,6 @@ I = TypeVar("I")
 O = TypeVar("O")
 
 
-# 		PremiseVisitor<DatalogValidationException, DatalogValidationException> cv = new CrashPremiseVisitor<DatalogValidationException, DatalogValidationException>() {
 class LocalCrashPremiseVisitor(CrashPremiseVisitor):
     def __init__(
         self,
@@ -280,7 +279,7 @@ class DatalogValidator:
     ) -> UnstratifiedProgram:
         rewritten_clauses: Set[ValidClause] = set()
         for clause in program:
-            rewritten_clauses.add(self.check_rule(clause))
+            rewritten_clauses.add(self.valid_clause(clause))
 
         empty_premise: Tuple[Premise] = tuple()
         rewritten_clauses.add(ValidClause(TrueAtom.getTrueAtom(), empty_premise))
@@ -325,7 +324,7 @@ class DatalogValidator:
                 initialFacts.add(head)
         return Program(rules, initialFacts, edbPredicateSymbols, idbPredicateSymbols)
 
-    def check_rule(self, clause: Clause) -> ValidClause:
+    def valid_clause(self, clause: Clause) -> ValidClause:
         bound_vars: Set[Variable] = set()
         possibly_unbound_vars: Set[Variable] = set()
         subst: TermUnifier = UnionFindBasedUnifier()
@@ -343,13 +342,12 @@ class DatalogValidator:
             possibly_unbound_vars,
         )
 
-
-        has_positive_atom: Box[bool] = Box(False)
+        has_positive_atom_box: Box[bool] = Box(False)
 
         cv: PremiseVisitor = LocalCrashPremiseVisitor(
             tv,
             subst,
-            has_positive_atom,
+            has_positive_atom_box,
             bound_vars,
             possibly_unbound_vars,
             self.allowBinaryUnification,
@@ -357,9 +355,9 @@ class DatalogValidator:
             self.allowNegatedBodyAtom,
         )
 
-        c: Premise
-        for c in clause.getBody():
-            e: DatalogValidationException = c.accept_premise_visitor(cv, None)
+        p: Premise
+        for p in clause.getBody():
+            e: DatalogValidationException = p.accept_premise_visitor(cv, None)
             if e:
                 raise e
 
@@ -375,9 +373,8 @@ class DatalogValidator:
                 )
 
         new_body_list: List[Premise] = list(copy.deepcopy(clause.getBody()))
-        if not has_positive_atom.value and new_body_list:
+        if not has_positive_atom_box.value and new_body_list:
             new_body_list.insert(0, TrueAtom.getTrueAtom())
         new_body = tuple(new_body_list)
         return ValidClause(clause.getHead(), new_body)
 
-    pass
