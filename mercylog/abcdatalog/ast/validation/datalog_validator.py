@@ -60,81 +60,30 @@ class LocalCrashPremiseVisitor(CrashPremiseVisitor):
 
         super(LocalCrashPremiseVisitor, self).__init__()
 
-    #
-    # 			@Override
-    # 			public DatalogValidationException visit(PositiveAtom atom, DatalogValidationException e) {
-    # 				TermHelpers.fold(atom.getArgs(), tv, boundVars);
-    # 				hasPositiveAtom.value = true;
-    # 				return e;
-    # 			}
-
-    def visit_positive_atom(self, atom: PositiveAtom, state: I) -> O:
+    def visit_positive_atom(self, atom: PositiveAtom, e: DatalogValidationException) -> DatalogValidationException:
         TermHelpers.fold(atom.getArgs(), self.tv, self.boundVars)
         self.hasPositiveAtom.value = True
-        return state
+        return e
 
-    # 			@Override
-    # 			public DatalogValidationException visit(BinaryUnifier u, DatalogValidationException e) {
-    # 				if (!allowBinaryUnification) {
-    # 					return new DatalogValidationException("Binary unification is not allowed: ");
-    # 				}
-    # 				TermHelpers.fold(u.getArgsIterable(), tv, possiblyUnboundVars);
-    # 				TermHelpers.unify(u.getLeft(), u.getRight(), subst);
-    # 				return e;
-    # 			}
-    #
-
-    def visit_binary_unifier(self, u: BinaryUnifier, state: I) -> O:
+    def visit_binary_unifier(self, u: BinaryUnifier, e: DatalogValidationException) -> DatalogValidationException:
         if not self.allowBinaryUnification:
             return DatalogValidationException("Binary unification is not allowed")
         TermHelpers.fold(u.getArgsIterable(), self.tv, self.possiblyUnboundVars)
         TermHelpers.unify_term_unifier(u.getLeft(), u.getRight(), self.subst)
-        return state
+        return e
 
-    # 			@Override
-    # 			public DatalogValidationException visit(BinaryDisunifier u, DatalogValidationException e) {
-    # 				if (!allowBinaryDisunification) {
-    # 					return new DatalogValidationException("Binary disunification is not allowed: ");
-    # 				}
-    # 				TermHelpers.fold(u.getArgsIterable(), tv, possiblyUnboundVars);
-    # 				return e;
-    # 			}
-    #
-
-    def visit_binary_disunifier(self, u: BinaryDisunifier, state: I) -> O:
+    def visit_binary_disunifier(self, u: BinaryDisunifier, e: DatalogValidationException) -> DatalogValidationException:
         if not self.allowBinaryDisunification:
             return DatalogValidationException("Binary disunification is not allowed")
         TermHelpers.fold(u.get_args_iterable(), self.tv, self.possiblyUnboundVars)
-        return state
+        return e
 
-    # 			@Override
-    # 			public DatalogValidationException visit(NegatedAtom atom, DatalogValidationException e) {
-    # 				if (!allowNegatedBodyAtom) {
-    # 					return new DatalogValidationException("Negated body atoms are not allowed: ");
-    # 				}
-    # 				TermHelpers.fold(atom.getArgs(), tv, possiblyUnboundVars);
-    # 				return e;
-    # 			}
-    #
-
-    def visit_negated_atom(self, atom: NegatedAtom, state: I) -> O:
+    def visit_negated_atom(self, atom: NegatedAtom, e: DatalogValidationException) -> DatalogValidationException:
         if not self.allowNegatedBodyAtom:
             return DatalogValidationException("Negated body atoms are not allowed:")
         TermHelpers.fold(atom.getArgs(), self.tv, self.possiblyUnboundVars)
-        return state
+        return e
 
-    # 		};
-    #
-    pass
-
-
-# 	public static final class ValidClause extends Clause {
-#
-# 		private ValidClause(Head head, List<Premise> body) {
-# 			super(head, body);
-# 		}
-#
-# 	}
 
 
 class ValidClause(Clause):
@@ -267,13 +216,7 @@ class DatalogValidator:
         self.allowNegatedBodyAtom = True
         return self
 
-    #
-    # 	public UnstratifiedProgram validate(Set<Clause> program) throws DatalogValidationException {
-    # 		return validate(program, false);
-    # 	}
-    #     def validate(self, program: Set[Clause]) -> UnStratifiedProgram:
-    #         return self.validate(program, False)
-    # #
+
     def validate(
         self, program: Set[Clause], treatIdbFactsAsClauses: bool = False
     ) -> UnstratifiedProgram:
