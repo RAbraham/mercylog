@@ -130,15 +130,14 @@ def test_recursion():
         R.ancestor(X, Y) << R.parent(X, Y),
         R.ancestor(X, Z) << and_(R.parent(X, Y), R.ancestor(Y, Z)),
     ]
-    '''
+    """
     or 
     rules = [
         R.ancestor(X,Y) << or_(R.parent(X,Y),
                                and_(R.parent(X, Z),
                                     R.parent(Z, Y)))
     ]
-    '''
-
+    """
 
     query = R.ancestor(X, Y)
 
@@ -181,6 +180,21 @@ def test_recursion():
     ]
     d5 = d(base + rules + [R.intermediate(Z, "A", "D")])
     assert_df(d5.df(), a_df({"Z": ["B", "C"]}))
+
+
+def test_facts_from_rules():
+    # Normally, we pass facts through a dataframe. But sometimes, a fact may just be needed to assert something
+    # about the context/environment. So we pass that in the rules section
+    exp_data = [["adam"]]
+    exp_df = pd.DataFrame(data=exp_data, columns=["X"])
+    rules = [
+        R.father("adam", "kane"),  # This is the global fact or assertion
+        R.parent(V.X, V.Parent) << R.father(V.X, V.Parent),
+        R.parent(V.X, "kane"),
+    ]
+    ds = db()
+    result = ds(rules)
+    assert_df(result.df(), exp_df)
 
 
 # When you consider variables

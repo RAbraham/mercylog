@@ -3,10 +3,12 @@
 from toolz.curried import *
 from typing import *
 
+from mercylog.lib.util import print_stop
 from mercylog.types import (
     Database,
     Relation,
     MercylogRule,
+    Variable,
     relation,
     _ as m_,
     Body,
@@ -110,19 +112,34 @@ def df_to_relations(a_df: pd.DataFrame) -> List[Relation]:
 
 
 def split_rules_query(args):
-    rules = [a for a in args[0] if isinstance(a, MercylogRule)]
-    query = [a for a in args[0] if isinstance(a, Relation)]
+    rules = [a for a in args[0] if is_rule(a) or is_fact(a)]
+    query = [a for a in args[0] if is_query(a)]
     return query, rules
 
 
 # @multimethod
-def db(df: DF) -> DataFrameDB:
+def db(df: Optional[DF] = None) -> DataFrameDB:
+    if df is None:
+        df = pd.DataFrame()
+
     return DataFrameDB(df)
 
 
 # @multimethod
 def facts(relations: List[Relation]) -> Database:
     return SimpleDB(relations)
+
+
+def is_query(a: Relation) -> bool:
+    return isinstance(a, Relation) and not is_rule(a) and not is_fact(a)
+
+
+def is_rule(a: Relation) -> bool:
+    return isinstance(a, MercylogRule)
+
+
+def is_fact(a: Relation) -> bool:
+    return not any(isinstance(t, Variable) for t in a.terms)
 
 
 if __name__ == "__main__":
